@@ -64,6 +64,26 @@ Somnia testnet details:
 | Explorer | `https://somnia-testnet.socialscan.io` |
 | Shannon Explorer | `https://shannon-explorer.somnia.network` |
 
+## Somnia Testnet Deployment
+
+Deployer:
+
+```text
+0xB883e76A4f6841E72cAF1C28ba00f78df974f448
+```
+
+Contracts:
+
+| Contract | Address |
+| --- | --- |
+| `AgentRegistry` | `0x5F5b8109c832BB6609178F0bb2e6A597387dA17E` |
+| `TreasuryPolicy` | `0x3F8bc2b46E7b71632CdADd1f00d4FD6BB11d8283` |
+| `AgentTreasury` | `0xe472A6367ab66C271aa47cA5882E919c0DEA0ff2` |
+| `AgentOrderBook` | `0x3587fd962d40433165d5f2a3dFc60636ebD11e59` |
+ 
+Machine-readable deployment metadata lives in
+`deployments/somnia-testnet.json`.
+
 ## Judge Path
 
 1. Read `docs/somnia-buildathon.md`.
@@ -78,5 +98,6 @@ Initial Somnia scaffold:
 
 - Solidity contracts added
 - deploy script added
+- Somnia testnet deployment completed
 - agent protocol docs added
 - `llms.txt` and `skill.md` added for agent-facing usage

@@ -2,7 +2,7 @@ import "@nomicfoundation/hardhat-toolbox";
 import "dotenv/config";
 import type { HardhatUserConfig } from "hardhat/config";
 
-const privateKey = process.env.PRIVATE_KEY;
+const privateKey = normalizePrivateKey(process.env.PRIVATE_KEY);
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -24,3 +24,11 @@ const config: HardhatUserConfig = {
 };
 
 export default config;
+
+function normalizePrivateKey(value: string | undefined): string | undefined {
+  const key = value?.trim();
+  if (!key || key === "0xYOUR_DEPLOYER_PRIVATE_KEY") {
+    return undefined;
+  }
+  return /^0x[0-9a-fA-F]{64}$/.test(key) ? key : undefined;
+}

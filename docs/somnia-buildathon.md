@@ -42,6 +42,21 @@ Somnia is positioned as an Agentic L1. ArcPay uses that premise directly:
 - `AgentTreasury.sol`: escrow and settlement
 - `AgentOrderBook.sol`: order state machine
 
+## Deployment
+
+Somnia testnet deployment metadata:
+
+```text
+deployments/somnia-testnet.json
+```
+
+| Contract | Address |
+| --- | --- |
+| `AgentRegistry` | `0x5F5b8109c832BB6609178F0bb2e6A597387dA17E` |
+| `TreasuryPolicy` | `0x3F8bc2b46E7b71632CdADd1f00d4FD6BB11d8283` |
+| `AgentTreasury` | `0xe472A6367ab66C271aa47cA5882E919c0DEA0ff2` |
+| `AgentOrderBook` | `0x3587fd962d40433165d5f2a3dFc60636ebD11e59` |
+
 ## Judging Alignment
 
 - Functionality: deployable Solidity contracts and deterministic order lifecycle

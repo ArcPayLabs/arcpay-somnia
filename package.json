@@ -7,6 +7,7 @@
     "build": "hardhat compile",
     "compile": "hardhat compile",
     "test": "hardhat test",
+    "check:deployer": "hardhat run scripts/check-deployer.ts --network somniaTestnet",
     "deploy:somnia": "hardhat run scripts/deploy.ts --network somniaTestnet"
   },
   "devDependencies": {
