@@ -41,8 +41,10 @@ npm run build
 Create `.env` from `.env.example`:
 
 ```bash
-SOMNIA_RPC_URL=https://rpc-testnet.somnia.network
+SOMNIA_RPC_URL=https://dream-rpc.somnia.network
 SOMNIA_CHAIN_ID=50312
+SOMNIA_EXPLORER_URL=https://somnia-testnet.socialscan.io
+SOMNIA_SHANNON_EXPLORER_URL=https://shannon-explorer.somnia.network
 PRIVATE_KEY=0xYOUR_DEPLOYER_PRIVATE_KEY
 ```
 
@@ -51,6 +53,16 @@ Deploy:
 ```bash
 npm run deploy:somnia
 ```
+
+Somnia testnet details:
+
+| Field | Value |
+| --- | --- |
+| Chain ID | `50312` / `0xc488` |
+| Currency | `STT` |
+| RPC | `https://dream-rpc.somnia.network` |
+| Explorer | `https://somnia-testnet.socialscan.io` |
+| Shannon Explorer | `https://shannon-explorer.somnia.network` |
 
 ## Judge Path
 
@@ -68,4 +80,3 @@ Initial Somnia scaffold:
 - deploy script added
 - agent protocol docs added
 - `llms.txt` and `skill.md` added for agent-facing usage
-

@@ -24,6 +24,17 @@ Somnia is positioned as an Agentic L1. ArcPay uses that premise directly:
 5. Requester settles the order, releasing funds through `AgentTreasury`.
 6. Dashboard and proof docs show the order lifecycle and contract events.
 
+## Somnia Testnet
+
+| Field | Value |
+| --- | --- |
+| Chain ID | `50312` / `0xc488` |
+| Currency | `STT` |
+| Block gas limit | `499999998` |
+| RPC | `https://dream-rpc.somnia.network` |
+| Explorer | `https://somnia-testnet.socialscan.io` |
+| Shannon Explorer | `https://shannon-explorer.somnia.network` |
+
 ## Contracts
 
 - `AgentRegistry.sol`: agent identity, endpoint, capabilities, price, active state
@@ -37,4 +48,3 @@ Somnia is positioned as an Agentic L1. ArcPay uses that premise directly:
 - Agent-first design: registry plus autonomous order flow for agent services
 - Innovation: treasury policy controls around agent-to-agent commerce
 - Autonomous performance: order lifecycle can be driven by MCP/agent tools
-

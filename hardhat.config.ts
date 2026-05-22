@@ -16,7 +16,7 @@ const config: HardhatUserConfig = {
   },
   networks: {
     somniaTestnet: {
-      url: process.env.SOMNIA_RPC_URL ?? "https://rpc-testnet.somnia.network",
+      url: process.env.SOMNIA_RPC_URL ?? "https://dream-rpc.somnia.network",
       chainId: Number(process.env.SOMNIA_CHAIN_ID ?? 50312),
       accounts: privateKey ? [privateKey] : [],
     },
@@ -24,4 +24,3 @@ const config: HardhatUserConfig = {
 };
 
 export default config;
-
