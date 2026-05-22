@@ -53,13 +53,13 @@ deployments/somnia-testnet.json
 
 | Contract | Address |
 | --- | --- |
-| `AgentRegistry` | `0xB9B9DAbb10036F83197a3345FF597c3427CA4816` |
-| `TreasuryPolicy` | `0x92Ae2aB255275ed2F1aA52539214A8Fe9968733a` |
-| `AgentTreasury` | `0x85dE6EAd41D1aD3B3cC4Bb282C842EFa9047411a` |
-| `AgentOrderBook` | `0xEE8d2c4848307C194386618A3FE5d8F7c0d975E8` |
-| `OperatorControls` | `0xB55B9CDE3EF6D5F4d09cFE33fe33755282DAa67F` |
-| `SomniaAgentRiskOracle` | `0xeBeB561321Ac832a1bAA758Ca643270Ef09DfFe3` |
-| `AgentSpendCardVault` | `0xfF9125E01949932D697950F768e7eE4bD018682B` |
+| `AgentRegistry` | `0x74d3f2Fe7A36Bd7859EF94477414b70A3B02191C` |
+| `TreasuryPolicy` | `0x257792367b2A5405aFC96242be5e702FdeB7B153` |
+| `AgentTreasury` | `0x929B5B3A831c5188902b0A617d732acC20b9cd87` |
+| `AgentOrderBook` | `0x3738033D7437f72057ee92C8d736C030Fd8Ab55c` |
+| `OperatorControls` | `0x246F3d4540a6edd7f385800764EC08Ffc8a724E7` |
+| `SomniaAgentRiskOracle` | `0xC9e4a3f86FD0771f657eA5dFE01d9E0e726e30D1` |
+| `AgentSpendCardVault` | `0x19Dcb620913a87C2199EcBA53915D861fAe0516e` |
 
 ## Judging Alignment
 

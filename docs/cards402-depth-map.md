@@ -50,3 +50,9 @@ Current deployment uses Somnia's testnet agent requester:
 ```text
 0x037Bb9C718F3f7fe5eCBDB0b600D607b52706776
 ```
+
+Default agent ID:
+
+```text
+13174292974160097713
+```

@@ -36,7 +36,7 @@ async function main() {
     mockPlatformAddress = await mockPlatform.getAddress();
     platformAddress = mockPlatformAddress;
   }
-  const riskAgentId = BigInt(process.env.SOMNIA_RISK_AGENT_ID ?? "0");
+  const riskAgentId = BigInt(process.env.SOMNIA_RISK_AGENT_ID ?? "13174292974160097713");
   const riskOracle = await ethers.deployContract("SomniaAgentRiskOracle", [platformAddress, riskAgentId]);
   await riskOracle.waitForDeployment();
 
