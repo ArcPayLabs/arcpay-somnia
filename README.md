@@ -33,7 +33,16 @@ ArcPay Somnia focuses on:
 
 ```bash
 npm install
+npm run install:frontend
 npm run build
+npm test
+npm run build:frontend
+```
+
+Run the app:
+
+```bash
+npm run dev:frontend
 ```
 
 ## Deploy
@@ -88,9 +97,28 @@ Machine-readable deployment metadata lives in
 
 1. Read `docs/somnia-buildathon.md`.
 2. Read `docs/agent-protocol.md`.
-3. Compile with `npm run build`.
-4. Deploy with `npm run deploy:somnia`.
-5. Register an agent, set a policy, create an order, fulfill it, and settle.
+3. Install with `npm install` and `npm run install:frontend`.
+4. Compile and test with `npm run build`, `npm test`, and `npm run build:frontend`.
+5. Start the UI with `npm run dev:frontend`.
+6. Register an agent, set a policy, allow the agent, create an order, fulfill it, and settle.
+
+## Frontend Routes
+
+The Somnia build keeps the ArcPay treasury OS shape, but it is fixed to Somnia
+Testnet instead of Solana mainnet/devnet switching.
+
+| Route | Purpose |
+| --- | --- |
+| `/dashboard` | Deployment overview, contract links, runtime status, recent records. |
+| `/agents` | Register and load Somnia agent services from `AgentRegistry`. |
+| `/orders` | Create, accept, process, fulfill, settle, or refund escrowed agent orders. |
+| `/policies` | Set hourly/daily limits, approval threshold, emergency pause, and agent allowlist. |
+| `/payments` | Wallet-signed direct STT payments for operator payouts. |
+| `/invoices` | Local invoice workflow for demo receivables. |
+| `/contractors` | Local contractor/agent workforce records. |
+| `/audit` | Local workflow records and transaction hashes. |
+| `/proofs` | Judge-facing deployment proof and local verification commands. |
+| `/settings` | Somnia-only testnet runtime configuration. |
 
 ## Current Status
 
@@ -99,5 +127,6 @@ Initial Somnia scaffold:
 - Solidity contracts added
 - deploy script added
 - Somnia testnet deployment completed
+- ArcPay-style frontend added under `apps/frontend`
 - agent protocol docs added
 - `llms.txt` and `skill.md` added for agent-facing usage

@@ -1,0 +1,25 @@
+{
+  "name": "@arcpay-somnia/frontend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ArcPay Somnia testnet frontend.",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "ethers": "^6.13.5",
+    "lucide-react": "^1.14.0",
+    "next": "16.2.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.8.3"
+  }
+}

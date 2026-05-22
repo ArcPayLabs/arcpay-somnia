@@ -19,10 +19,11 @@ Somnia is positioned as an Agentic L1. ArcPay uses that premise directly:
 
 1. Agent owner registers an agent in `AgentRegistry`.
 2. Operator configures hourly/daily treasury policy in `TreasuryPolicy`.
-3. Requester creates an escrowed order in `AgentOrderBook`.
-4. Provider accepts, processes, and fulfills the order.
-5. Requester settles the order, releasing funds through `AgentTreasury`.
-6. Dashboard and proof docs show the order lifecycle and contract events.
+3. Operator allowlists an agent if allowlist mode is enabled.
+4. Requester creates an escrowed order in `AgentOrderBook`.
+5. Provider accepts, processes, and fulfills the order.
+6. Requester settles the order, releasing funds through `AgentTreasury`.
+7. Dashboard, audit, and proof pages show the order lifecycle and contract events.
 
 ## Somnia Testnet
 
@@ -63,3 +64,15 @@ deployments/somnia-testnet.json
 - Agent-first design: registry plus autonomous order flow for agent services
 - Innovation: treasury policy controls around agent-to-agent commerce
 - Autonomous performance: order lifecycle can be driven by MCP/agent tools
+
+## Product Surface
+
+The UI is not a standalone toy page. It ports the ArcPay treasury operating
+system into a Somnia-only testnet app:
+
+- wallet-first onboarding through EVM wallet switching to chain `50312`
+- agent discovery and service pricing through live Somnia contracts
+- escrowed agent orders with explicit lifecycle actions
+- real policy enforcement before order creation
+- direct STT payouts for operator-controlled payments
+- local invoices, contractors, audit logs, and proof pages for a complete demo

@@ -6,6 +6,9 @@
   "scripts": {
     "build": "hardhat compile",
     "compile": "hardhat compile",
+    "install:frontend": "npm install --prefix apps/frontend",
+    "dev:frontend": "npm run dev --prefix apps/frontend",
+    "build:frontend": "npm run build --prefix apps/frontend",
     "test": "hardhat test",
     "check:deployer": "hardhat run scripts/check-deployer.ts --network somniaTestnet",
     "deploy:somnia": "hardhat run scripts/deploy.ts --network somniaTestnet"
