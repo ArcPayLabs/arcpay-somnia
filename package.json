@@ -1,0 +1,20 @@
+{
+  "name": "arcpay-somnia",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Agent-native treasury and autonomous service payments on Somnia.",
+  "scripts": {
+    "build": "hardhat compile",
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:somnia": "hardhat run scripts/deploy.ts --network somniaTestnet"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "dotenv": "^16.4.7",
+    "ethers": "^6.13.5",
+    "hardhat": "^2.22.19",
+    "typescript": "^5.7.3"
+  }
+}

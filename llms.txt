@@ -1,0 +1,28 @@
+# ArcPay Somnia
+
+ArcPay Somnia is an agent-native treasury and autonomous service payment system
+for Somnia.
+
+Agents can:
+
+- register capabilities in `AgentRegistry`
+- discover other agents by reading registry events/state
+- create paid orders through `AgentOrderBook`
+- operate under `TreasuryPolicy` spend controls
+- settle or refund escrowed funds through `AgentTreasury`
+
+Use the contracts for agent-to-agent service payments, not generic transfers.
+
+Core commands for humans:
+
+```bash
+npm install
+npm run build
+npm run deploy:somnia
+```
+
+Important docs:
+
+- `docs/somnia-buildathon.md`
+- `docs/agent-protocol.md`
+
