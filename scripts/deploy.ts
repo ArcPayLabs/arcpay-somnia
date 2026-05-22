@@ -25,9 +25,12 @@ async function main() {
   const operatorControls = await ethers.deployContract("OperatorControls");
   await operatorControls.waitForDeployment();
 
-  let platformAddress = process.env.SOMNIA_AGENT_PLATFORM;
+  const spendCardVault = await ethers.deployContract("AgentSpendCardVault");
+  await spendCardVault.waitForDeployment();
+
+  let platformAddress = process.env.SOMNIA_AGENT_PLATFORM ?? "0x037Bb9C718F3f7fe5eCBDB0b600D607b52706776";
   let mockPlatformAddress: string | undefined;
-  if (!platformAddress) {
+  if (platformAddress === "mock") {
     const mockPlatform = await ethers.deployContract("MockSomniaAgentPlatform");
     await mockPlatform.waitForDeployment();
     mockPlatformAddress = await mockPlatform.getAddress();
@@ -52,10 +55,12 @@ async function main() {
       AgentOrderBook: await orderBook.getAddress(),
       OperatorControls: await operatorControls.getAddress(),
       SomniaAgentRiskOracle: await riskOracle.getAddress(),
+      AgentSpendCardVault: await spendCardVault.getAddress(),
       ...(mockPlatformAddress ? { MockSomniaAgentPlatform: mockPlatformAddress } : {}),
     },
     somniaAgentPlatform: platformAddress,
     somniaRiskAgentId: riskAgentId.toString(),
+    somUsdToken: process.env.SOMUSD_TOKEN_ADDRESS ?? "0x02b8316775057e2096471473663d51ceafbe3e3b",
   };
 
   fs.mkdirSync("deployments", { recursive: true });

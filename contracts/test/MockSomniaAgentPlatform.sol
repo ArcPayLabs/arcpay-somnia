@@ -6,12 +6,16 @@ contract MockSomniaAgentPlatform {
 
     event MockRequestCreated(uint256 indexed agentId, bytes input, address callback, bytes4 callbackSelector);
 
-    function createRequest(uint256 agentId, bytes calldata input, address callback, bytes4 callbackSelector)
+    function getRequestDeposit() external pure returns (uint256) {
+        return 0.03 ether;
+    }
+
+    function createRequest(uint256 agentId, address callback, bytes4 callbackSelector, bytes calldata input)
         external
         payable
-        returns (bytes32 requestId)
+        returns (uint256 requestId)
     {
-        requestId = keccak256(abi.encode(block.chainid, address(this), msg.sender, nonce++));
+        requestId = ++nonce;
         emit MockRequestCreated(agentId, input, callback, callbackSelector);
     }
 }

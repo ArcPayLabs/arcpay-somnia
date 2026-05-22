@@ -13,6 +13,7 @@ Stellar/card-specific implementation.
 | Circuit-breaker webhooks | `OperatorControls` tracks per-origin webhook failures and opens a breaker after repeated failures. |
 | Agent claim code onboarding | `OperatorControls` creates and redeems expiring claim codes by hash. |
 | CLI tool | `bin/arcpay-somnia.mjs` supports contracts, wallet, agent ID, claim hash, demo path, and MCP config commands. |
+| Card-like spend product | `AgentSpendCardVault` creates SOMUSD-backed virtual cards for agent budgets. |
 
 ## Somnia-Native Layer
 
@@ -43,3 +44,9 @@ npm run deploy:somnia
 
 If those envs are absent, the deploy script uses a mock platform so judges can
 still run the same request/callback lifecycle locally or on testnet.
+
+Current deployment uses Somnia's testnet agent requester:
+
+```text
+0x037Bb9C718F3f7fe5eCBDB0b600D607b52706776
+```

@@ -97,38 +97,39 @@ Contracts:
 
 | Contract | Address |
 | --- | --- |
-| `AgentRegistry` | `0x5F5b8109c832BB6609178F0bb2e6A597387dA17E` |
-| `TreasuryPolicy` | `0x3F8bc2b46E7b71632CdADd1f00d4FD6BB11d8283` |
-| `AgentTreasury` | `0xe472A6367ab66C271aa47cA5882E919c0DEA0ff2` |
-| `AgentOrderBook` | `0x3587fd962d40433165d5f2a3dFc60636ebD11e59` |
+| `AgentRegistry` | `0xB9B9DAbb10036F83197a3345FF597c3427CA4816` |
+| `TreasuryPolicy` | `0x92Ae2aB255275ed2F1aA52539214A8Fe9968733a` |
+| `AgentTreasury` | `0x85dE6EAd41D1aD3B3cC4Bb282C842EFa9047411a` |
+| `AgentOrderBook` | `0xEE8d2c4848307C194386618A3FE5d8F7c0d975E8` |
+| `OperatorControls` | `0xB55B9CDE3EF6D5F4d09cFE33fe33755282DAa67F` |
+| `SomniaAgentRiskOracle` | `0xeBeB561321Ac832a1bAA758Ca643270Ef09DfFe3` |
+| `AgentSpendCardVault` | `0xfF9125E01949932D697950F768e7eE4bD018682B` |
  
 Machine-readable deployment metadata lives in
 `deployments/somnia-testnet.json`.
 
 ## Depth Contract Redeploy
 
-The repo now includes the Cards402-depth layer:
+The repo now includes and deploys the Cards402-depth layer:
 
 - `OperatorControls`
 - `SomniaAgentRiskOracle`
+- `AgentSpendCardVault`
 - upgraded `TreasuryPolicy`
 - upgraded `AgentOrderBook`
 
-The deployer currently needs enough Somnia testnet STT before this upgraded
-stack can replace the address file. Top up:
-
-```text
-0xB883e76A4f6841E72cAF1C28ba00f78df974f448
-```
-
-Then run:
+To redeploy after future changes:
 
 ```bash
 npm run deploy:somnia
 ```
 
-That command rewrites `deployments/somnia-testnet.json`; the frontend imports
-that file automatically.
+The command rewrites `deployments/somnia-testnet.json`; the frontend imports
+that file automatically. Current Somnia agent platform:
+`0x037Bb9C718F3f7fe5eCBDB0b600D607b52706776`.
+
+Current SOMUSD testnet token:
+`0x02b8316775057e2096471473663d51ceafbe3e3b`.
 
 ## Judge Path
 
@@ -149,6 +150,7 @@ Testnet instead of Solana mainnet/devnet switching.
 | `/dashboard` | Deployment overview, contract links, runtime status, recent records. |
 | `/agents` | Register and load Somnia agent services from `AgentRegistry`. |
 | `/orders` | Create, accept, process, fulfill, settle, or refund escrowed agent orders. |
+| `/cards` | Create SOMUSD-backed agent spend cards with limits and freeze controls. |
 | `/policies` | Set hourly/daily/weekly limits, approval threshold, UTC-hour windows, emergency pause, and agent allowlist. |
 | `/operator` | Claim-code onboarding and webhook circuit-breaker controls. |
 | `/oracle` | Somnia agent risk request/callback flow. |

@@ -3,7 +3,7 @@
 import { Interface, type LogDescription } from "ethers";
 import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { DEPTH_CONTRACTS_READY, RISK_ORACLE_ABI, hashText, riskOracleContract, writeRecord } from "@/lib/somnia";
+import { DEPTH_CONTRACTS_READY, RISK_ORACLE_ABI, hashText, riskOracleContract, toWei, writeRecord } from "@/lib/somnia";
 
 const oracleInterface = new Interface(RISK_ORACLE_ABI);
 
@@ -12,6 +12,7 @@ export default function OraclePage() {
     orderId: hashText("demo-order"),
     prompt: "Score this autonomous treasury order for fraud, webhook risk, and policy anomalies.",
     requestId: "",
+    deposit: "0.24",
     score: "84",
     verdict: "APPROVE",
     evidenceUri: "ipfs://risk-evidence-demo",
@@ -25,7 +26,7 @@ export default function OraclePage() {
       return;
     }
     const contract = await riskOracleContract();
-    const tx = await contract.requestRisk(form.orderId, form.prompt);
+    const tx = await contract.requestRisk(form.orderId, form.prompt, { value: toWei(form.deposit) });
     const receipt = await tx.wait();
     const event = receipt?.logs
       .map((log: { topics: string[]; data: string }) => {
@@ -36,7 +37,7 @@ export default function OraclePage() {
         }
       })
       .find((parsed: LogDescription | null) => parsed?.name === "RiskRequested");
-    const requestId = event?.args?.requestId as string | undefined;
+    const requestId = event?.args?.requestId?.toString() as string | undefined;
     if (requestId) setForm((next) => ({ ...next, requestId }));
     writeRecord({ id: crypto.randomUUID(), type: "audit", title: "Somnia agent risk request", status: "requested", txHash: tx.hash });
     setStatus(`Risk requested${requestId ? `: ${requestId}` : ""}`);
@@ -48,7 +49,7 @@ export default function OraclePage() {
       return;
     }
     const contract = await riskOracleContract();
-    const tx = await contract.ownerFulfillForDemo(form.requestId, BigInt(form.score), form.verdict, form.evidenceUri);
+    const tx = await contract.ownerFulfillForDemo(BigInt(form.requestId), BigInt(form.score), form.verdict, form.evidenceUri);
     await tx.wait();
     writeRecord({ id: crypto.randomUUID(), type: "audit", title: `Risk oracle ${form.verdict}`, status: "fulfilled", txHash: tx.hash });
     setStatus(`Risk fulfilled: ${tx.hash}`);
@@ -61,8 +62,8 @@ export default function OraclePage() {
       return;
     }
     const contract = await riskOracleContract();
-    const next = await contract.results(form.requestId);
-    setResult(`Order ${next[0]} | requester ${next[1]} | score ${next[2]} | verdict ${next[3]} | evidence ${next[4]} | fulfilled ${next[5]}`);
+    const next = await contract.results(BigInt(form.requestId));
+    setResult(`Request ${next[0]} | Order ${next[1]} | requester ${next[2]} | score ${next[3]} | verdict ${next[4]} | evidence ${next[5]} | fulfilled ${next[6]}`);
   }
 
   return (
@@ -81,6 +82,7 @@ export default function OraclePage() {
           <h2>Request agent scoring</h2>
           <label className="field"><span>Order ID</span><input value={form.orderId} onChange={(event) => setForm({ ...form, orderId: event.target.value })} /></label>
           <label className="field"><span>Prompt</span><textarea value={form.prompt} onChange={(event) => setForm({ ...form, prompt: event.target.value })} /></label>
+          <label className="field"><span>Somnia agent deposit STT</span><input value={form.deposit} onChange={(event) => setForm({ ...form, deposit: event.target.value })} /></label>
           <button onClick={requestRisk}>Request risk score</button>
         </div>
         <div className="panel">

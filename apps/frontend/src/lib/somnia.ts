@@ -15,10 +15,12 @@ export const CONTRACTS = {
   AgentOrderBook: deployedContracts.AgentOrderBook,
   OperatorControls: deployedContracts.OperatorControls ?? ZERO_ADDRESS,
   SomniaAgentRiskOracle: deployedContracts.SomniaAgentRiskOracle ?? ZERO_ADDRESS,
+  AgentSpendCardVault: deployedContracts.AgentSpendCardVault ?? ZERO_ADDRESS,
 } as const;
 
 export const DEPTH_CONTRACTS_READY =
   CONTRACTS.OperatorControls !== ZERO_ADDRESS && CONTRACTS.SomniaAgentRiskOracle !== ZERO_ADDRESS;
+export const SOMUSD_TOKEN_ADDRESS = (deployment as { somUsdToken?: string }).somUsdToken ?? "0x02b8316775057e2096471473663d51ceafbe3e3b";
 
 export const AGENT_REGISTRY_ABI = [
   "function registerAgent(bytes32 agentId,string name,string endpoint,string capabilities,uint256 priceWei)",
@@ -65,10 +67,26 @@ export const OPERATOR_CONTROLS_ABI = [
 ] as const;
 
 export const RISK_ORACLE_ABI = [
-  "function requestRisk(bytes32 orderId,string prompt) payable returns (bytes32 requestId)",
-  "function ownerFulfillForDemo(bytes32 requestId,uint256 score,string verdict,string evidenceUri)",
-  "function results(bytes32 requestId) view returns (bytes32 orderId,address requester,uint256 score,string verdict,string evidenceUri,bool fulfilled,uint256 requestedAt,uint256 fulfilledAt)",
-  "event RiskRequested(bytes32 indexed requestId,bytes32 indexed orderId,address indexed requester,string prompt)",
+  "function requestRisk(bytes32 orderId,string prompt) payable returns (uint256 requestId)",
+  "function ownerFulfillForDemo(uint256 requestId,uint256 score,string verdict,string evidenceUri)",
+  "function results(uint256 requestId) view returns (uint256 requestId,bytes32 orderId,address requester,uint256 score,string verdict,string evidenceUri,bool fulfilled,uint8 responseStatus,uint256 requestedAt,uint256 fulfilledAt)",
+  "event RiskRequested(uint256 indexed requestId,bytes32 indexed orderId,address indexed requester,string prompt)",
+] as const;
+
+export const SPEND_CARD_VAULT_ABI = [
+  "function createCard(bytes32 cardId,address agent,address token,uint256 limit,string label)",
+  "function topUpCard(bytes32 cardId,uint256 amount)",
+  "function setCardStatus(bytes32 cardId,bool active)",
+  "function setCardLimit(bytes32 cardId,uint256 limit)",
+  "function spendCard(bytes32 cardId,address recipient,uint256 amount,string memo)",
+  "function cards(bytes32 cardId) view returns (address operator,address agent,address token,uint256 limit,uint256 balance,uint256 spent,bool active,string label,uint256 createdAt)",
+] as const;
+
+export const ERC20_ABI = [
+  "function approve(address spender,uint256 amount) returns (bool)",
+  "function balanceOf(address owner) view returns (uint256)",
+  "function decimals() view returns (uint8)",
+  "function symbol() view returns (string)",
 ] as const;
 
 export const ORDER_STATUS = ["Pending", "Accepted", "Processing", "Fulfilled", "Settled", "Refunded", "Failed"] as const;
@@ -89,6 +107,18 @@ export function hashText(value: string) {
 
 export function toWei(value: string) {
   return parseEther(value || "0");
+}
+
+export function toUnits(value: string, decimals = 6) {
+  const [whole, fraction = ""] = (value || "0").split(".");
+  return BigInt(whole || "0") * (10n ** BigInt(decimals)) + BigInt((fraction.padEnd(decimals, "0").slice(0, decimals)) || "0");
+}
+
+export function fromUnits(value: bigint, decimals = 6) {
+  const base = 10n ** BigInt(decimals);
+  const whole = value / base;
+  const fraction = (value % base).toString().padStart(decimals, "0").replace(/0+$/, "");
+  return fraction ? `${whole}.${fraction}` : whole.toString();
 }
 
 export function fromWei(value: bigint) {
@@ -173,6 +203,16 @@ export async function operatorControlsContract() {
 export async function riskOracleContract() {
   const signer = await signerProvider();
   return new Contract(CONTRACTS.SomniaAgentRiskOracle, RISK_ORACLE_ABI, signer);
+}
+
+export async function spendCardVaultContract() {
+  const signer = await signerProvider();
+  return new Contract(CONTRACTS.AgentSpendCardVault, SPEND_CARD_VAULT_ABI, signer);
+}
+
+export async function erc20Contract(address = SOMUSD_TOKEN_ADDRESS) {
+  const signer = await signerProvider();
+  return new Contract(address, ERC20_ABI, signer);
 }
 
 export type LocalRecord = {

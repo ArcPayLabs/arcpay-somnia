@@ -6,13 +6,12 @@ describe("SomniaAgentRiskOracle", () => {
     const [owner, requester] = await ethers.getSigners();
     const platform = await ethers.deployContract("MockSomniaAgentPlatform");
     const oracle = await ethers.deployContract("SomniaAgentRiskOracle", [await platform.getAddress(), 7]);
-    const requestId = ethers.id("risk-request-1");
     const orderId = ethers.id("order-1");
 
-    await expect(oracle.ownerFulfillForDemo(requestId, 82, "APPROVE", "ipfs://risk-evidence"))
+    await expect(oracle.ownerFulfillForDemo(999, 82, "APPROVE", "ipfs://risk-evidence"))
       .to.be.revertedWith("request missing");
 
-    await oracle.connect(requester).requestRisk(orderId, "Score this order");
+    await oracle.connect(requester).requestRisk(orderId, "Score this order", { value: ethers.parseEther("0.24") });
     const resultRequestId = await oracle.queryFilter(oracle.filters.RiskRequested()).then((events) => events[0].args.requestId);
 
     await expect(oracle.ownerFulfillForDemo(resultRequestId, 82, "APPROVE", "ipfs://risk-evidence"))

@@ -53,10 +53,13 @@ deployments/somnia-testnet.json
 
 | Contract | Address |
 | --- | --- |
-| `AgentRegistry` | `0x5F5b8109c832BB6609178F0bb2e6A597387dA17E` |
-| `TreasuryPolicy` | `0x3F8bc2b46E7b71632CdADd1f00d4FD6BB11d8283` |
-| `AgentTreasury` | `0xe472A6367ab66C271aa47cA5882E919c0DEA0ff2` |
-| `AgentOrderBook` | `0x3587fd962d40433165d5f2a3dFc60636ebD11e59` |
+| `AgentRegistry` | `0xB9B9DAbb10036F83197a3345FF597c3427CA4816` |
+| `TreasuryPolicy` | `0x92Ae2aB255275ed2F1aA52539214A8Fe9968733a` |
+| `AgentTreasury` | `0x85dE6EAd41D1aD3B3cC4Bb282C842EFa9047411a` |
+| `AgentOrderBook` | `0xEE8d2c4848307C194386618A3FE5d8F7c0d975E8` |
+| `OperatorControls` | `0xB55B9CDE3EF6D5F4d09cFE33fe33755282DAa67F` |
+| `SomniaAgentRiskOracle` | `0xeBeB561321Ac832a1bAA758Ca643270Ef09DfFe3` |
+| `AgentSpendCardVault` | `0xfF9125E01949932D697950F768e7eE4bD018682B` |
 
 ## Judging Alignment
 
@@ -78,3 +81,4 @@ system into a Somnia-only testnet app:
 - local invoices, contractors, audit logs, and proof pages for a complete demo
 - claim-code onboarding and webhook circuit-breaker controls
 - Somnia `createRequest`-compatible risk oracle for agentic policy decisions
+- SOMUSD-backed agent spend cards with limits, balances, spend events, and freeze controls
