@@ -6,7 +6,7 @@ interface IAgentRegistry {
 }
 
 interface ITreasuryPolicy {
-    function validateAndRecord(address operator, bytes32 agentId, uint256 amountWei) external;
+    function validateAndRecord(address operator, bytes32 agentId, bytes32 orderId, uint256 amountWei) external;
 }
 
 interface IAgentTreasury {
@@ -49,6 +49,7 @@ contract AgentOrderBook {
     event OrderCreated(bytes32 indexed orderId, bytes32 indexed agentId, address indexed requester, address provider, uint256 amountWei, string requestUri);
     event OrderStatusChanged(bytes32 indexed orderId, OrderStatus status);
     event OrderFulfilled(bytes32 indexed orderId, string resultUri);
+    event OrderFailed(bytes32 indexed orderId, string reason);
 
     constructor(address registry_, address policy_, address treasury_) {
         require(registry_ != address(0), "registry required");
@@ -65,9 +66,9 @@ contract AgentOrderBook {
         require(msg.value >= priceWei, "insufficient payment");
         require(bytes(requestUri).length > 0, "request uri required");
 
-        policy.validateAndRecord(msg.sender, agentId, msg.value);
-
         orderId = keccak256(abi.encodePacked(block.chainid, address(this), msg.sender, agentId, orderNonce++));
+        policy.validateAndRecord(msg.sender, agentId, orderId, msg.value);
+
         orders[orderId] = Order({
             orderId: orderId,
             agentId: agentId,
@@ -125,10 +126,24 @@ contract AgentOrderBook {
         treasury.refund(orderId, payable(order.requester));
     }
 
+    function failOrder(bytes32 orderId, string calldata reason) external {
+        Order storage order = orders[orderId];
+        require(order.requester == msg.sender || order.provider == msg.sender, "not participant");
+        require(
+            order.status == OrderStatus.Pending ||
+                order.status == OrderStatus.Accepted ||
+                order.status == OrderStatus.Processing ||
+                order.status == OrderStatus.Fulfilled,
+            "bad status"
+        );
+        _setStatus(order, OrderStatus.Failed);
+        treasury.refund(orderId, payable(order.requester));
+        emit OrderFailed(orderId, reason);
+    }
+
     function _setStatus(Order storage order, OrderStatus status) internal {
         order.status = status;
         order.updatedAt = block.timestamp;
         emit OrderStatusChanged(order.orderId, status);
     }
 }
-

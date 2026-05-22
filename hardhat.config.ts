@@ -19,6 +19,7 @@ const config: HardhatUserConfig = {
       url: process.env.SOMNIA_RPC_URL ?? "https://dream-rpc.somnia.network",
       chainId: Number(process.env.SOMNIA_CHAIN_ID ?? 50312),
       accounts: privateKey ? [privateKey] : [],
+      timeout: 120000,
     },
   },
 };

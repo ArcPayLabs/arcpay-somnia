@@ -3,12 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "description": "Agent-native treasury and autonomous service payments on Somnia.",
+  "bin": {
+    "arcpay-somnia": "bin/arcpay-somnia.mjs"
+  },
   "scripts": {
     "build": "hardhat compile",
     "compile": "hardhat compile",
     "install:frontend": "npm install --prefix apps/frontend",
+    "install:mcp": "npm install --prefix apps/mcp",
     "dev:frontend": "npm run dev --prefix apps/frontend",
     "build:frontend": "npm run build --prefix apps/frontend",
+    "mcp": "npm run start --prefix apps/mcp",
+    "arcpay": "node bin/arcpay-somnia.mjs",
     "test": "hardhat test",
     "check:deployer": "hardhat run scripts/check-deployer.ts --network somniaTestnet",
     "deploy:somnia": "hardhat run scripts/deploy.ts --network somniaTestnet"

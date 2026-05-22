@@ -3,7 +3,7 @@
 import { Interface, type LogDescription } from "ethers";
 import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { AGENT_ORDER_BOOK_ABI, ORDER_STATUS, agentIdFromSlug, fromWei, orderBookContract, toWei, writeRecord } from "@/lib/somnia";
+import { AGENT_ORDER_BOOK_ABI, DEPTH_CONTRACTS_READY, ORDER_STATUS, agentIdFromSlug, fromWei, orderBookContract, toWei, writeRecord } from "@/lib/somnia";
 
 type OrderView = {
   orderId: string;
@@ -22,6 +22,7 @@ export default function OrdersPage() {
   const [form, setForm] = useState({ agentSlug: "research-agent", requestUri: "ipfs://request-demo", amount: "0.01" });
   const [orderId, setOrderId] = useState("");
   const [resultUri, setResultUri] = useState("ipfs://result-demo");
+  const [failReason, setFailReason] = useState("provider unavailable");
   const [order, setOrder] = useState<OrderView | null>(null);
   const [status, setStatus] = useState("");
 
@@ -71,6 +72,20 @@ export default function OrdersPage() {
     await loadOrder();
   }
 
+  async function failOrder() {
+    if (!DEPTH_CONTRACTS_READY) {
+      setStatus("Fail + refund requires the depth contract redeploy.");
+      return;
+    }
+    setStatus("Failing order and refunding escrow...");
+    const contract = await orderBookContract();
+    const tx = await contract.failOrder(orderId, failReason);
+    await tx.wait();
+    writeRecord({ id: crypto.randomUUID(), type: "audit", title: "Order failed and refunded", status: "confirmed", txHash: tx.hash });
+    setStatus(`failOrder confirmed: ${tx.hash}`);
+    await loadOrder();
+  }
+
   return (
     <>
       <PageHeader
@@ -108,6 +123,10 @@ export default function OrdersPage() {
             <span>Result URI</span>
             <input value={resultUri} onChange={(event) => setResultUri(event.target.value)} />
           </label>
+          <label className="field">
+            <span>Failure reason</span>
+            <input value={failReason} onChange={(event) => setFailReason(event.target.value)} />
+          </label>
           <div className="actions">
             <button className="secondary" onClick={loadOrder}>Load</button>
             <button onClick={() => mutate("acceptOrder")}>Accept</button>
@@ -115,6 +134,7 @@ export default function OrdersPage() {
             <button onClick={() => mutate("fulfillOrder")}>Fulfill</button>
             <button onClick={() => mutate("settleOrder")}>Settle</button>
             <button className="secondary" onClick={() => mutate("refundOrder")}>Refund</button>
+            <button disabled={!DEPTH_CONTRACTS_READY} className="secondary" onClick={failOrder}>Fail + refund</button>
           </div>
           {status ? <div className="notice">{status}</div> : null}
         </div>

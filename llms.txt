@@ -25,4 +25,12 @@ Important docs:
 
 - `docs/somnia-buildathon.md`
 - `docs/agent-protocol.md`
+- `docs/cards402-depth-map.md`
 
+Agent tooling:
+
+- `npm run arcpay -- mcp-config`
+- `npm run mcp`
+- `npm run arcpay -- demo-path`
+- `/operator` for claim-code onboarding and webhook circuit breakers
+- `/oracle` for Somnia agent risk request/callback proof

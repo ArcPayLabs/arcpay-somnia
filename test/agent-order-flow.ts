@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
+import { time } from "@nomicfoundation/hardhat-network-helpers";
 
 describe("ArcPay Somnia agent order flow", () => {
   async function deployFixture() {
@@ -36,7 +37,10 @@ describe("ArcPay Somnia agent order flow", () => {
     await policy.connect(requester).setPolicy(
       ethers.parseEther("0.05"),
       ethers.parseEther("0.10"),
+      ethers.parseEther("0.50"),
       ethers.parseEther("0.02"),
+      0,
+      0,
       false,
       true,
     );
@@ -68,6 +72,52 @@ describe("ArcPay Somnia agent order flow", () => {
     expect(await treasury.escrowedWei(orderId)).to.equal(0);
   });
 
+  it("requires explicit approval above threshold and can fail/refund orders", async () => {
+    const { requester, provider, registry, policy, treasury, orderBook } = await deployFixture();
+    const agentId = ethers.id("approval-agent");
+    const price = ethers.parseEther("0.03");
+
+    await registry.connect(provider).registerAgent(
+      agentId,
+      "Approval Agent",
+      "https://agent.example/approval",
+      "approval-required",
+      price,
+    );
+
+    await policy.connect(requester).setPolicy(
+      ethers.parseEther("0.10"),
+      ethers.parseEther("0.20"),
+      ethers.parseEther("1"),
+      ethers.parseEther("0.02"),
+      0,
+      0,
+      false,
+      true,
+    );
+    await policy.connect(requester).setAgentAllowed(agentId, true);
+
+    const predictedOrderId = ethers.keccak256(
+      ethers.solidityPacked(
+        ["uint256", "address", "address", "bytes32", "uint256"],
+        [(await ethers.provider.getNetwork()).chainId, await orderBook.getAddress(), requester.address, agentId, 0],
+      ),
+    );
+
+    await expect(
+      orderBook.connect(requester).createOrder(agentId, "ipfs://request-approval", { value: price }),
+    ).to.be.revertedWith("approval required");
+
+    await policy.connect(requester).approveSpend(predictedOrderId, true);
+    await orderBook.connect(requester).createOrder(agentId, "ipfs://request-approval", { value: price });
+    expect(await treasury.escrowedWei(predictedOrderId)).to.equal(price);
+
+    await expect(orderBook.connect(provider).failOrder(predictedOrderId, "agent unavailable"))
+      .to.emit(orderBook, "OrderFailed")
+      .withArgs(predictedOrderId, "agent unavailable");
+    expect(await treasury.escrowedWei(predictedOrderId)).to.equal(0);
+  });
+
   it("blocks orders when emergency pause is enabled", async () => {
     const { requester, provider, registry, policy, orderBook } = await deployFixture();
     const agentId = ethers.id("blocked-agent");
@@ -81,11 +131,41 @@ describe("ArcPay Somnia agent order flow", () => {
       price,
     );
 
-    await policy.connect(requester).setPolicy(0, 0, 0, true, false);
+    await policy.connect(requester).setPolicy(0, 0, 0, 0, 0, 0, true, false);
 
     await expect(
       orderBook.connect(requester).createOrder(agentId, "ipfs://request-2", { value: price }),
     ).to.be.revertedWith("emergency paused");
   });
-});
 
+  it("blocks weekly limit overflow", async () => {
+    const { requester, provider, registry, policy, orderBook } = await deployFixture();
+    const agentId = ethers.id("weekly-agent");
+    const price = ethers.parseEther("0.02");
+
+    await registry.connect(provider).registerAgent(
+      agentId,
+      "Weekly Agent",
+      "https://agent.example/weekly",
+      "weekly-limit",
+      price,
+    );
+
+    await policy.connect(requester).setPolicy(
+      ethers.parseEther("0.02"),
+      ethers.parseEther("0.02"),
+      ethers.parseEther("0.03"),
+      0,
+      0,
+      0,
+      false,
+      true,
+    );
+    await policy.connect(requester).setAgentAllowed(agentId, true);
+
+    await orderBook.connect(requester).createOrder(agentId, "ipfs://weekly-1", { value: price });
+    await time.increase(1 * 24 * 60 * 60);
+    await expect(orderBook.connect(requester).createOrder(agentId, "ipfs://weekly-2", { value: price }))
+      .to.be.revertedWith("weekly limit");
+  });
+});

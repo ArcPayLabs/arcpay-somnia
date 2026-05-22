@@ -76,3 +76,5 @@ system into a Somnia-only testnet app:
 - real policy enforcement before order creation
 - direct STT payouts for operator-controlled payments
 - local invoices, contractors, audit logs, and proof pages for a complete demo
+- claim-code onboarding and webhook circuit-breaker controls
+- Somnia `createRequest`-compatible risk oracle for agentic policy decisions

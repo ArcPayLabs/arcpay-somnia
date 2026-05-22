@@ -34,6 +34,7 @@ ArcPay Somnia focuses on:
 ```bash
 npm install
 npm run install:frontend
+npm run install:mcp
 npm run build
 npm test
 npm run build:frontend
@@ -43,6 +44,17 @@ Run the app:
 
 ```bash
 npm run dev:frontend
+```
+
+Agent and operator tooling:
+
+```bash
+npm run arcpay -- contracts
+npm run arcpay -- wallet
+npm run arcpay -- agent-id research-agent
+npm run arcpay -- claim-hash claim-research-agent-001
+npm run arcpay -- mcp-config
+npm run mcp
 ```
 
 ## Deploy
@@ -93,6 +105,31 @@ Contracts:
 Machine-readable deployment metadata lives in
 `deployments/somnia-testnet.json`.
 
+## Depth Contract Redeploy
+
+The repo now includes the Cards402-depth layer:
+
+- `OperatorControls`
+- `SomniaAgentRiskOracle`
+- upgraded `TreasuryPolicy`
+- upgraded `AgentOrderBook`
+
+The deployer currently needs enough Somnia testnet STT before this upgraded
+stack can replace the address file. Top up:
+
+```text
+0xB883e76A4f6841E72cAF1C28ba00f78df974f448
+```
+
+Then run:
+
+```bash
+npm run deploy:somnia
+```
+
+That command rewrites `deployments/somnia-testnet.json`; the frontend imports
+that file automatically.
+
 ## Judge Path
 
 1. Read `docs/somnia-buildathon.md`.
@@ -112,7 +149,9 @@ Testnet instead of Solana mainnet/devnet switching.
 | `/dashboard` | Deployment overview, contract links, runtime status, recent records. |
 | `/agents` | Register and load Somnia agent services from `AgentRegistry`. |
 | `/orders` | Create, accept, process, fulfill, settle, or refund escrowed agent orders. |
-| `/policies` | Set hourly/daily limits, approval threshold, emergency pause, and agent allowlist. |
+| `/policies` | Set hourly/daily/weekly limits, approval threshold, UTC-hour windows, emergency pause, and agent allowlist. |
+| `/operator` | Claim-code onboarding and webhook circuit-breaker controls. |
+| `/oracle` | Somnia agent risk request/callback flow. |
 | `/payments` | Wallet-signed direct STT payments for operator payouts. |
 | `/invoices` | Local invoice workflow for demo receivables. |
 | `/contractors` | Local contractor/agent workforce records. |
@@ -128,5 +167,8 @@ Initial Somnia scaffold:
 - deploy script added
 - Somnia testnet deployment completed
 - ArcPay-style frontend added under `apps/frontend`
+- MCP server added under `apps/mcp`
+- CLI added under `bin/arcpay-somnia.mjs`
+- Cards402-depth operator controls added
 - agent protocol docs added
 - `llms.txt` and `skill.md` added for agent-facing usage
