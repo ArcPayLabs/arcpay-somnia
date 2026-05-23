@@ -9,10 +9,10 @@ const deployedContracts = deployment.contracts as Record<string, string>;
 export const NATIVE_TOKEN = "0x0000000000000000000000000000000000000000";
 
 export const CONTRACTS = {
-  AgentRegistry: deployedContracts.AgentRegistry,
-  TreasuryPolicy: deployedContracts.TreasuryPolicy,
-  AgentTreasury: deployedContracts.AgentTreasury,
-  AgentOrderBook: deployedContracts.AgentOrderBook,
+  AgentRegistry: deployedContracts.AgentRegistry ?? NATIVE_TOKEN,
+  TreasuryPolicy: deployedContracts.TreasuryPolicy ?? NATIVE_TOKEN,
+  AgentTreasury: deployedContracts.AgentTreasury ?? NATIVE_TOKEN,
+  AgentOrderBook: deployedContracts.AgentOrderBook ?? NATIVE_TOKEN,
   OperatorControls: deployedContracts.OperatorControls ?? NATIVE_TOKEN,
   SomniaAgentRiskOracle: deployedContracts.SomniaAgentRiskOracle ?? NATIVE_TOKEN,
   AgentSpendCardVault: deployedContracts.AgentSpendCardVault ?? NATIVE_TOKEN,

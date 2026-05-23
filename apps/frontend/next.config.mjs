@@ -1,15 +1,12 @@
-import { dirname, resolve } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const appDir = dirname(fileURLToPath(import.meta.url));
-const repoRoot = resolve(appDir, "../..");
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: [],
-  turbopack: {
-    root: repoRoot,
-  },
+  output: "standalone",
+  outputFileTracingRoot: join(__dirname, "../../"),
 };
 
 export default nextConfig;

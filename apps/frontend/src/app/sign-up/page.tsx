@@ -1,13 +1,8 @@
-import { AuthShell } from "@/components/AuthShell";
-import { SignUpForm } from "@/components/AuthForm";
+"use client";
+
+import { renderProductRoute } from "../product-render";
+import { Route } from "../../product-ui/routes/sign-up";
 
 export default function SignUpPage() {
-  return (
-    <AuthShell
-      heading="Spin up your workspace."
-      subheading="Three steps to a treasury that can coordinate autonomous agents on Somnia."
-    >
-      <SignUpForm />
-    </AuthShell>
-  );
+  return renderProductRoute(Route);
 }

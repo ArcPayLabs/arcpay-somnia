@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { verifyMessage } from "ethers";
-import { challengeCookie, createSession, readChallenge, sessionCookie, sessionTtlSeconds } from "@/lib/server/session";
+import { challengeCookie, createSession, readChallenge, sessionCookie, sessionTtlSeconds } from "@somnia/lib/server/session";
 
 export async function POST(request: Request) {
   const body = await request.json();

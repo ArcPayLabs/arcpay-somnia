@@ -1,56 +1,141 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { BadgeCheck, Building2, Mail, UserRound, Wallet } from "lucide-react";
-import { PageHeader } from "@/components/PageHeader";
-import { connectedAddress, shortAddress } from "@/lib/somnia";
+import { Mail, UserRound, Wallet } from "lucide-react";
+import { ProductAppShell } from "../product-render";
+import { PageHeader } from "../../product-ui/components/app/PageHeader";
+import { StatCard } from "../../product-ui/components/primitives/StatCard";
+import { useWalletConnectAction } from "../../product-ui/hooks/use-wallet-connect-action";
+import { getOptionalSupabaseClient } from "../supabase-client";
+
+type ProfileForm = {
+  displayName: string;
+  role: string;
+  notificationEmail: string;
+  walletLabel: string;
+};
+
+const EMPTY_PROFILE: ProfileForm = {
+  displayName: "",
+  role: "Founder / finance lead",
+  notificationEmail: "",
+  walletLabel: "Somnia operations wallet",
+};
 
 export default function ProfilePage() {
-  const [address, setAddress] = useState("");
+  const walletAction = useWalletConnectAction();
+  const [profile, setProfile] = useState<ProfileForm>(EMPTY_PROFILE);
   const [email, setEmail] = useState("");
-  const [workspace, setWorkspace] = useState("ArcPay Somnia workspace");
-  const [status, setStatus] = useState("Profile changes are local until you attach a signed update flow.");
+  const [userId, setUserId] = useState("");
+  const [status, setStatus] = useState("Connect a Somnia wallet or sign in with email to sync profile details.");
+  const walletAddress = walletAction.publicKeyBase58 ?? "";
 
   useEffect(() => {
-    connectedAddress().then(setAddress).catch(() => undefined);
-    const session = window.localStorage.getItem("arcpay-somnia-email-session");
-    if (session) {
-      try {
-        const parsed = JSON.parse(session) as { user?: { email?: string } };
-        setEmail(parsed.user?.email ?? "");
-      } catch {}
+    const supabase = getOptionalSupabaseClient();
+    let mounted = true;
+
+    async function load() {
+      if (!supabase) {
+        setStatus("Supabase env is not configured. Wallet profile remains local.");
+        return;
+      }
+      const { data } = await supabase.auth.getUser();
+      const user = data.user;
+      if (!mounted) return;
+      setUserId(user?.id ?? "");
+      setEmail(user?.email ?? "");
+      if (!user) return;
+
+      const { data: row, error } = await supabase
+        .from("user_profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (!mounted) return;
+      if (error) {
+        setStatus(`Profile load failed: ${error.message}`);
+        return;
+      }
+      setProfile({
+        displayName: row?.display_name ?? "",
+        role: row?.role ?? "Founder / finance lead",
+        notificationEmail: row?.notification_email || user.email || "",
+        walletLabel: row?.wallet_label || "Somnia operations wallet",
+      });
+      setStatus("Profile loaded.");
     }
+
+    void load();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
+  async function connectWallet() {
+    await walletAction.connectWallet();
+    setStatus(walletAction.errorMessage ?? "Somnia wallet linked to this browser session.");
+  }
+
+  async function saveProfile() {
+    const supabase = getOptionalSupabaseClient();
+    if (!supabase || !userId) {
+      setStatus("Email profile sync requires Supabase sign-in. Wallet identity is already stored in this browser session.");
+      return;
+    }
+    const { error } = await supabase.from("user_profiles").upsert({
+      user_id: userId,
+      display_name: profile.displayName,
+      role: profile.role,
+      notification_email: profile.notificationEmail || email,
+      wallet_label: profile.walletLabel,
+      linked_wallet_address: walletAddress || null,
+    }, { onConflict: "user_id" });
+    setStatus(error ? `Profile save failed: ${error.message}` : "Profile saved.");
+  }
+
   return (
-    <>
-      <PageHeader
-        eyebrow="Workspace profile"
-        title="Operator identity"
-        description="Somnia wallet identity is the primary account layer. Email can be linked as a secondary login path, while agent actions stay wallet-signed."
-        badges={["Wallet-first", "Email optional", "Workspace metadata"]}
-      />
-      <section className="profile-layout section">
-        <div className="profile-card large">
-          <div className="profile-avatar"><UserRound size={34} /></div>
-          <span>Operator</span>
-          <h2>{workspace}</h2>
-          <p>{address ? `Primary wallet: ${shortAddress(address)}` : "Connect a Somnia wallet to bind this browser session to an operator identity."}</p>
-          <div className="profile-meta">
-            <div><Wallet /><span>{address || "No wallet linked"}</span></div>
-            <div><Mail /><span>{email || "Email not linked"}</span></div>
-          </div>
+    <ProductAppShell>
+      <div className="space-y-6">
+        <PageHeader
+          icon={UserRound}
+          eyebrow="Workspace identity"
+          title="Profile"
+          description="Manage the operator profile, notification email, and Somnia wallet identity used for ArcPay treasury actions."
+          actions={
+            <button onClick={() => void connectWallet()} className="rounded-full bg-foreground px-4 py-2.5 text-sm font-semibold text-background">
+              {walletAddress ? "Refresh wallet" : "Connect Somnia wallet"}
+            </button>
+          }
+        />
+
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+          <StatCard icon={Wallet} label="Wallet" value={walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : "--"} hint="Somnia signer" />
+          <StatCard icon={Mail} label="Email" value={email || "--"} hint="Optional login identity" />
+          <StatCard label="Sync" value={userId ? "Supabase" : "Local"} hint="Profile persistence" emphasis />
         </div>
-        <form className="profile-card" onSubmit={(event) => { event.preventDefault(); setStatus("Profile saved locally for this browser session."); }}>
-          <h2>Workspace details</h2>
-          <label className="field"><span>Workspace name</span><input value={workspace} onChange={(event) => setWorkspace(event.target.value)} /></label>
-          <label className="field"><span>Notification email</span><input value={email} onChange={(event) => setEmail(event.target.value)} placeholder="operator@studio.com" /></label>
-          <button type="submit">Save profile</button>
-          <div className="notice">{status}</div>
-        </form>
-        <div className="profile-card"><Building2 /><h2>Cross-chain records</h2><p>Somnia writes to `arcpay_somnia_records`; Sui, Mantle, and Arbitrum use their own tables in the same Supabase project.</p></div>
-        <div className="profile-card"><BadgeCheck /><h2>Judge clarity</h2><p>Profile state is intentionally transparent: wallet ownership, table isolation, and audit persistence are easy to verify.</p></div>
-      </section>
-    </>
+
+        <div className="rounded-2xl border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">{status}</div>
+
+        <section className="rounded-3xl border border-border bg-card p-5 md:p-6">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field label="Display name"><input className="ap-in" value={profile.displayName} onChange={(event) => setProfile({ ...profile, displayName: event.target.value })} /></Field>
+            <Field label="Role"><input className="ap-in" value={profile.role} onChange={(event) => setProfile({ ...profile, role: event.target.value })} /></Field>
+            <Field label="Notification email"><input className="ap-in" value={profile.notificationEmail} onChange={(event) => setProfile({ ...profile, notificationEmail: event.target.value })} /></Field>
+            <Field label="Wallet label"><input className="ap-in" value={profile.walletLabel} onChange={(event) => setProfile({ ...profile, walletLabel: event.target.value })} /></Field>
+          </div>
+          <button onClick={() => void saveProfile()} className="mt-5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">Save profile</button>
+        </section>
+      </div>
+    </ProductAppShell>
+  );
+}
+
+function Field({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{label}</span>
+      {children}
+    </label>
   );
 }

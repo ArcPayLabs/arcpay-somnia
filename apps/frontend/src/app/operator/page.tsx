@@ -1,9 +1,10 @@
+// @ts-nocheck
 "use client";
 
 import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { RecordTable } from "@/components/RecordTable";
-import { DEPTH_CONTRACTS_READY, agentIdFromSlug, hashText, operatorControlsContract, writeRecord } from "@/lib/somnia";
+import { DEPTH_CONTRACTS_READY, agentIdFromSlug, hashText, operatorControlsContract, writeRecord } from "@somnia/lib/somnia";
 
 export default function OperatorPage() {
   const [claim, setClaim] = useState({

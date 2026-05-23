@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { createRecord, listRecords } from "@/lib/server/records";
-import { readSession, sessionCookie } from "@/lib/server/session";
+import { createRecord, listRecords } from "@somnia/lib/server/records";
+import { readSession, sessionCookie } from "@somnia/lib/server/session";
 
 function sessionFromRequest(request: Request) {
   return readSession(request.headers.get("cookie")?.match(new RegExp(`${sessionCookie}=([^;]+)`))?.[1]);
