@@ -32,3 +32,14 @@ npm run worker
 
 The worker prints structured JSON logs. A production deployment can route those
 logs into Azure Monitor, Log Analytics, or a Supabase ingestion table.
+
+Current VM deployment uses a systemd service:
+
+```bash
+sudo systemctl status arcpay-somnia-worker --no-pager
+sudo journalctl -u arcpay-somnia-worker -n 50 --no-pager
+sudo systemctl restart arcpay-somnia-worker
+```
+
+The service runs from `/home/arcpay/arcpay-somnia` and restarts automatically
+after VM reboot.

@@ -86,7 +86,7 @@ export default function PoliciesPage() {
       <section className="grid section">
         {!DEPTH_CONTRACTS_READY ? (
           <div className="panel full notice">
-            Current deployment is the base stack. Weekly limits, time windows, and per-order approvals are compiled and tested, but need a Somnia STT top-up and redeploy before they are live on testnet.
+            Depth contracts are not present in the current deployment file. Redeploy before testing weekly limits, time windows, or per-order approvals.
           </div>
         ) : null}
         <div className="panel">

@@ -114,6 +114,44 @@ Machine-readable deployment metadata lives in
 
 Privacy Intent builder docs live in `docs/privacy-intents.md`.
 
+## Persistence
+
+Wallet sessions work without Supabase. To persist audit records in Vercel, run
+`supabase/migrations/202605230001_somnia_records.sql` in your Supabase project
+and set:
+
+```bash
+ARCPAY_SESSION_SECRET=...
+SUPABASE_URL=...
+SUPABASE_SERVICE_ROLE_KEY=...
+```
+
+For Vercel, set the project root directory to `apps/frontend`. The frontend
+build command is `npm run build`. Required production env:
+
+```bash
+ARCPAY_SESSION_SECRET=...
+SUPABASE_URL=...
+SUPABASE_SERVICE_ROLE_KEY=...
+```
+
+Optional public Supabase env can stay unset unless client-side Supabase reads
+are added later:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+```
+
+The Azure worker only needs Somnia RPC access and the checked-in deployment
+metadata:
+
+```bash
+SOMNIA_RPC_URL=https://dream-rpc.somnia.network
+ARCPAY_ROOT=/home/arcpay/arcpay-somnia
+```
+
 ## Depth Contract Redeploy
 
 The repo now includes and deploys the Cards402-depth layer:
@@ -171,7 +209,7 @@ demo paths resolve to Somnia infrastructure.
 
 ## Current Status
 
-Initial Somnia scaffold:
+Current Somnia build:
 
 - Solidity contracts added
 - deploy script added
@@ -182,3 +220,5 @@ Initial Somnia scaffold:
 - Cards402-depth operator controls added
 - agent protocol docs added
 - `llms.txt` and `skill.md` added for agent-facing usage
+- Supabase persistence migration added for audit/workflow records
+- Azure worker package added for live event monitoring
