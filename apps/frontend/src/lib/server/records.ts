@@ -7,10 +7,11 @@ type RecordInput = {
 };
 
 const memoryRecords: Array<RecordInput & { id: string; owner: string; createdAt: string }> = [];
+const DEFAULT_RECORDS_TABLE = "arcpay_somnia_records";
 
 export async function listRecords(owner: string) {
   if (hasSupabase()) {
-    const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/arcpay_somnia_records?owner=eq.${owner}&order=created_at.desc`, {
+    const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/${recordsTable()}?owner=eq.${encodeURIComponent(owner)}&order=created_at.desc`, {
       headers: supabaseHeaders(),
       cache: "no-store",
     });
@@ -27,7 +28,7 @@ export async function createRecord(owner: string, input: RecordInput) {
     createdAt: new Date().toISOString(),
   };
   if (hasSupabase()) {
-    await fetch(`${process.env.SUPABASE_URL}/rest/v1/arcpay_somnia_records`, {
+    await fetch(`${process.env.SUPABASE_URL}/rest/v1/${recordsTable()}`, {
       method: "POST",
       headers: { ...supabaseHeaders(), "Content-Type": "application/json", Prefer: "return=minimal" },
       body: JSON.stringify({
@@ -49,6 +50,12 @@ export async function createRecord(owner: string, input: RecordInput) {
 
 function hasSupabase() {
   return Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+}
+
+function recordsTable() {
+  const table = process.env.ARCPAY_RECORDS_TABLE ?? DEFAULT_RECORDS_TABLE;
+  if (!/^arcpay_[a-z0-9_]+_records$/.test(table)) return DEFAULT_RECORDS_TABLE;
+  return table;
 }
 
 function supabaseHeaders() {

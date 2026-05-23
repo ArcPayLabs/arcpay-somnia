@@ -122,6 +122,7 @@ and set:
 
 ```bash
 ARCPAY_SESSION_SECRET=...
+ARCPAY_RECORDS_TABLE=arcpay_somnia_records
 SUPABASE_URL=...
 SUPABASE_SERVICE_ROLE_KEY=...
 ```
@@ -131,9 +132,20 @@ build command is `npm run build`. Required production env:
 
 ```bash
 ARCPAY_SESSION_SECRET=...
+ARCPAY_RECORDS_TABLE=arcpay_somnia_records
 SUPABASE_URL=...
 SUPABASE_SERVICE_ROLE_KEY=...
 ```
+
+The same Supabase project can back every ArcPay chain repo. Keep records
+separated by table:
+
+| Chain repo | Records table |
+| --- | --- |
+| `arcpay-somnia` | `arcpay_somnia_records` |
+| `arcpay-sui` | `arcpay_sui_records` |
+| `arcpay-mantle` | `arcpay_mantle_records` |
+| `arcpay-arbitrum` | `arcpay_arbitrum_records` |
 
 Optional public Supabase env can stay unset unless client-side Supabase reads
 are added later:
