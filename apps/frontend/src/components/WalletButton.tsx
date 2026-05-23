@@ -58,11 +58,11 @@ export function WalletButton() {
     <div className="wallet-box">
       {address ? (
         <>
-          <span className="badge">{shortAddress(address)}</span>
-          <span className="badge">{Number(balance).toFixed(4)} STT</span>
+          <span className="wallet-pill">{shortAddress(address)}</span>
+          <span className="wallet-pill">{Number(balance).toFixed(4)} STT</span>
         </>
       ) : null}
-      <button onClick={connect}>{address ? "Refresh wallet" : "Connect Somnia wallet"}</button>
+      <button onClick={connect}>{address ? "Refresh wallet" : "Connect wallet"}</button>
       <button className="secondary" onClick={signIn}>{authed ? "Signed in" : "Sign in"}</button>
       {error ? <small className="danger">{error}</small> : null}
     </div>

@@ -10,7 +10,7 @@ export function PageHeader({
   badges?: string[];
 }) {
   return (
-    <header className="page-title">
+    <header className="page-title page-hero">
       <span className="eyebrow">{eyebrow}</span>
       <h1>{title}</h1>
       <p>{description}</p>
