@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, Bot, CreditCard, LockKeyhole, MonitorCheck, Server, ShieldCheck, Wallet, Workflow } from "lucide-react";
+import { ArrowRight, BadgeCheck, Bot, CreditCard, FileCheck2, LockKeyhole, MonitorCheck, Server, ShieldCheck, Wallet, Workflow, Zap } from "lucide-react";
 import { MarketingNav } from "@/components/MarketingNav";
 
 const partners = ["Somnia", "SOMUSD", "Agent Registry", "Privacy Intents", "Policy Engine", "MCP", "Azure Worker"];
@@ -16,6 +16,18 @@ const stack = [
   ["Contracts", "Registry, policy, order book, controls, cards, oracle, privacy vault.", BadgeCheck],
   ["Worker", "Azure systemd worker watches order, card, and operator-control events.", Server],
   ["Proof", "Deployment file, explorer links, build commands, and judge demo path.", MonitorCheck],
+] as const;
+const how = [
+  ["01", "Operator connects", "Wallet auth locks the session to Somnia Testnet and keeps signing explicit."],
+  ["02", "Agent registers", "Services publish capabilities, endpoint, price, owner, and active state onchain."],
+  ["03", "Policy gates spend", "Hourly, daily, weekly, allowlist, threshold, and pause controls guard movement."],
+  ["04", "Work settles", "Orders move from escrow to fulfillment, settlement, refund, or audit proof."],
+] as const;
+const faq = [
+  ["Is this Somnia-only?", "This repo is fixed to Somnia Testnet. No alternate-chain switch is exposed here."],
+  ["Are swaps and yield faked?", "No. Those pages save policy-ready intents until a stable Somnia router or vault adapter is selected."],
+  ["What makes it agent-first?", "Agents can be registered, discovered, hired, escrowed, scored, budgeted with cards, and audited."],
+  ["What can judges verify?", "Contracts, explorer links, wallet transactions, Supabase records, CLI/MCP docs, and Azure worker status."],
 ] as const;
 
 export default function Home() {
@@ -37,7 +49,7 @@ export default function Home() {
               create privacy intents, and keep every action auditable.
             </p>
             <div className="hero-actions">
-              <Link className="hero-primary" href="/sign-up">
+              <Link className="hero-primary" href="/onboard">
                 Join the beta <span><ArrowRight size={18} /></span>
               </Link>
               <Link className="hero-secondary" href="/sign-in">Sign in</Link>
@@ -73,11 +85,29 @@ export default function Home() {
           <h2>Discover agent. Set policy. Fund work. Prove execution.</h2>
         </div>
         <ol>
-          <li><b>1</b><span>Connect a Somnia wallet and sign into the workspace.</span></li>
-          <li><b>2</b><span>Register an agent with capability metadata and STT pricing.</span></li>
-          <li><b>3</b><span>Set treasury limits, allowed agents, and emergency controls.</span></li>
-          <li><b>4</b><span>Create an escrowed order, fulfill it, settle it, and export proof.</span></li>
+          {how.map(([step, title, body]) => (
+            <li key={step}><b>{step}</b><span><strong>{title}</strong>{body}</span></li>
+          ))}
         </ol>
+      </section>
+
+      <section className="landing-showcase">
+        <article>
+          <span>Operator console</span>
+          <h2>Not just connect-wallet UI.</h2>
+          <p>The app surface covers agents, orders, SOMUSD cards, direct STT payments, invoices, contractors, policy, privacy, oracle, proofs, profile, and settings.</p>
+          <div>
+            <Link href="/dashboard">Open dashboard</Link>
+            <Link href="/agents">Register agent</Link>
+            <Link href="/privacy">Create privacy intent</Link>
+          </div>
+        </article>
+        <aside>
+          <div><Zap /><strong>50312</strong><span>Somnia chain ID</span></div>
+          <div><FileCheck2 /><strong>8</strong><span>Contracts deployed</span></div>
+          <div><CreditCard /><strong>SOMUSD</strong><span>Agent cards</span></div>
+          <div><LockKeyhole /><strong>Vault</strong><span>Privacy intents</span></div>
+        </aside>
       </section>
 
       <section className="landing-stack">
@@ -123,6 +153,33 @@ export default function Home() {
         </div>
         <Link className="hero-primary" href="/dashboard">Open App <span><ArrowRight size={18} /></span></Link>
       </section>
+
+      <section className="landing-faq">
+        <div className="section-heading">
+          <span>Judge notes</span>
+          <h2>Clear boundaries, live pieces, no fake production-network claims.</h2>
+        </div>
+        <div>
+          {faq.map(([question, answer]) => (
+            <article key={question}>
+              <h3>{question}</h3>
+              <p>{answer}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <footer className="marketing-footer">
+        <div>
+          <strong>ArcPay</strong>
+          <span>Private treasury OS for autonomous agents on Somnia.</span>
+        </div>
+        <nav>
+          <Link href="/docs">Docs</Link>
+          <Link href="/proofs">Proofs</Link>
+          <Link href="/dashboard">Open App</Link>
+        </nav>
+      </footer>
     </main>
   );
 }

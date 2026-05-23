@@ -8,9 +8,13 @@ import {
   Bot,
   CreditCard,
   ArrowLeftRight,
+  Bell,
+  Building2,
+  ChevronDown,
   Gauge,
   LayoutDashboard,
   LockKeyhole,
+  Search,
   ReceiptText,
   ScrollText,
   Send,
@@ -55,10 +59,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="app-layout">
       <aside className="app-sidebar">
         <Link className="app-brand" href="/dashboard">
-          <span className="brand-mark">A</span>
+          <span className="brand-mark">⌁</span>
           <span>
             <strong>ArcPay</strong>
-            <em>Somnia treasury OS</em>
+            <em>Somnia agent treasury</em>
           </span>
         </Link>
 
@@ -91,15 +95,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <section className="app-frame">
         <header className="app-topbar">
           <div className="workspace-pill">
-            <Wallet size={16} />
+            <Building2 size={16} />
             <span>ArcPay Labs</span>
-            <strong>Somnia</strong>
+            <ChevronDown size={14} />
           </div>
           <div className="network-pills">
             <span>Somnia Testnet</span>
             <span>Chain 50312</span>
             <span>STT</span>
           </div>
+          <button className="topbar-search" type="button" aria-label="Search">
+            <Search size={16} />
+            <span>Jump to...</span>
+            <kbd>⌘K</kbd>
+          </button>
+          <button className="topbar-icon" type="button" aria-label="Notifications">
+            <Bell size={16} />
+            <i />
+          </button>
           <WalletButton />
         </header>
 

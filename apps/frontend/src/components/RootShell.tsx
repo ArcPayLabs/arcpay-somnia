@@ -12,6 +12,7 @@ const publicPrefixes = [
   "/security",
   "/pricing",
   "/docs",
+  "/onboard",
 ];
 
 export function RootShell({ children }: { readonly children: React.ReactNode }) {
