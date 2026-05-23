@@ -27,6 +27,7 @@ export default function ProofsPage() {
           <code>npm run build</code>
           <code>npm run build:frontend</code>
           <code>npm run dev:frontend</code>
+          <code>npm run arcpay -- privacy-guide</code>
         </div>
         <div className="panel full">
           <h2>Explorer</h2>
@@ -37,6 +38,10 @@ export default function ProofsPage() {
           <p>
             The core live flow is: register agent, set spend policy, allow agent, create escrowed order, update order status,
             settle or refund, then review the audit trail.
+          </p>
+          <p>
+            Builders can integrate the privacy layer from <code>docs/privacy-intents.md</code> or use the CLI/MCP helpers
+            to derive commitments and nullifiers for SOMUSD/STT payment intents.
           </p>
         </div>
       </section>

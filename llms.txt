@@ -26,6 +26,7 @@ Important docs:
 - `docs/somnia-buildathon.md`
 - `docs/agent-protocol.md`
 - `docs/cards402-depth-map.md`
+- `docs/privacy-intents.md`
 
 Agent tooling:
 
@@ -34,3 +35,4 @@ Agent tooling:
 - `npm run arcpay -- demo-path`
 - `/operator` for claim-code onboarding and webhook circuit breakers
 - `/oracle` for Somnia agent risk request/callback proof
+- `/privacy` for Privacy Intent creation/release

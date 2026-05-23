@@ -35,6 +35,32 @@ server.tool("derive_claim_hash", "Derive the on-chain claim-code hash for Operat
   content: [{ type: "text", text: keccak256(toUtf8Bytes(code)) }],
 }));
 
+server.tool("derive_privacy_commitment", "Derive a Privacy Intent commitment or nullifier from secret text.", {
+  secret: z.string().min(1),
+}, async ({ secret }) => ({
+  content: [{ type: "text", text: keccak256(toUtf8Bytes(secret)) }],
+}));
+
+server.tool("privacy_intent_guide", "Return builder instructions for integrating ArcPay Privacy Intents on Somnia.", {}, async () => {
+  const deployment = readDeployment();
+  return {
+    content: [{
+      type: "text",
+      text: [
+        "ArcPay Privacy Intents for Somnia",
+        `Vault: ${deployment.contracts.SomniaPrivacyVault}`,
+        `SOMUSD: ${deployment.somUsdToken}`,
+        "commitment = keccak256(secret)",
+        "nullifier = keccak256(releaseSecret)",
+        "SOMUSD flow: approve vault, then createTokenIntent(commitment, SOMUSD, amount, encryptedMemoUri).",
+        "STT flow: createNativeIntent(commitment, encryptedMemoUri) with msg.value.",
+        "Release: releaseIntent(commitment, nullifier, recipient).",
+        "Boundary: this hides metadata/recipient during intent phase, not a full shielded pool.",
+      ].join("\n"),
+    }],
+  };
+});
+
 server.tool("demo_path", "Return the judge demo path for ArcPay Somnia.", {}, async () => ({
   content: [{
     type: "text",
@@ -45,6 +71,7 @@ server.tool("demo_path", "Return the judge demo path for ArcPay Somnia.", {}, as
       "Create and settle an escrowed agent order on /orders.",
       "Create/redeem claim codes and trigger webhook breaker on /operator.",
       "Request and fulfill risk oracle result on /oracle.",
+      "Create and release encrypted Privacy Intents on /privacy.",
       "Show /audit and /proofs.",
     ].join("\n"),
   }],

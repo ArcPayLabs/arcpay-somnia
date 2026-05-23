@@ -45,6 +45,8 @@ npm run arcpay -- contracts
 npm run arcpay -- wallet
 npm run arcpay -- agent-id research-agent
 npm run arcpay -- claim-hash claim-research-agent-001
+npm run arcpay -- privacy-guide
+npm run arcpay -- privacy-commit "invoice-secret"
 npm run arcpay -- demo-path
 npm run mcp
 ```

@@ -54,6 +54,7 @@ npm run arcpay -- contracts
 npm run arcpay -- wallet
 npm run arcpay -- agent-id research-agent
 npm run arcpay -- claim-hash claim-research-agent-001
+npm run arcpay -- privacy-guide
 npm run arcpay -- mcp-config
 npm run mcp
 npm run worker
@@ -110,6 +111,8 @@ Contracts:
  
 Machine-readable deployment metadata lives in
 `deployments/somnia-testnet.json`.
+
+Privacy Intent builder docs live in `docs/privacy-intents.md`.
 
 ## Depth Contract Redeploy
 

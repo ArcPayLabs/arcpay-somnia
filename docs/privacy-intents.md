@@ -1,0 +1,79 @@
+# ArcPay Privacy Intents
+
+ArcPay Privacy Intents are a lightweight treasury privacy primitive for Somnia
+agents.
+
+They are designed for:
+
+- confidential contractor payouts
+- hidden invoice settlement
+- delayed recipient disclosure
+- agent-to-agent payment intents with encrypted business metadata
+- hackathon apps that need privacy without building a full shielded pool
+
+## Live Contracts
+
+| Resource | Address |
+| --- | --- |
+| `SomniaPrivacyVault` | `0x6948a15dED7F6708BD4DfD8c3Ee5314bC5B53D14` |
+| `SOMUSD` | `0x02b8316775057e2096471473663d51ceafbe3e3b` |
+
+## Privacy Boundary
+
+This is not a ZK mixer and does not make final transfers invisible. It provides
+application-level treasury privacy:
+
+- commitment IDs instead of plain business IDs
+- encrypted memo URI instead of public invoice/contractor metadata
+- recipient hidden until release
+- one-time release through a nullifier
+- cancellation/refund while unreleased
+
+## Solidity Interface
+
+```solidity
+function createNativeIntent(bytes32 commitment, string calldata encryptedMemoUri) external payable;
+function createTokenIntent(bytes32 commitment, address token, uint256 amount, string calldata encryptedMemoUri) external;
+function releaseIntent(bytes32 commitment, bytes32 nullifier, address payable recipient) external;
+function cancelIntent(bytes32 commitment) external;
+```
+
+## SOMUSD Flow
+
+```ts
+import { Contract, keccak256, toUtf8Bytes } from "ethers";
+
+const commitment = keccak256(toUtf8Bytes("invoice-42-secret"));
+const nullifier = keccak256(toUtf8Bytes("release-secret-42"));
+
+await somusd.approve(privacyVaultAddress, amount);
+await privacyVault.createTokenIntent(
+  commitment,
+  somusdAddress,
+  amount,
+  "encrypted://your-ciphertext-or-ipfs-pointer",
+);
+
+await privacyVault.releaseIntent(commitment, nullifier, recipient);
+```
+
+## CLI Helpers
+
+```bash
+npm run arcpay -- privacy-commit "invoice-42-secret"
+npm run arcpay -- privacy-abi
+npm run arcpay -- privacy-guide
+```
+
+## MCP Tools
+
+The ArcPay Somnia MCP server exposes:
+
+- `derive_privacy_commitment`
+- `privacy_intent_guide`
+
+Run:
+
+```bash
+npm run mcp
+```

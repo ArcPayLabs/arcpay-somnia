@@ -21,6 +21,9 @@ Commands:
   arcpay-somnia wallet                 Print network wallet instructions
   arcpay-somnia agent-id <slug>        Derive bytes32 agent id
   arcpay-somnia claim-hash <code>      Derive claim-code hash
+  arcpay-somnia privacy-commit <text>  Derive Privacy Intent commitment/nullifier
+  arcpay-somnia privacy-abi            Print Privacy Intent contract ABI
+  arcpay-somnia privacy-guide          Print builder integration guide
   arcpay-somnia demo-path              Print judge demo steps
   arcpay-somnia mcp-config             Print MCP host config
 `);
@@ -44,6 +47,32 @@ try {
     console.log(id(args.join(" ") || "agent"));
   } else if (command === "claim-hash") {
     console.log(keccak256(toUtf8Bytes(args.join(" "))));
+  } else if (command === "privacy-commit") {
+    console.log(keccak256(toUtf8Bytes(args.join(" "))));
+  } else if (command === "privacy-abi") {
+    console.log(JSON.stringify([
+      "function createNativeIntent(bytes32 commitment,string encryptedMemoUri) payable",
+      "function createTokenIntent(bytes32 commitment,address token,uint256 amount,string encryptedMemoUri)",
+      "function releaseIntent(bytes32 commitment,bytes32 nullifier,address recipient)",
+      "function cancelIntent(bytes32 commitment)",
+      "function intents(bytes32 commitment) view returns (address operator,address token,uint256 amount,string encryptedMemoUri,bool released,bool cancelled,uint256 createdAt)",
+    ], null, 2));
+  } else if (command === "privacy-guide") {
+    const info = deployment();
+    console.log([
+      "ArcPay Privacy Intents for Somnia",
+      "",
+      `Vault: ${info.contracts.SomniaPrivacyVault}`,
+      `SOMUSD: ${info.somUsdToken}`,
+      "",
+      "1. commitment = keccak256(secret)",
+      "2. nullifier = keccak256(releaseSecret)",
+      "3. approve SOMUSD to the vault for token intents",
+      "4. call createTokenIntent(commitment, SOMUSD, amount, encryptedMemoUri)",
+      "5. later call releaseIntent(commitment, nullifier, recipient)",
+      "",
+      "Privacy boundary: metadata and recipient are hidden during intent phase; release transfer is public.",
+    ].join("\n"));
   } else if (command === "demo-path") {
     console.log([
       "1. Connect wallet and switch to Somnia Testnet.",
@@ -53,7 +82,8 @@ try {
       "5. Move order through accept -> processing -> fulfill -> settle or fail/refund.",
       "6. Open /operator for claim-code and webhook circuit-breaker proof.",
       "7. Open /oracle for Somnia agent risk callback proof.",
-      "8. Open /proofs for deployed addresses and build commands.",
+      "8. Open /privacy for encrypted-metadata payment intents.",
+      "9. Open /proofs for deployed addresses and build commands.",
     ].join("\n"));
   } else if (command === "mcp-config") {
     console.log(JSON.stringify({
