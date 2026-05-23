@@ -14,6 +14,7 @@ Stellar/card-specific implementation.
 | Agent claim code onboarding | `OperatorControls` creates and redeems expiring claim codes by hash. |
 | CLI tool | `bin/arcpay-somnia.mjs` supports contracts, wallet, agent ID, claim hash, demo path, and MCP config commands. |
 | Card-like spend product | `AgentSpendCardVault` creates SOMUSD-backed virtual cards for agent budgets. |
+| Privacy layer | `SomniaPrivacyVault` creates commitment-based SOMUSD/STT payment intents with encrypted metadata and nullifier release. |
 
 ## Somnia-Native Layer
 

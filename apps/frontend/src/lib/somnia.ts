@@ -6,20 +6,21 @@ export const SOMNIA_CHAIN_ID_HEX = "0xc488";
 export const SOMNIA_RPC_URL = "https://dream-rpc.somnia.network";
 export const SOMNIA_EXPLORER_URL = "https://somnia-testnet.socialscan.io";
 const deployedContracts = deployment.contracts as Record<string, string>;
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+export const NATIVE_TOKEN = "0x0000000000000000000000000000000000000000";
 
 export const CONTRACTS = {
   AgentRegistry: deployedContracts.AgentRegistry,
   TreasuryPolicy: deployedContracts.TreasuryPolicy,
   AgentTreasury: deployedContracts.AgentTreasury,
   AgentOrderBook: deployedContracts.AgentOrderBook,
-  OperatorControls: deployedContracts.OperatorControls ?? ZERO_ADDRESS,
-  SomniaAgentRiskOracle: deployedContracts.SomniaAgentRiskOracle ?? ZERO_ADDRESS,
-  AgentSpendCardVault: deployedContracts.AgentSpendCardVault ?? ZERO_ADDRESS,
+  OperatorControls: deployedContracts.OperatorControls ?? NATIVE_TOKEN,
+  SomniaAgentRiskOracle: deployedContracts.SomniaAgentRiskOracle ?? NATIVE_TOKEN,
+  AgentSpendCardVault: deployedContracts.AgentSpendCardVault ?? NATIVE_TOKEN,
+  SomniaPrivacyVault: deployedContracts.SomniaPrivacyVault ?? NATIVE_TOKEN,
 } as const;
 
 export const DEPTH_CONTRACTS_READY =
-  CONTRACTS.OperatorControls !== ZERO_ADDRESS && CONTRACTS.SomniaAgentRiskOracle !== ZERO_ADDRESS;
+  CONTRACTS.OperatorControls !== NATIVE_TOKEN && CONTRACTS.SomniaAgentRiskOracle !== NATIVE_TOKEN;
 export const SOMUSD_TOKEN_ADDRESS = (deployment as { somUsdToken?: string }).somUsdToken ?? "0x02b8316775057e2096471473663d51ceafbe3e3b";
 
 export const AGENT_REGISTRY_ABI = [
@@ -87,6 +88,14 @@ export const ERC20_ABI = [
   "function balanceOf(address owner) view returns (uint256)",
   "function decimals() view returns (uint8)",
   "function symbol() view returns (string)",
+] as const;
+
+export const PRIVACY_VAULT_ABI = [
+  "function createNativeIntent(bytes32 commitment,string encryptedMemoUri) payable",
+  "function createTokenIntent(bytes32 commitment,address token,uint256 amount,string encryptedMemoUri)",
+  "function releaseIntent(bytes32 commitment,bytes32 nullifier,address recipient)",
+  "function cancelIntent(bytes32 commitment)",
+  "function intents(bytes32 commitment) view returns (address operator,address token,uint256 amount,string encryptedMemoUri,bool released,bool cancelled,uint256 createdAt)",
 ] as const;
 
 export const ORDER_STATUS = ["Pending", "Accepted", "Processing", "Fulfilled", "Settled", "Refunded", "Failed"] as const;
@@ -213,6 +222,11 @@ export async function spendCardVaultContract() {
 export async function erc20Contract(address = SOMUSD_TOKEN_ADDRESS) {
   const signer = await signerProvider();
   return new Contract(address, ERC20_ABI, signer);
+}
+
+export async function privacyVaultContract() {
+  const signer = await signerProvider();
+  return new Contract(CONTRACTS.SomniaPrivacyVault, PRIVACY_VAULT_ABI, signer);
 }
 
 export type LocalRecord = {

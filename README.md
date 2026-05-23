@@ -99,13 +99,14 @@ Contracts:
 
 | Contract | Address |
 | --- | --- |
-| `AgentRegistry` | `0x74d3f2Fe7A36Bd7859EF94477414b70A3B02191C` |
-| `TreasuryPolicy` | `0x257792367b2A5405aFC96242be5e702FdeB7B153` |
-| `AgentTreasury` | `0x929B5B3A831c5188902b0A617d732acC20b9cd87` |
-| `AgentOrderBook` | `0x3738033D7437f72057ee92C8d736C030Fd8Ab55c` |
-| `OperatorControls` | `0x246F3d4540a6edd7f385800764EC08Ffc8a724E7` |
-| `SomniaAgentRiskOracle` | `0xC9e4a3f86FD0771f657eA5dFE01d9E0e726e30D1` |
-| `AgentSpendCardVault` | `0x19Dcb620913a87C2199EcBA53915D861fAe0516e` |
+| `AgentRegistry` | `0x350F8f29a5A10eE4d85642CE3AB72497982ee09D` |
+| `TreasuryPolicy` | `0x4c0f962e6555399f45C628DC7F77d4cC6171BB2A` |
+| `AgentTreasury` | `0x9dB9477D068A58154A54d10D1E5711A9E1fD9EA0` |
+| `AgentOrderBook` | `0x6A07886d465Bd64ED3264F4e824C1dF2884a7B45` |
+| `OperatorControls` | `0xb7b26AD2cCBf6613A43f2Db4a550eDF1D7dB8b32` |
+| `SomniaAgentRiskOracle` | `0xA5Ec905B95E5b166EF846849eaB8FDD1dB134D0C` |
+| `AgentSpendCardVault` | `0x0480E467bA12E33DA163FeA45a20C30133F84B93` |
+| `SomniaPrivacyVault` | `0x6948a15dED7F6708BD4DfD8c3Ee5314bC5B53D14` |
  
 Machine-readable deployment metadata lives in
 `deployments/somnia-testnet.json`.
@@ -117,6 +118,7 @@ The repo now includes and deploys the Cards402-depth layer:
 - `OperatorControls`
 - `SomniaAgentRiskOracle`
 - `AgentSpendCardVault`
+- `SomniaPrivacyVault`
 - upgraded `TreasuryPolicy`
 - upgraded `AgentOrderBook`
 
@@ -154,6 +156,7 @@ demo paths resolve to Somnia infrastructure.
 | `/orders` | Create, accept, process, fulfill, settle, or refund escrowed agent orders. |
 | `/cards` | Create SOMUSD-backed agent spend cards with limits and freeze controls. |
 | `/policies` | Set hourly/daily/weekly limits, approval threshold, UTC-hour windows, emergency pause, and agent allowlist. |
+| `/privacy` | Create commitment-based private SOMUSD/STT payment intents with encrypted metadata. |
 | `/operator` | Claim-code onboarding and webhook circuit-breaker controls. |
 | `/oracle` | Somnia agent risk request/callback flow. |
 | `/payments` | Wallet-signed direct STT payments for operator payouts. |

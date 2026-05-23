@@ -13,6 +13,7 @@ const nav = [
   ["Invoices", "/invoices"],
   ["Contractors", "/contractors"],
   ["Policies", "/policies"],
+  ["Privacy", "/privacy"],
   ["Operator", "/operator"],
   ["Oracle", "/oracle"],
   ["Audit", "/audit"],

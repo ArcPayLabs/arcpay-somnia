@@ -36,6 +36,7 @@ treasury policies.
 5. Settle, refund, or fail/refund.
 6. Use `/operator` for onboarding and circuit-breaker proof.
 7. Use `/oracle` for Somnia agent risk proof.
+8. Use `/privacy` for encrypted-metadata payment intents.
 
 ## CLI
 

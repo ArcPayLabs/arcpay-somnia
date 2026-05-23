@@ -28,6 +28,9 @@ async function main() {
   const spendCardVault = await ethers.deployContract("AgentSpendCardVault");
   await spendCardVault.waitForDeployment();
 
+  const privacyVault = await ethers.deployContract("SomniaPrivacyVault");
+  await privacyVault.waitForDeployment();
+
   let platformAddress = process.env.SOMNIA_AGENT_PLATFORM ?? "0x037Bb9C718F3f7fe5eCBDB0b600D607b52706776";
   let mockPlatformAddress: string | undefined;
   if (platformAddress === "mock") {
@@ -56,6 +59,7 @@ async function main() {
       OperatorControls: await operatorControls.getAddress(),
       SomniaAgentRiskOracle: await riskOracle.getAddress(),
       AgentSpendCardVault: await spendCardVault.getAddress(),
+      SomniaPrivacyVault: await privacyVault.getAddress(),
       ...(mockPlatformAddress ? { MockSomniaAgentPlatform: mockPlatformAddress } : {}),
     },
     somniaAgentPlatform: platformAddress,
