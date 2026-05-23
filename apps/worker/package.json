@@ -7,6 +7,9 @@
     "start": "node src/index.mjs",
     "check": "node --check src/index.mjs"
   },
+  "overrides": {
+    "ws": "^8.20.1"
+  },
   "dependencies": {
     "ethers": "^6.13.5"
   }
