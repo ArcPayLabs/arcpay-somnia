@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
-import { AppShell } from "@/components/AppShell";
+import { RootShell } from "@/components/RootShell";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "ArcPay Somnia",
-  description: "Wallet-first treasury and autonomous agent payments on Somnia testnet.",
+  description: "Private treasury OS for autonomous agents on Somnia testnet.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <body>
-        <AppShell>{children}</AppShell>
+        <RootShell>{children}</RootShell>
       </body>
     </html>
   );
