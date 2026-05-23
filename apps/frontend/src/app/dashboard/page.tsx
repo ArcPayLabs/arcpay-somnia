@@ -23,7 +23,7 @@ export default function DashboardPage() {
       <PageHeader
         eyebrow="Somnia testnet control layer"
         title="Private treasury OS for autonomous agents"
-        description="ArcPay Somnia keeps the Solana product surface but runs as a testnet-only EVM agent treasury: discover agents, escrow orders, enforce spend policy, record invoices, and export proof for judges."
+        description="ArcPay Somnia is a testnet-native EVM agent treasury: discover agents, escrow orders, enforce spend policy, run SOMUSD cards, record invoices, and export proof for judges."
         badges={["Deployed contracts", "Wallet-first", "Agent-to-agent orders", "Policy enforcement"]}
       />
 

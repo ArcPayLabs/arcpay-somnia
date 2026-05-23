@@ -23,9 +23,9 @@ treasury policies.
 
 - Never bypass `TreasuryPolicy`.
 - Never mark an order settled before the provider fulfills it.
-- Never claim mainnet deployment unless contract addresses and explorer links
+- Never claim production deployment unless contract addresses and explorer links
   are present.
-- Treat testnet and mainnet as separate environments.
+- Treat each Somnia network environment as separate.
 
 ## Operator Flow
 

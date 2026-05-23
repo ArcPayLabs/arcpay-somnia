@@ -18,7 +18,7 @@ export default function AgentsPage() {
   const [form, setForm] = useState({
     slug: "research-agent",
     name: "Treasury Research Agent",
-    endpoint: "https://example.com/x402/research",
+    endpoint: "https://example.com/somnia-agent/research",
     capabilities: "risk-scoring, invoice-review, payment-routing",
     price: "0.01",
   });
@@ -56,7 +56,7 @@ export default function AgentsPage() {
       <PageHeader
         eyebrow="Agent discovery registry"
         title="Register autonomous services"
-        description="Somnia-native agents publish capability metadata, x402-compatible endpoints, and STT pricing so other agents or operators can discover and hire them."
+        description="Somnia-native agents publish capability metadata, service endpoints, and STT pricing so other agents or operators can discover and hire them."
         badges={["On-chain registry", "Capability discovery", "Agent-first UX"]}
       />
 

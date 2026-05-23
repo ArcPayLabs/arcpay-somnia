@@ -233,4 +233,9 @@ export function readRecords(): LocalRecord[] {
 export function writeRecord(record: Omit<LocalRecord, "createdAt">) {
   const next = [{ ...record, createdAt: new Date().toISOString() }, ...readRecords()].slice(0, 100);
   window.localStorage.setItem("arcpay-somnia-records", JSON.stringify(next));
+  fetch("/api/records", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(record),
+  }).catch(() => undefined);
 }

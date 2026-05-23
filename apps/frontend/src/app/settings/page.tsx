@@ -7,8 +7,8 @@ export default function SettingsPage() {
       <PageHeader
         eyebrow="Testnet configuration"
         title="Somnia-only runtime"
-        description="This build intentionally removes Solana mainnet/devnet switching. It is fixed to Somnia Testnet so the hackathon demo is deterministic."
-        badges={["No mainnet switch", "EVM wallet", "Somnia RPC"]}
+        description="This build is fixed to Somnia Testnet so the hackathon demo is deterministic and every transaction points to Somnia infrastructure."
+        badges={["Somnia Testnet", "EVM wallet", "Somnia RPC"]}
       />
       <section className="grid section">
         <div className="panel">

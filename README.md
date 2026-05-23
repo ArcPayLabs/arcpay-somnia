@@ -35,6 +35,7 @@ ArcPay Somnia focuses on:
 npm install
 npm run install:frontend
 npm run install:mcp
+npm run install:worker
 npm run build
 npm test
 npm run build:frontend
@@ -55,6 +56,7 @@ npm run arcpay -- agent-id research-agent
 npm run arcpay -- claim-hash claim-research-agent-001
 npm run arcpay -- mcp-config
 npm run mcp
+npm run worker
 ```
 
 ## Deploy
@@ -142,8 +144,8 @@ Current SOMUSD testnet token:
 
 ## Frontend Routes
 
-The Somnia build keeps the ArcPay treasury OS shape, but it is fixed to Somnia
-Testnet instead of Solana mainnet/devnet switching.
+The Somnia build is fixed to Somnia Testnet so all wallet actions, proofs, and
+demo paths resolve to Somnia infrastructure.
 
 | Route | Purpose |
 | --- | --- |

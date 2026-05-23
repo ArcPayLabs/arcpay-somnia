@@ -39,9 +39,8 @@ Keep chain-specific logic inside one library module, like
 
 ## Testnet-Only Rule
 
-Unlike the Solana ArcPay app, these hackathon ports should be fixed to the
-target testnet. Do not add a mainnet/devnet switch unless the track explicitly
-requires it.
+These hackathon ports should be fixed to the target testnet. Do not add a
+mainnet/testnet switch unless the track explicitly requires it.
 
 ## Judge Verification
 
