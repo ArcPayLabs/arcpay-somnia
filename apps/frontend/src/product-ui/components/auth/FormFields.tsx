@@ -35,7 +35,7 @@ export function PasswordField({
         <input
           {...rest}
           type={show ? "text" : "password"}
-          placeholder="••••••••"
+          placeholder="********"
           className="w-full bg-muted border border-transparent rounded-xl h-11 px-4 pr-11 text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/40"
         />
         <button
@@ -74,7 +74,15 @@ export function WalletConnectButton({ redirectTo }: { redirectTo?: string }) {
       setLoading(true);
       setErrorMessage(null);
 
-      await wallet.connectWallet();
+      const result = await wallet.connectWallet();
+      if (result.supabaseAuth) {
+        const { error } = await supabase.auth.verifyOtp({
+          token_hash: result.supabaseAuth.tokenHash,
+          type: result.supabaseAuth.type,
+        });
+        if (error) throw error;
+      }
+
       window.dispatchEvent(new StorageEvent("storage", { key: "arcpay-somnia-wallet-session" }));
 
       await ensureCurrentUserAccount(supabase);

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { verifyMessage } from "ethers";
+import { createSupabaseAdminClient } from "../../../supabase-server";
 import { challengeCookie, createSession, readChallenge, sessionCookie, sessionTtlSeconds } from "@somnia/lib/server/session";
 
 export async function POST(request: Request) {
@@ -12,7 +13,33 @@ export async function POST(request: Request) {
   if (recovered !== challenge.address) {
     return NextResponse.json({ error: "bad_signature" }, { status: 401 });
   }
-  const response = NextResponse.json({ address: recovered });
+
+  const walletEmail = `wallet-${recovered.slice(2)}@arcpay.local`;
+  const admin = createSupabaseAdminClient();
+  const { data: link, error } = await admin.auth.admin.generateLink({
+    type: "magiclink",
+    email: walletEmail,
+    options: {
+      data: {
+        name: `Somnia ${recovered.slice(0, 6)}`,
+        wallet_address: recovered,
+        workspace: "Somnia agent treasury",
+      },
+    },
+  });
+
+  if (error || !link.properties?.hashed_token) {
+    return NextResponse.json({ error: error?.message ?? "wallet_supabase_link_failed" }, { status: 500 });
+  }
+
+  const response = NextResponse.json({
+    address: recovered,
+    supabaseAuth: {
+      email: walletEmail,
+      tokenHash: link.properties.hashed_token,
+      type: "email",
+    },
+  });
   response.cookies.set(sessionCookie, createSession(recovered), {
     httpOnly: true,
     sameSite: "lax",

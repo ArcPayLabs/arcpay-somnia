@@ -8,8 +8,19 @@ type EthereumProvider = {
   request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
 };
 
+export type WalletSupabaseAuth = {
+  email: string;
+  tokenHash: string;
+  type: "email";
+};
+
+export type WalletConnectResult = {
+  address: string;
+  supabaseAuth?: WalletSupabaseAuth;
+};
+
 type WalletConnectAction = {
-  readonly connectWallet: () => Promise<void>;
+  readonly connectWallet: () => Promise<WalletConnectResult>;
   readonly connected: boolean;
   readonly connecting: boolean;
   readonly errorMessage: string | null;
@@ -31,7 +42,7 @@ export function useWalletConnectAction(): WalletConnectAction {
     if (stored) setAddress(stored);
   }, []);
 
-  const connectWallet = useCallback(async () => {
+  const connectWallet = useCallback(async (): Promise<WalletConnectResult> => {
     try {
       setConnecting(true);
       setErrorMessage(null);
@@ -72,15 +83,17 @@ export function useWalletConnectAction(): WalletConnectAction {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ signature }),
       });
-      const verifiedBody = await verified.json() as { address?: string; error?: string };
+      const verifiedBody = await verified.json() as { address?: string; error?: string; supabaseAuth?: WalletSupabaseAuth };
       if (!verified.ok || !verifiedBody.address) throw new Error(verifiedBody.error ?? "Wallet signature verification failed.");
 
       window.localStorage.setItem(sessionKey, nextAddress);
       setAddress(nextAddress);
+      return { address: nextAddress, supabaseAuth: verifiedBody.supabaseAuth };
     } catch (error) {
       const message = error instanceof Error ? error.message : "Somnia wallet connection failed.";
       setErrorMessage(message);
       console.warn("Somnia wallet connection failed.", message);
+      throw error instanceof Error ? error : new Error(message);
     } finally {
       setConnecting(false);
     }
