@@ -51,7 +51,7 @@ export function useAppAccess() {
   return {
     canOpenApp,
     loading,
-    openAppPath: canOpenApp ? "/app/dashboard" : "/onboard",
+    openAppPath: canOpenApp ? "/dashboard" : "/onboard",
     signedIn,
     walletConnected,
   };

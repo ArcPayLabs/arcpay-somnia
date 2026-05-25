@@ -3,35 +3,35 @@ import { SectionHeading } from "@/components/primitives/SectionHeading";
 
 export function PrivacyAudit() {
   return (
-    <section className="bg-background pb-24 px-6">
-      <div className="max-w-[88rem] mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-4">
-        <div className="rounded-3xl bg-card border border-border p-10">
+    <section className="bg-background px-6 pb-24">
+      <div className="mx-auto grid max-w-[88rem] grid-cols-1 gap-4 lg:grid-cols-[1.1fr_1fr]">
+        <div className="rounded-3xl border border-border bg-card p-10">
           <SectionHeading
             eyebrow="Privacy & audit"
-            title="Public ledger does not have to mean public revenue."
-            description="ArcPay routes incoming and outgoing funds through shielded rails when available, then exports viewing-key reports when finance, tax, or compliance teams need disclosure."
+            title="Public chain evidence without exposing every private detail."
+            description="ArcPay includes a SomniaPrivacyVault contract for commitment-based payment intents, encrypted memo pointers, and selective disclosure records."
           />
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {[
-              { icon: EyeOff, t: "Shield", b: "Private payment rails" },
+              { icon: EyeOff, t: "Commit", b: "Privacy Vault intents" },
               { icon: KeyRound, t: "Disclose", b: "Scoped viewing keys" },
-              { icon: Eye, t: "Audit", b: "Date-range exports" },
+              { icon: Eye, t: "Audit", b: "Local and mirrored records" },
             ].map((c) => (
               <div key={c.t} className="rounded-xl bg-muted p-4">
-                <c.icon className="w-4 h-4 text-primary mb-2" />
+                <c.icon className="mb-2 h-4 w-4 text-primary" />
                 <div className="text-sm font-semibold">{c.t}</div>
-                <div className="text-xs text-muted-foreground mt-1">{c.b}</div>
+                <div className="mt-1 text-xs text-muted-foreground">{c.b}</div>
               </div>
             ))}
           </div>
         </div>
-        <div className="rounded-3xl bg-surface-dark text-surface-dark-foreground p-10 flex flex-col justify-between min-h-[420px] ap-grid-bg">
-          <div className="text-xs uppercase tracking-[0.18em] text-white/50">Compliance posture</div>
+        <div className="flex min-h-[420px] flex-col justify-between rounded-3xl bg-surface-dark p-10 text-surface-dark-foreground ap-grid-bg">
+          <div className="text-xs uppercase tracking-[0.18em] text-white/50">Builder opportunity</div>
           <div>
-            <p className="text-2xl md:text-3xl font-medium leading-snug" style={{ letterSpacing: "-0.025em" }}>
-              "Treasury privacy should not remove oversight. ArcPay keeps the public trail minimal while giving approved reviewers the records they need."
+            <p className="text-2xl font-medium leading-snug md:text-3xl" style={{ letterSpacing: "-0.025em" }}>
+              "Somnia does not need a separate native privacy app for every hackathon team. ArcPay ships a reusable privacy-intent layer agents can build on."
             </p>
-            <div className="mt-6 text-sm text-white/55">ArcPay compliance principle</div>
+            <div className="mt-6 text-sm text-white/55">ArcPay privacy principle</div>
           </div>
         </div>
       </div>

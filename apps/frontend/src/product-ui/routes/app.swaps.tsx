@@ -21,7 +21,7 @@ function SwapsRoute() {
     <div className="space-y-6">
       <PageHeader icon={ArrowLeftRight} eyebrow="Treasury routing" title="Swap intents" description="Prepare policy-checked Somnia route intents without pretending a swap executed." />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <StatCard icon={RouteIcon} label="Route type" value="Intent" hint="No fake fills" />
+        <StatCard icon={RouteIcon} label="Route type" value="Intent" hint="No simulated fills" />
         <StatCard icon={ShieldCheck} label="Policy" value="Required" hint="Before execution" />
         <StatCard icon={Bot} label="Executor" value={form.agent} hint="Agent order ready" emphasis />
       </div>
@@ -37,7 +37,7 @@ function SwapsRoute() {
           <div className="rounded-xl border border-border bg-muted p-3 text-sm text-muted-foreground">{message}</div>
         </form>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {["Intent, not fake fill", "Router-ready fields", "Policy-first execution", "Agent order handoff"].map((title) => (
+          {["Intent, not simulated fill", "Router-ready fields", "Policy-first execution", "Agent order handoff"].map((title) => (
             <article className="rounded-2xl border border-border bg-card p-5" key={title}>
               <ArrowLeftRight className="h-5 w-5 text-primary" />
               <h2 className="mt-10 text-xl font-medium">{title}</h2>

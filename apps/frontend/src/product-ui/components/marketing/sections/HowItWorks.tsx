@@ -1,50 +1,50 @@
-﻿import { Inbox, Shield, Sparkles, Send } from "lucide-react";
+import { Bot, CreditCard, Shield, Workflow } from "lucide-react";
 import { SectionHeading } from "@/components/primitives/SectionHeading";
 
 const STEPS = [
   {
-    icon: Inbox,
-    name: "Receive",
-    body: "Agents collect payment via x402-style endpoints, invoices, and pay links in SOMUSD or STT.",
+    icon: Bot,
+    name: "Discover",
+    body: "Operators register agents with capability metadata, endpoints, and STT pricing in the Somnia agent registry.",
+  },
+  {
+    icon: Workflow,
+    name: "Escrow",
+    body: "Agent work orders escrow STT and move through pending, processing, fulfilled, settled, refunded, or failed states.",
+  },
+  {
+    icon: CreditCard,
+    name: "Control",
+    body: "Treasury policies, claim-code onboarding, webhook circuit breakers, and SOMUSD cards control what each agent can spend.",
   },
   {
     icon: Shield,
-    name: "Shield",
-    body: "Route incoming funds into shielded balances with viewing-key disclosure, so the public ledger doesn't leak per-agent revenue.",
-  },
-  {
-    icon: Sparkles,
-    name: "Earn",
-    body: "Idle dollars sweep into Somnia strategy and (when enabled) LP Agent Zap-In, with policy-bounded risk levels.",
-  },
-  {
-    icon: Send,
-    name: "Pay",
-    body: "Pay contractors and run batch payroll through Somnia router / Explorer proof routes, with Somnia risk oracle risk scoring at the review step.",
+    name: "Prove",
+    body: "Risk oracle requests, privacy commitments, audit exports, MCP docs, and the Azure event worker give judges verifiable evidence.",
   },
 ];
 
 export function HowItWorks() {
   return (
-    <section className="bg-background py-24 px-6">
-      <div className="max-w-[88rem] mx-auto">
+    <section className="bg-background px-6 py-24">
+      <div className="mx-auto max-w-[88rem]">
         <SectionHeading
           eyebrow="How ArcPay works"
-          title={<>One pipeline, <span className="text-primary">four moves</span>.</>}
-          description="Every dollar that lands in an agent wallet flows through the same auditable pipeline. You decide the policies; ArcPay enforces them."
+          title={<>One agent economy, <span className="text-primary">four controls</span>.</>}
+          description="Every agent action moves through registry, order, policy, card, privacy, and audit surfaces that are actually built in this repo."
         />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
+        <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((s, i) => (
-            <div key={s.name} className="rounded-2xl border border-border bg-card p-6 flex flex-col gap-4">
+            <div key={s.name} className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-6">
               <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                  <s.icon className="w-5 h-5" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <s.icon className="h-5 w-5" />
                 </div>
                 <span className="text-xs font-medium text-muted-foreground">0{i + 1}</span>
               </div>
               <div>
                 <h3 className="text-lg font-semibold">{s.name}</h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{s.body}</p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
               </div>
             </div>
           ))}
@@ -53,4 +53,3 @@ export function HowItWorks() {
     </section>
   );
 }
-

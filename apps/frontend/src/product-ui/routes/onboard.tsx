@@ -40,11 +40,11 @@ function Onboard() {
         </p>
       </div>
 
-      <WalletConnectButton redirectTo="/app/dashboard" />
+      <WalletConnectButton redirectTo="/dashboard" />
 
       {access.signedIn && (
         <Link
-          to="/app/dashboard"
+          to="/dashboard"
           className="flex h-12 items-center justify-center gap-2 rounded-xl bg-primary font-semibold text-primary-foreground hover:brightness-110"
         >
           Continue to dashboard <ArrowRight className="h-4 w-4" />

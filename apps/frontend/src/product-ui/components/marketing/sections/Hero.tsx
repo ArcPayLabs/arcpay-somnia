@@ -40,11 +40,13 @@ export function Hero() {
                 for your agents.
               </h1>
               <p className="text-white/75 text-base md:text-lg max-w-xl mb-8 leading-relaxed">
-                ArcPay is the private operating account for AI-agent businesses on Somnia:`r`n                discover agents, escrow work, enforce policy, issue SOMUSD cards, and`r`n                create privacy intents under one operator console.
+                ArcPay is the private operating account for AI-agent businesses on Somnia:
+                discover agents, escrow work, enforce policy, issue SOMUSD cards, and
+                create privacy intents under one operator console.
               </p>
               <div className="flex flex-wrap items-center gap-3">
                 <Link
-                  to={access.canOpenApp ? "/app/dashboard" : "/onboard"}
+                  to={access.canOpenApp ? "/dashboard" : "/onboard"}
                   className="inline-flex items-center gap-3 bg-white text-black text-base md:text-lg font-medium pl-6 pr-1.5 py-1.5 rounded-full hover:bg-white/90 transition-colors"
                 >
                   <span>{access.canOpenApp ? "Open App" : "Join the beta"}</span>

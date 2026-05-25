@@ -20,22 +20,22 @@ const SOLUTIONS = [
   {
     icon: Bot,
     title: "AI-agent operators",
-    body: "Monetize agent endpoints via x402, route revenue into shielded balances, and pay model providers with policy guardrails.",
+    body: "Register service agents, publish capabilities, price work in STT, and let other operators or agents create escrowed orders.",
   },
   {
     icon: Briefcase,
     title: "Multi-agent agencies",
-    body: "One dashboard for client revenue, contractor payroll, and treasury health without leaking per-agent balances on the public ledger.",
+    body: "One dashboard for agent orders, contractor records, SOMUSD spend cards, privacy commitments, and audit evidence.",
   },
   {
     icon: Users,
     title: "DAOs & collectives",
-    body: "Policy-bounded spending, viewing-key disclosure for members, and audit exports that match what the public ledger shows.",
+    body: "Policy-bounded spending, risk review, selective disclosure records, and exportable audit trails for shared operators.",
   },
   {
     icon: Building2,
     title: "Enterprise treasury",
-    body: "Policy signer-gated dWallet approvals, scoped Explorer proof routes, Somnia risk oracle-driven counterparty controls, and emergency pause.",
+    body: "Spend windows, weekly and daily limits, approval thresholds, allowlists, webhook circuit breakers, risk oracle requests, and emergency pause.",
   },
 ];
 
@@ -47,8 +47,8 @@ function SolutionsPage() {
           <SectionHeading
             align="center"
             eyebrow="Solutions"
-            title={<>Built for the people <span className="text-primary">moving real money</span>.</>}
-            description="ArcPay is one product. The shape it takes depends on who's running it."
+            title={<>Built for teams running <span className="text-primary">autonomous work</span>.</>}
+            description="ArcPay is a Somnia Testnet product surface for agent operators, builders, judges, and treasury teams."
           />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12">
             {SOLUTIONS.map((s) => (

@@ -1,76 +1,74 @@
-﻿import { SectionHeading } from "@/components/primitives/SectionHeading";
-import { TrendingUp, Layers, ShieldAlert, Lock } from "lucide-react";
+import { CreditCard, Layers, Lock, ShieldAlert } from "lucide-react";
+import { SectionHeading } from "@/components/primitives/SectionHeading";
 
 export function YieldRisk() {
   return (
-    <section className="bg-background pb-24 px-6">
-      <div className="max-w-[88rem] mx-auto">
+    <section className="bg-background px-6 pb-24">
+      <div className="mx-auto max-w-[88rem]">
         <SectionHeading
           eyebrow="Treasury intelligence"
-          title={<>Yield routing and risk, <span className="text-primary">policy-bounded</span>.</>}
-          description="Idle balances sweep into yield. Counterparties are scored before payment. You set the rules; ArcPay enforces them at the final-review step."
+          title={<>Cards, risk, and policy, <span className="text-primary">built for agents</span>.</>}
+          description="ArcPay does not overclaim missing DeFi rails. It gives Somnia agents real order escrow, SOMUSD spend cards, risk requests, privacy commitments, and policy checks today."
         />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-12">
-          {/* Yield card */}
+        <div className="mt-12 grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div className="rounded-3xl border border-border bg-card p-8">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground mb-4">
-              <TrendingUp className="w-3.5 h-3.5" /> Yield positions
+            <div className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              <CreditCard className="h-3.5 w-3.5" /> Agent spend cards
             </div>
             <div className="flex flex-col gap-3">
-              <div className="rounded-2xl bg-muted p-5 flex items-center justify-between">
+              <div className="flex items-center justify-between rounded-2xl bg-muted p-5">
                 <div>
-                  <div className="text-sm font-semibold">Somnia strategy SOMUSD vault</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">Conservative Â· Liquid</div>
+                  <div className="text-sm font-semibold">Research Agent SOMUSD Card</div>
+                  <div className="mt-0.5 text-xs text-muted-foreground">Create, top up, freeze, activate</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-medium">8.2%</div>
-                  <div className="text-xs text-muted-foreground">est. APY</div>
+                  <div className="text-lg font-medium">5</div>
+                  <div className="text-xs text-muted-foreground">SOMUSD limit</div>
                 </div>
               </div>
-              <div className="rounded-2xl bg-muted p-5 flex items-center justify-between">
+              <div className="flex items-center justify-between rounded-2xl bg-muted p-5">
                 <div>
-                  <div className="text-sm font-semibold">LP Agent Â· Meteora Zap-In</div>
-                  <div className="text-xs text-warning-foreground/80 mt-0.5 flex items-center gap-1.5">
-                    <Lock className="w-3 h-3" /> LP Agent premium endpoint connected
+                  <div className="text-sm font-semibold">Webhook circuit breaker</div>
+                  <div className="mt-0.5 flex items-center gap-1.5 text-xs text-warning-foreground/80">
+                    <Lock className="h-3 w-3" /> Auto-opens after repeated failures
                   </div>
                 </div>
-                <div className="text-right opacity-50">
-                  <div className="text-lg font-medium">--</div>
-                  <div className="text-xs">ready</div>
+                <div className="text-right">
+                  <div className="text-lg font-medium">3</div>
+                  <div className="text-xs">failure threshold</div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Risk card */}
           <div className="rounded-3xl border border-border bg-card p-8">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground mb-4">
-              <ShieldAlert className="w-3.5 h-3.5" /> Counterparty risk
+            <div className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              <ShieldAlert className="h-3.5 w-3.5" /> Counterparty risk
             </div>
             <div className="rounded-2xl bg-muted p-5">
-              <div className="flex items-center justify-between mb-3">
+              <div className="mb-3 flex items-center justify-between">
                 <div className="font-mono text-xs text-muted-foreground">0x7H...9bX</div>
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-success/15 text-success">Approve</span>
+                <span className="rounded-full bg-success/15 px-2 py-0.5 text-xs font-semibold text-success">Approve</span>
               </div>
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div>
                   <div className="text-lg font-medium">82</div>
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Somnia risk oracle</div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Somnia score</div>
                 </div>
                 <div>
-                  <div className="text-lg font-medium">9 mo</div>
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Wallet age</div>
+                  <div className="text-lg font-medium">Oracle</div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Risk source</div>
                 </div>
                 <div>
-                  <div className="text-lg font-medium">142</div>
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Tx 30d</div>
+                  <div className="text-lg font-medium">Audit</div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Record trail</div>
                 </div>
               </div>
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
-              {["Daily limit Â· 25k SOMUSD", "Allowed: SOMUSD, SOMUSD, SOMUSD", "Min score Â· 60", "Block Â· sanctioned"].map((p) => (
-                <span key={p} className="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-muted text-foreground/70">
-                  <Layers className="w-3 h-3" /> {p}
+              {["Hourly / daily / weekly limits", "Allowed: STT, SOMUSD", "Risk floor 60", "Emergency pause"].map((p) => (
+                <span key={p} className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs text-foreground/70">
+                  <Layers className="h-3 w-3" /> {p}
                 </span>
               ))}
             </div>
@@ -80,4 +78,3 @@ export function YieldRisk() {
     </section>
   );
 }
-

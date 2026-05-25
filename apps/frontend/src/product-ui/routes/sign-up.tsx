@@ -59,7 +59,7 @@ function SignUp() {
 
     if (data.session) {
       await ensureCurrentUserAccount(supabase);
-      navigate({ to: "/app/dashboard" });
+      navigate({ to: "/dashboard" });
       return;
     }
 
@@ -85,7 +85,7 @@ function SignUp() {
         <p className="text-muted-foreground text-sm mt-1.5">Wallet sign-in can create the account automatically. Use this form only when you want email to be the primary login now.</p>
       </div>
 
-      <WalletConnectButton redirectTo="/app/dashboard" />
+      <WalletConnectButton redirectTo="/dashboard" />
       <Divider />
 
       <form className="space-y-4" onSubmit={submit}>

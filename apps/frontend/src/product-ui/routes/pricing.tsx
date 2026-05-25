@@ -25,23 +25,23 @@ const TIERS = [
     features: [
       "Unlimited testnet workspaces",
       "All policy controls",
-      "Privacy Vault testnet, Policy signer pre-alpha",
-      "Somnia RPC webhook activity",
+      "Privacy Vault testnet intents",
+      "Azure event worker activity",
       "Audit export",
     ],
   },
   {
-    name: "Operator",
-    price: "$0.05",
-    sub: "per settled $1k, testnet only",
-    cta: "Request testnet",
+    name: "Buildathon",
+    price: "Open",
+    sub: "for judges and testers",
+    cta: "Open app",
     highlight: true,
     features: [
-      "SOMUSD, SOMUSD, SOMUSD, STT",
-      "Somnia strategy yield routing",
-      "Somnia router + Explorer proof swap rails",
-      "Somnia risk oracle risk scoring",
-      "Up to 5 workspace members",
+      "STT order escrow",
+      "SOMUSD agent spend cards",
+      "Somnia risk oracle requests",
+      "MCP, CLI, skill.md, and llms.txt",
+      "Operator controls and circuit breakers",
     ],
   },
   {
@@ -50,11 +50,11 @@ const TIERS = [
     sub: "Volume + private rails",
     cta: "Talk to us",
     features: [
-      "Privacy Vault / Private intent production rails",
-      "LP Agent Zap-In (premium)",
-      "Policy signer dWallet policy approvals",
-      "SSO + workspace controls",
-      "Dedicated infra & support",
+      "Production privacy hardening",
+      "Hosted worker observability",
+      "SSO and workspace controls",
+      "Dedicated deployment support",
+      "Custom chain-specific extensions",
     ],
   },
 ];
@@ -68,7 +68,7 @@ function PricingPage() {
             align="center"
             eyebrow="Pricing"
             title={<>Pay only when value <span className="text-primary">settles</span>.</>}
-            description="No seat licenses, no setup fees. testnet usage is metered on settled volume; testnet is free during beta."
+            description="The Somnia buildathon version is free to test. Pricing is future-facing and only applies after production hardening."
           />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12">
             {TIERS.map((t) => (

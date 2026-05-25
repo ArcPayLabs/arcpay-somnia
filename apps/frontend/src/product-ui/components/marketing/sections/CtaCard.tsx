@@ -18,7 +18,7 @@ export function CtaCard() {
             a treasury that thinks?
           </h2>
           <p className="text-base md:text-lg text-white/85 mb-8 max-w-xl">
-            Join the ArcPay beta. testnet is open today; testnet rolls out by invite.
+            Open the Somnia Testnet build, connect an EVM wallet, and run the agent treasury flow end to end.
           </p>
           <Link
             to="/sign-up"

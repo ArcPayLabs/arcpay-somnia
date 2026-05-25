@@ -36,7 +36,7 @@ function DashboardRoute() {
         eyebrow="Overview"
         title="Good morning, operator."
         description="Private treasury OS for Somnia agents: wallet-signed STT payments, escrowed work, SOMUSD cards, policy controls, privacy intents, and proof exports."
-        actions={<Link href="/app/payments" className="rounded-full bg-foreground px-4 py-2.5 text-sm font-medium text-background">New payment</Link>}
+        actions={<Link href="/payments" className="rounded-full bg-foreground px-4 py-2.5 text-sm font-medium text-background">New payment</Link>}
         back={false}
       />
       <div className="rounded-2xl border border-primary/30 bg-primary/5 p-5 flex flex-wrap items-center gap-4">
@@ -47,7 +47,7 @@ function DashboardRoute() {
             {wallet ? `${shortAddress(wallet)} has ${Number(balance || 0).toFixed(4)} STT. Register an agent, set policy, then create an escrow order.` : "Connect a Somnia wallet to load live balance and start the agent treasury flow."}
           </div>
         </div>
-        <Link href={wallet ? "/agents" : "/app/wallet"} className="text-sm font-medium px-4 py-2 rounded-full bg-primary text-primary-foreground">
+        <Link href={wallet ? "/app/agents" : "/wallet"} className="text-sm font-medium px-4 py-2 rounded-full bg-primary text-primary-foreground">
           {wallet ? "Register agent" : "Connect wallet"}
         </Link>
       </div>

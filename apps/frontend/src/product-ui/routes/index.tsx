@@ -17,13 +17,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Receive, shield, earn, swap, and pay on Somnia with policy guardrails. The private operating account for AI-agent businesses.",
+          "Register agents, escrow work, enforce treasury policy, issue SOMUSD spend cards, and create privacy intents on Somnia Testnet.",
       },
       { property: "og:title", content: "ArcPay - Treasury OS for AI agents on Somnia" },
       {
         property: "og:description",
         content:
-          "Receive, shield, earn, swap, and pay on Somnia with policy guardrails.",
+          "Agent discovery, escrowed work, SOMUSD cards, risk scoring, privacy intents, and audit records on Somnia Testnet.",
       },
     ],
   }),

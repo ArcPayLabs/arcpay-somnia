@@ -46,7 +46,7 @@ function Reset() {
       return;
     }
 
-    navigate({ to: "/app/dashboard" });
+    navigate({ to: "/dashboard" });
   };
 
   return (

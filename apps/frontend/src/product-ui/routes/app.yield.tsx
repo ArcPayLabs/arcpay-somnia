@@ -21,7 +21,7 @@ function YieldRoute() {
     <div className="space-y-6">
       <PageHeader icon={TrendingUp} eyebrow="Yield strategy" title="Agent-managed yield intents" description="Prepare policy-approved strategy requests for Somnia-native vaults and autonomous strategy agents." />
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <StatCard icon={TrendingUp} label="Strategy" value="Intent" hint="No fake APY" />
+        <StatCard icon={TrendingUp} label="Strategy" value="Intent" hint="No simulated APY" />
         <StatCard icon={ShieldCheck} label="Policy" value="Required" hint="Spend controls first" />
         <StatCard icon={WalletCards} label="Asset" value={form.asset} hint="Treasury asset" />
         <StatCard icon={Bot} label="Agent" value="Ready" hint={form.agent} emphasis />

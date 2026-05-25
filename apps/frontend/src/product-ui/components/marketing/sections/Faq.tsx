@@ -1,39 +1,39 @@
-﻿import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { SectionHeading } from "@/components/primitives/SectionHeading";
 
 const FAQS = [
   {
     q: "Which tokens does ArcPay support?",
-    a: "Today: SOMUSD, STT, SOMUSD (testnet pending fund), and SOMUSD for AUD settlement. More stable rails will come as native pools and routes are confirmed live.",
+    a: "Today in the Somnia build: STT for native gas/order escrow and SOMUSD for agent spend cards. Extra rails can be added after native Somnia liquidity and provider APIs are confirmed live.",
   },
   {
     q: "How is privacy actually delivered?",
-    a: "Through Privacy Vault and Private intent rails on Somnia, with viewing-key disclosure for compliance. ArcPay labels each rail as testnet, pre-alpha, or production-ready, and never claims final privacy on a route that isn't live.",
+    a: "Through the SomniaPrivacyVault contract: commitment-based intents, encrypted memo URIs, and selective disclosure records. It is a testnet privacy-intent layer with production hardening still ahead.",
   },
   {
     q: "Do you hold custody of funds?",
     a: "No. ArcPay is policy-controlled, not custodial. Signing happens in your wallet. ArcPay enforces guardrails and never moves money on its own.",
   },
   {
-    q: "What happens when a route or pool isn't available?",
-    a: "You get a real provider-style error: 'Insufficient STT for network fees.', 'No active SOMUSD/SOMUSD pool found.', 'Route minimum is 10 SOMUSD.' We never pretend a transaction worked.",
+    q: "What happens when a route or pool is not available?",
+    a: "ArcPay records the action as a governed intent or blocks it with policy feedback. Swap and yield pages stay in intent mode until native Somnia rails are deployed.",
   },
   {
     q: "Can I export an audit report?",
-    a: "Yes. The audit page produces a date-range export including transaction signatures, viewing-key requests, and a 'public ledger shows X / private report reveals Y' explanation for each entry.",
+    a: "Yes. The audit page exports local and mirrored action records, including transaction hashes where a Somnia contract write happened.",
   },
 ];
 
 export function Faq() {
   const [open, setOpen] = useState(0);
   return (
-    <section className="bg-background py-24 px-6">
-      <div className="max-w-[88rem] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-12">
+    <section className="bg-background px-6 py-24">
+      <div className="mx-auto grid max-w-[88rem] grid-cols-1 gap-12 lg:grid-cols-[1fr_1.4fr]">
         <SectionHeading
           eyebrow="FAQ"
           title="Straightforward answers."
-          description="If you have a question we haven't covered, ping us. We'd rather give an honest 'not yet' than a marketing answer."
+          description="If you have a question we have not covered, ping us. We would rather give an honest 'not yet' than a marketing answer."
         />
         <div className="flex flex-col gap-3">
           {FAQS.map((f, i) => {
@@ -43,15 +43,15 @@ export function Faq() {
                 key={f.q}
                 type="button"
                 onClick={() => setOpen(active ? -1 : i)}
-                className={`text-left rounded-2xl border p-5 transition-all ${
+                className={`rounded-2xl border p-5 text-left transition-all ${
                   active ? "border-foreground/15 bg-card shadow-sm" : "border-border bg-card hover:border-foreground/15"
                 }`}
               >
                 <div className="flex items-center justify-between gap-4">
                   <span className="text-base font-medium">{f.q}</span>
-                  {active ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                  {active ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
                 </div>
-                {active && <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{f.a}</p>}
+                {active && <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{f.a}</p>}
               </button>
             );
           })}
@@ -60,4 +60,3 @@ export function Faq() {
     </section>
   );
 }
-

@@ -45,7 +45,7 @@ function SignIn() {
     }
 
     await ensureCurrentUserAccount(supabase);
-    navigate({ to: "/app/dashboard" });
+    navigate({ to: "/dashboard" });
   };
 
   return (
@@ -60,7 +60,7 @@ function SignIn() {
         <p className="text-muted-foreground text-sm mt-1.5">Use wallet first, or use email only if that email account already exists.</p>
       </div>
 
-      <WalletConnectButton redirectTo="/app/dashboard" />
+      <WalletConnectButton redirectTo="/dashboard" />
       <Divider />
 
       <form className="space-y-4" onSubmit={submit}>
