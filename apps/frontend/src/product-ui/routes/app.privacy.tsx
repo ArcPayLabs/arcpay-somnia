@@ -29,8 +29,9 @@ function PrivacyPage() {
   const [items, setItems] = useState<PrivacyIntent[]>(() => readLocalJson(STORAGE_KEY, [] as PrivacyIntent[]));
   const [open, setOpen] = useState<"shield" | "key" | null>(null);
   const [review, setReview] = useState<PrivacyIntent | null>(null);
+  const [releaseTarget, setReleaseTarget] = useState<PrivacyIntent | null>(null);
   const [message, setMessage] = useState("Somnia does not ship a native privacy app yet, so ArcPay provides a testnet privacy-intent layer for agents.");
-  const [form, setForm] = useState({ amount: "0.01", recipient: "", memoUri: "ipfs://encrypted-agent-payment-memo" });
+  const [form, setForm] = useState({ amount: "0.01", recipient: "", memoUri: "ipfs://encrypted-agent-payment-memo", nullifier: "release-secret-001" });
 
   const submitted = items.filter((item) => item.status === "Submitted");
   const disclosures = items.filter((item) => item.status === "Disclosure ready");
@@ -82,6 +83,24 @@ function PrivacyPage() {
     setMessage(`Privacy intent submitted by ${shortAddress(signer)}: ${tx.hash}`);
     setReview(null);
     setOpen(null);
+  }
+
+  async function releaseIntent(item: PrivacyIntent) {
+    const recipient = form.recipient.trim();
+    if (!recipient || !recipient.startsWith("0x")) {
+      setMessage("Enter a recipient wallet address before releasing the intent.");
+      return;
+    }
+
+    const contract = await privacyVaultContract() as any;
+    const nullifier = hashText(`${item.id}:${form.nullifier}:${Date.now()}`);
+    const tx = await contract.releaseIntent(item.commitment, nullifier, recipient);
+    await tx.wait();
+    const next = items.map((current) => current.id === item.id ? { ...current, status: "Disclosure ready" as const, txHash: tx.hash } : current);
+    persist(next);
+    writeRecord({ id: crypto.randomUUID(), type: "privacy", title: `Released privacy commitment ${shortAddress(item.commitment)}`, status: "released", amount: item.amount, txHash: tx.hash });
+    setMessage(`Privacy intent released with nullifier ${shortAddress(nullifier)}: ${tx.hash}`);
+    setReleaseTarget(null);
   }
 
   function createDisclosure() {
@@ -142,6 +161,7 @@ function PrivacyPage() {
             <Field label="Amount STT"><input value={form.amount} onChange={(event) => setForm({ ...form, amount: event.target.value })} className="ap-in" inputMode="decimal" /></Field>
             <Field label="Recipient / auditor"><input value={form.recipient} onChange={(event) => setForm({ ...form, recipient: event.target.value })} className="ap-in" placeholder="0x... or auditor name" /></Field>
             <Field label="Encrypted memo URI"><input value={form.memoUri} onChange={(event) => setForm({ ...form, memoUri: event.target.value })} className="ap-in" /></Field>
+            <Field label="Release secret"><input value={form.nullifier} onChange={(event) => setForm({ ...form, nullifier: event.target.value })} className="ap-in" /></Field>
           </div>
           <div className="mt-5 flex flex-wrap gap-2">
             {open === "shield" ? <button onClick={prepareShield} className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">Review vault tx</button> : null}
@@ -164,12 +184,32 @@ function PrivacyPage() {
               <div className="md:col-span-2">
                 {item.txHash ? <a href={txUrl(item.txHash)} target="_blank" rel="noreferrer" className="text-primary underline-offset-4 hover:underline">{shortAddress(item.txHash)}</a> : <span className="text-muted-foreground">No tx yet</span>}
               </div>
+              <div className="md:col-span-12 flex flex-wrap gap-2">
+                {item.status === "Submitted" && (
+                  <button onClick={() => setReleaseTarget(item)} className="rounded-full bg-foreground px-4 py-2 text-xs font-semibold text-background">
+                    Release with nullifier
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>
       </section>
 
       <ReviewModal open={Boolean(review)} onOpenChange={(value) => !value && setReview(null)} title="Submit privacy vault intent" rows={rows} confirmLabel="Sign vault tx" onConfirm={submitShield} />
+      <ReviewModal
+        open={Boolean(releaseTarget)}
+        onOpenChange={(value) => !value && setReleaseTarget(null)}
+        title="Release privacy intent"
+        rows={releaseTarget ? [
+          { label: "Commitment", value: shortAddress(releaseTarget.commitment), mono: true },
+          { label: "Recipient", value: form.recipient || "Missing recipient", mono: true },
+          { label: "Nullifier", value: "Derived at release", mono: true },
+          { label: "Amount", value: `${releaseTarget.amount} STT`, mono: true },
+        ] : []}
+        confirmLabel="Sign release"
+        onConfirm={() => releaseTarget ? releaseIntent(releaseTarget) : undefined}
+      />
     </div>
   );
 }

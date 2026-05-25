@@ -26,6 +26,8 @@ const STATUS_STYLE: Record<Status, string> = {
 
 const CHECKS: { surface: string; status: Status; evidence: string }[] = [
   { surface: "Somnia Testnet contracts", status: "testnet", evidence: "AgentRegistry, TreasuryPolicy, AgentOrderBook, OperatorControls, RiskOracle, SpendCardVault, and PrivacyVault are deployed on chain 50312." },
+  { surface: "Funded live smoke", status: "testnet", evidence: "npm run smoke:live performs live writes for registry, policy, escrowed orders, operator controls, SOMUSD cards, privacy release, and Somnia agent risk fulfillment." },
+  { surface: "Auth and workspace smoke", status: "live", evidence: "npm run smoke:auth verifies Supabase records, email sign-in workspace upsert, wallet workspace creation, and Somnia contract reads." },
   { surface: "Frontend", status: "live", evidence: "Next.js product UI builds successfully with Somnia-only wallet/auth/dashboard content." },
   { surface: "Worker", status: "live", evidence: "Azure systemd worker listens to Somnia order, card, and operator events from the deployed contracts." },
   { surface: "Tests", status: "local", evidence: "Hardhat test suite covers order lifecycle, approvals, emergency pause, weekly limit, cards, claim codes, circuit breakers, oracle, and privacy vault." },
@@ -67,7 +69,7 @@ function ProofsPage() {
             <section className="rounded-3xl border border-border bg-card p-6">
               <div className="text-sm font-semibold">Run locally</div>
               <div className="mt-4 space-y-3">
-                {["npm run build:frontend", "npm test", "npm run check:worker"].map((cmd) => (
+                {["npm run build:frontend", "npm test", "npm run check:worker", "npm run smoke:auth", "npm run smoke:live"].map((cmd) => (
                   <code key={cmd} className="block rounded-2xl bg-muted px-4 py-3 text-sm">{cmd}</code>
                 ))}
               </div>

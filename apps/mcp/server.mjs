@@ -71,8 +71,21 @@ server.tool("demo_path", "Return the judge demo path for ArcPay Somnia.", {}, as
       "Create and settle an escrowed agent order on /orders.",
       "Create/redeem claim codes and trigger webhook breaker on /operator.",
       "Request and fulfill risk oracle result on /oracle.",
-      "Create and release encrypted Privacy Intents on /privacy.",
+      "Create and release encrypted Privacy Intents with nullifiers on /privacy.",
       "Show /audit and /proofs.",
+    ].join("\n"),
+  }],
+}));
+
+server.tool("smoke_commands", "Return the verification commands judges can run locally and against Somnia testnet.", {}, async () => ({
+  content: [{
+    type: "text",
+    text: [
+      "npm run build:frontend",
+      "npm test",
+      "npm run check:worker",
+      "npm run smoke:auth",
+      "npm run smoke:live",
     ].join("\n"),
   }],
 }));

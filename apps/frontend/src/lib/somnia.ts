@@ -22,6 +22,10 @@ export const CONTRACTS = {
 export const DEPTH_CONTRACTS_READY =
   CONTRACTS.OperatorControls !== NATIVE_TOKEN && CONTRACTS.SomniaAgentRiskOracle !== NATIVE_TOKEN;
 export const SOMUSD_TOKEN_ADDRESS = (deployment as { somUsdToken?: string }).somUsdToken ?? "0x02b8316775057e2096471473663d51ceafbe3e3b";
+export const SOMNIA_AGENT_PLATFORM_ADDRESS =
+  (deployment as { somniaAgentPlatform?: string }).somniaAgentPlatform ?? "0x037Bb9C718F3f7fe5eCBDB0b600D607b52706776";
+export const SOMNIA_RISK_AGENT_ID =
+  (deployment as { somniaRiskAgentId?: string }).somniaRiskAgentId ?? "13174292974160097713";
 
 export const AGENT_REGISTRY_ABI = [
   "function registerAgent(bytes32 agentId,string name,string endpoint,string capabilities,uint256 priceWei)",
@@ -71,7 +75,14 @@ export const RISK_ORACLE_ABI = [
   "function requestRisk(bytes32 orderId,string prompt) payable returns (uint256 requestId)",
   "function ownerFulfillForDemo(uint256 requestId,uint256 score,string verdict,string evidenceUri)",
   "function results(uint256 requestId) view returns (uint256 requestId,bytes32 orderId,address requester,uint256 score,string verdict,string evidenceUri,bool fulfilled,uint8 responseStatus,uint256 requestedAt,uint256 fulfilledAt)",
+  "function pricePerAgentWei() view returns (uint256)",
+  "function subcommitteeSize() view returns (uint256)",
   "event RiskRequested(uint256 indexed requestId,bytes32 indexed orderId,address indexed requester,string prompt)",
+  "event RiskFulfilled(uint256 indexed requestId,bytes32 indexed orderId,uint256 score,string verdict,string evidenceUri)",
+] as const;
+
+export const SOMNIA_AGENT_PLATFORM_ABI = [
+  "function getRequestDeposit() view returns (uint256)",
 ] as const;
 
 export const SPEND_CARD_VAULT_ABI = [
@@ -148,6 +159,26 @@ export function addressUrl(address: string) {
 
 export function publicProvider() {
   return new JsonRpcProvider(SOMNIA_RPC_URL, SOMNIA_CHAIN_ID);
+}
+
+export async function riskOracleQuote() {
+  const provider = publicProvider();
+  const oracle = new Contract(CONTRACTS.SomniaAgentRiskOracle, RISK_ORACLE_ABI, provider);
+  const platform = new Contract(SOMNIA_AGENT_PLATFORM_ADDRESS, SOMNIA_AGENT_PLATFORM_ABI, provider);
+  const [requestDeposit, pricePerAgentWei, subcommitteeSize] = await Promise.all([
+    (platform as any).getRequestDeposit() as Promise<bigint>,
+    (oracle as any).pricePerAgentWei() as Promise<bigint>,
+    (oracle as any).subcommitteeSize() as Promise<bigint>,
+  ]);
+
+  return {
+    agentId: SOMNIA_RISK_AGENT_ID,
+    platform: SOMNIA_AGENT_PLATFORM_ADDRESS,
+    pricePerAgentWei,
+    requestDeposit,
+    subcommitteeSize,
+    totalWei: requestDeposit + (pricePerAgentWei * subcommitteeSize),
+  };
 }
 
 export async function switchToSomnia() {

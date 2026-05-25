@@ -4,7 +4,7 @@ import { useState } from "react";
 import { CreditCard, Pause, Plus, WalletCards } from "lucide-react";
 import { PageHeader } from "@/components/app/PageHeader";
 import { StatCard } from "@/components/primitives/StatCard";
-import { erc20Contract, hashText, shortAddress, SOMUSD_TOKEN_ADDRESS, spendCardVaultContract, toUnits, writeRecord } from "@somnia/lib/somnia";
+import { connectedAddress, erc20Contract, hashText, shortAddress, SOMUSD_TOKEN_ADDRESS, spendCardVaultContract, toUnits, writeRecord } from "@somnia/lib/somnia";
 
 export const Route = { options: { component: CardsRoute } };
 
@@ -14,7 +14,8 @@ function CardsRoute() {
 
   async function createCard() {
     const vault = await spendCardVaultContract() as any;
-    const tx = await vault.createCard(hashText(form.slug), form.agent, SOMUSD_TOKEN_ADDRESS, toUnits(form.limit), form.label);
+    const agent = form.agent.trim() || await connectedAddress();
+    const tx = await vault.createCard(hashText(form.slug), agent, SOMUSD_TOKEN_ADDRESS, toUnits(form.limit), form.label);
     await tx.wait();
     writeRecord({ id: crypto.randomUUID(), type: "card", title: `Created ${form.label}`, status: "created", amount: form.limit, txHash: tx.hash });
     setStatus(`Card created: ${tx.hash}`);

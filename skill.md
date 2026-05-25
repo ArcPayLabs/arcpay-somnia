@@ -17,6 +17,8 @@ treasury policies.
 - Create and redeem agent claim codes through `OperatorControls`.
 - Track webhook circuit breakers through `OperatorControls`.
 - Request risk analysis through `SomniaAgentRiskOracle`.
+- Quote and pay the live Somnia agent requester deposit before risk requests.
+- Create and release Privacy Intents with one-time nullifiers.
 - Use the MCP server with `npm run mcp`.
 
 ## Constraints
@@ -48,5 +50,6 @@ npm run arcpay -- claim-hash claim-research-agent-001
 npm run arcpay -- privacy-guide
 npm run arcpay -- privacy-commit "invoice-secret"
 npm run arcpay -- demo-path
+npm run arcpay -- smoke
 npm run mcp
 ```

@@ -19,7 +19,17 @@ function OrdersRoute() {
     const contract = await orderBookContract() as any;
     const tx = await contract.createOrder(agentIdFromSlug(form.agentSlug), form.requestUri, { value: toWei(form.amount) });
     const receipt = await tx.wait();
-    const orderId = receipt.logs?.[0]?.topics?.[1] ?? "";
+    const parsed = receipt.logs
+      ?.map((log: unknown) => {
+        try {
+          return contract.interface.parseLog(log);
+        } catch {
+          return null;
+        }
+      })
+      .find((event: { name?: string } | null) => event?.name === "OrderCreated");
+    const orderId = parsed?.args?.orderId ?? "";
+    if (!orderId) throw new Error("OrderCreated event missing.");
     writeRecord({ id: crypto.randomUUID(), type: "order", title: `Created ${form.agentSlug} order`, status: "pending", amount: form.amount, txHash: tx.hash });
     setForm((current) => ({ ...current, orderId }));
     setStatus(`Order created: ${tx.hash}`);

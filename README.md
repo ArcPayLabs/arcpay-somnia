@@ -39,6 +39,8 @@ npm run install:worker
 npm run build
 npm test
 npm run build:frontend
+npm run smoke:auth
+npm run smoke:live
 ```
 
 Run the app:
@@ -55,6 +57,8 @@ npm run arcpay -- wallet
 npm run arcpay -- agent-id research-agent
 npm run arcpay -- claim-hash claim-research-agent-001
 npm run arcpay -- privacy-guide
+npm run arcpay -- demo-path
+npm run arcpay -- smoke
 npm run arcpay -- mcp-config
 npm run mcp
 npm run worker
@@ -192,10 +196,13 @@ Current SOMUSD testnet token:
 
 1. Read `docs/somnia-buildathon.md`.
 2. Read `docs/agent-protocol.md`.
-3. Install with `npm install` and `npm run install:frontend`.
-4. Compile and test with `npm run build`, `npm test`, and `npm run build:frontend`.
-5. Start the UI with `npm run dev:frontend`.
-6. Register an agent, set a policy, allow the agent, create an order, fulfill it, and settle.
+3. Read `docs/judge-demo-script.md`.
+4. Install with `npm install` and `npm run install:frontend`.
+5. Compile and test with `npm run build`, `npm test`, and `npm run build:frontend`.
+6. Run `npm run smoke:auth` for Supabase/auth/workspace and read-only Somnia checks.
+7. Run `npm run smoke:live` with a funded Somnia testnet `PRIVATE_KEY` for live contract writes.
+8. Start the UI with `npm run dev:frontend`.
+9. Register an agent, set a policy, allow the agent, create an order, fulfill it, settle it, request risk, create a card, and release a privacy intent.
 
 ## Frontend Routes
 
@@ -209,7 +216,7 @@ demo paths resolve to Somnia infrastructure.
 | `/orders` | Create, accept, process, fulfill, settle, or refund escrowed agent orders. |
 | `/cards` | Create SOMUSD-backed agent spend cards with limits and freeze controls. |
 | `/policies` | Set hourly/daily/weekly limits, approval threshold, UTC-hour windows, emergency pause, and agent allowlist. |
-| `/privacy` | Create commitment-based private SOMUSD/STT payment intents with encrypted metadata. |
+| `/privacy` | Create and release commitment-based SOMUSD/STT payment intents with encrypted metadata and nullifiers. |
 | `/operator` | Claim-code onboarding and webhook circuit-breaker controls. |
 | `/oracle` | Somnia agent risk request/callback flow. |
 | `/payments` | Wallet-signed direct STT payments for operator payouts. |
@@ -234,3 +241,4 @@ Current Somnia build:
 - `llms.txt` and `skill.md` added for agent-facing usage
 - Supabase persistence migration added for audit/workflow records
 - Azure worker package added for live event monitoring
+- repeatable smoke scripts added for auth/workspace and funded Somnia testnet writes

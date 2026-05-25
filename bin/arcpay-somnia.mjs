@@ -25,6 +25,7 @@ Commands:
   arcpay-somnia privacy-abi            Print Privacy Intent contract ABI
   arcpay-somnia privacy-guide          Print builder integration guide
   arcpay-somnia demo-path              Print judge demo steps
+  arcpay-somnia smoke                  Print smoke-test commands
   arcpay-somnia mcp-config             Print MCP host config
 `);
 }
@@ -82,8 +83,17 @@ try {
       "5. Move order through accept -> processing -> fulfill -> settle or fail/refund.",
       "6. Open /operator for claim-code and webhook circuit-breaker proof.",
       "7. Open /oracle for Somnia agent risk callback proof.",
-      "8. Open /privacy for encrypted-metadata payment intents.",
+      "8. Open /privacy for encrypted-metadata payment intents and nullifier release.",
       "9. Open /proofs for deployed addresses and build commands.",
+    ].join("\n"));
+  } else if (command === "smoke") {
+    console.log([
+      "Run local + live verification:",
+      "npm run build:frontend",
+      "npm test",
+      "npm run check:worker",
+      "npm run smoke:auth",
+      "npm run smoke:live",
     ].join("\n"));
   } else if (command === "mcp-config") {
     console.log(JSON.stringify({

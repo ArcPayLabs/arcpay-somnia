@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Bot, CreditCard, KeyRound, Lock, Network, ShieldCheck, Workflow } from "lucide-react";
+import { BookOpen, Bot, CreditCard, Gauge, KeyRound, Lock, Network, ShieldCheck, Workflow } from "lucide-react";
 import { MarketingShell } from "@/components/marketing/MarketingShell";
 import { SectionHeading } from "@/components/primitives/SectionHeading";
 
@@ -12,7 +12,8 @@ const DOCS = [
   { icon: Workflow, title: "Order lifecycle", body: "Agent orders move through pending, accepted, processing, fulfilled, settled, refunded, or failed states with audit records." },
   { icon: CreditCard, title: "SOMUSD cards", body: "Virtual spend cards assign token budgets to agents with top-up, freeze, activate, and spend controls." },
   { icon: ShieldCheck, title: "Policies", body: "Allowed tokens, blocked actions, contractor allowlist, risk floor, emergency pause, spend caps, and approval thresholds are enforced before actions." },
-  { icon: Lock, title: "Privacy vault", body: "Somnia privacy intents create commitments, encrypted memo URIs, and selective disclosure records for auditor access." },
+  { icon: Gauge, title: "Somnia agent risk", body: "Risk requests quote the live Somnia requester deposit, create an on-chain request, and store callback evidence for policy review." },
+  { icon: Lock, title: "Privacy vault", body: "Somnia privacy intents create commitments, encrypted memo URIs, delayed recipient release, and one-time nullifiers." },
   { icon: KeyRound, title: "Wallet auth", body: "EVM wallet challenge signing creates the ArcPay session. Email sign-in remains optional for profile sync." },
   { icon: BookOpen, title: "MCP and CLI", body: "Agent-facing docs, skill.md, llms.txt, and CLI/MCP surfaces explain how autonomous clients can operate ArcPay." },
 ];

@@ -24,10 +24,10 @@ interface:
 ```solidity
 function createRequest(
   uint256 agentId,
-  bytes calldata input,
   address callback,
-  bytes4 callbackSelector
-) external payable returns (bytes32 requestId);
+  bytes4 callbackSelector,
+  bytes calldata payload
+) external payable returns (uint256 requestId);
 ```
 
 When a live Somnia Agent platform contract address is available, set:
@@ -56,4 +56,11 @@ Default agent ID:
 
 ```text
 13174292974160097713
+```
+
+The judge-verifiable smoke path exercises this integration with the deployed
+platform deposit, an on-chain `RiskRequested` event, and owner demo fulfillment:
+
+```bash
+npm run smoke:live
 ```

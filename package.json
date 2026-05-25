@@ -17,6 +17,8 @@
     "mcp": "npm run start --prefix apps/mcp",
     "worker": "npm run start --prefix apps/worker",
     "check:worker": "npm run check --prefix apps/worker",
+    "smoke:auth": "node scripts/smoke-auth.mjs",
+    "smoke:live": "node scripts/smoke-live.mjs",
     "arcpay": "node bin/arcpay-somnia.mjs",
     "test": "hardhat test",
     "check:deployer": "hardhat run scripts/check-deployer.ts --network somniaTestnet",
@@ -25,6 +27,7 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^3.0.8",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@supabase/supabase-js": "^2.106.2",
     "dotenv": "^16.4.7",
     "ethers": "^6.13.5",
     "hardhat": "^2.22.19",

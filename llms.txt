@@ -34,5 +34,7 @@ Agent tooling:
 - `npm run mcp`
 - `npm run arcpay -- demo-path`
 - `/operator` for claim-code onboarding and webhook circuit breakers
-- `/oracle` for Somnia agent risk request/callback proof
-- `/privacy` for Privacy Intent creation/release
+- `/oracle` for Somnia agent requester deposit + risk callback proof
+- `/privacy` for Privacy Intent creation and nullifier release
+- `npm run smoke:auth` for Supabase/auth/workspace verification
+- `npm run smoke:live` for funded Somnia testnet writes

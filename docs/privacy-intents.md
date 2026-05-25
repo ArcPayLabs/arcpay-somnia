@@ -28,6 +28,7 @@ application-level treasury privacy:
 - recipient hidden until release
 - one-time release through a nullifier
 - cancellation/refund while unreleased
+- release proof via nullifier so the same intent cannot be released twice
 
 ## Solidity Interface
 
@@ -55,6 +56,30 @@ await privacyVault.createTokenIntent(
 );
 
 await privacyVault.releaseIntent(commitment, nullifier, recipient);
+```
+
+## Native STT Flow
+
+```ts
+const commitment = keccak256(toUtf8Bytes("payout-42-secret"));
+const nullifier = keccak256(toUtf8Bytes("release-secret-42"));
+
+await privacyVault.createNativeIntent(
+  commitment,
+  "encrypted://your-ciphertext-or-ipfs-pointer",
+  { value: parseEther("0.01") },
+);
+
+await privacyVault.releaseIntent(commitment, nullifier, recipient);
+```
+
+## Smoke Proof
+
+The funded smoke test creates and releases a native privacy intent on Somnia
+testnet:
+
+```bash
+npm run smoke:live
 ```
 
 ## CLI Helpers
