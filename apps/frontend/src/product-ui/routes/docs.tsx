@@ -72,6 +72,8 @@ function DocsPage() {
               </div>
               <div className="mt-6 flex flex-wrap gap-2">
                 <Link href="/sign-in" className="rounded-full bg-foreground px-4 py-2 text-sm font-semibold text-background">Open app</Link>
+                <a href="/openapi.json" target="_blank" rel="noreferrer" className="rounded-full border border-border px-4 py-2 text-sm font-semibold">OpenAPI</a>
+                <a href="/llms.txt" target="_blank" rel="noreferrer" className="rounded-full border border-border px-4 py-2 text-sm font-semibold">llms.txt</a>
                 <a href="https://somnia-testnet.socialscan.io" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold">
                   Explorer <ExternalLink className="h-3.5 w-3.5" />
                 </a>

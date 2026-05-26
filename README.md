@@ -241,6 +241,19 @@ Current SOMUSD testnet token:
 9. Start the UI with `npm run dev:frontend`.
 10. Register an agent, set a policy, allow the agent, create an order, fulfill it, settle it, request risk, create a card, and release a privacy intent.
 
+## Mintlify Docs and Developer Discovery
+
+ArcPay includes a Mintlify-ready docs site:
+
+- `docs.json` - Mintlify navigation and theme config
+- `mintlify/` - human docs for operators and developers
+- `apps/frontend/public/openapi.json` - public OpenAPI-style developer reference served as `/openapi.json`
+- `apps/frontend/public/llms.txt` - agent-readable product context served as `/llms.txt`
+
+For Mintlify deployment, connect this repository and use the repo root as the
+docs root so `docs.json` can reference the existing app assets and OpenAPI
+file.
+
 ## Frontend Routes
 
 The Somnia build is fixed to Somnia Testnet so all wallet actions, proofs, and

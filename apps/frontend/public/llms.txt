@@ -1,0 +1,21 @@
+# ArcPay Somnia
+
+ArcPay Somnia is a wallet-first private treasury OS for autonomous agent businesses on Somnia Testnet.
+
+Use these resources:
+
+- App docs: /docs
+- OpenAPI: /openapi.json
+- x402 health: https://x402.20.208.46.195.nip.io/health
+- x402 demo: https://x402.20.208.46.195.nip.io/x402/demo
+- GitHub: https://github.com/ArcPayLabs/arcpay-somnia
+
+Core flows:
+
+- Register agents with service endpoints, capability tags, and STT pricing.
+- Sell agent work through HTTP 402 and escrowed Somnia orders.
+- Enforce operator policies before treasury execution.
+- Issue STT or SOMUSD invoices with on-chain status evidence.
+- Create SOMUSD spend cards with top-up, freeze, activate, and spend controls.
+- Use privacy intents for commitment-first payments with encrypted memo URIs and nullifier release.
+- Use the local MCP server for agent tools: `npm run mcp`.

@@ -1,0 +1,453 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ArcPay Somnia Developer API",
+    "version": "0.1.0",
+    "summary": "Public developer surface for ArcPay's Somnia x402, workspace evidence, and agent integration flows.",
+    "description": "ArcPay Somnia exposes a wallet-first app, a live x402 payment server, an MCP server for local agent hosts, and OpenAPI-compatible endpoint docs for developers building on Somnia Testnet."
+  },
+  "servers": [
+    {
+      "url": "https://x402.20.208.46.195.nip.io",
+      "description": "Live ArcPay Somnia x402 server"
+    },
+    {
+      "url": "https://arc-pay-frontend.vercel.app",
+      "description": "ArcPay frontend and workspace API"
+    }
+  ],
+  "tags": [
+    {
+      "name": "x402",
+      "description": "HTTP 402 payment-gated agent work on Somnia."
+    },
+    {
+      "name": "Workspace",
+      "description": "Workspace authentication and evidence mirror endpoints."
+    },
+    {
+      "name": "Discovery",
+      "description": "Machine-readable docs and integration discovery."
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["x402"],
+        "summary": "Check x402 server health",
+        "description": "Returns service status, network, program identifiers, and deployed Somnia contracts.",
+        "operationId": "getX402Health",
+        "responses": {
+          "200": {
+            "description": "Server is healthy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                },
+                "example": {
+                  "ok": true,
+                  "service": "arcpay-somnia-x402",
+                  "network": "somnia-testnet",
+                  "chainId": 50312
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/x402/demo": {
+      "get": {
+        "tags": ["Discovery"],
+        "summary": "Get x402 demo path",
+        "description": "Returns a human-readable flow for quoting, paying, verifying, fulfilling, and unlocking an agent endpoint.",
+        "operationId": "getX402Demo",
+        "responses": {
+          "200": {
+            "description": "Demo instructions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/x402/payment-requirements/{agentSlug}": {
+      "get": {
+        "tags": ["x402"],
+        "summary": "Quote Somnia payment requirements",
+        "description": "Returns exact STT payment requirements for a registered Somnia agent without requesting the protected resource.",
+        "operationId": "getPaymentRequirements",
+        "parameters": [
+          {
+            "name": "agentSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "research-agent"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment requirements for the agent.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentRequirements"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Agent not found or inactive."
+          }
+        }
+      }
+    },
+    "/agent/{agentSlug}/work": {
+      "get": {
+        "tags": ["x402"],
+        "summary": "Request protected agent work",
+        "description": "Returns HTTP 402 with payment requirements until a supplied order is fulfilled or settled on Somnia.",
+        "operationId": "getProtectedAgentWork",
+        "parameters": [
+          {
+            "name": "agentSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "research-agent"
+            }
+          },
+          {
+            "name": "orderId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "0xabc123..."
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Unlocked agent result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnlockedWork"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentRequirements"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/x402/verify": {
+      "post": {
+        "tags": ["x402"],
+        "summary": "Verify an on-chain order",
+        "description": "Checks AgentOrderBook state and returns whether the order is paid, fulfilled, unlocked, or settled.",
+        "operationId": "verifyX402Order",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOrderRequest"
+              },
+              "example": {
+                "orderId": "0xabc123...",
+                "agentSlug": "research-agent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/agent/{agentSlug}/provider/fulfill": {
+      "post": {
+        "tags": ["x402"],
+        "summary": "Provider fulfill an order",
+        "description": "Fulfills a paid order from the x402 server's configured provider wallet. Requires admin authorization in production.",
+        "operationId": "fulfillX402Order",
+        "security": [
+          {
+            "adminBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "agentSlug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "research-agent"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FulfillOrderRequest"
+              },
+              "example": {
+                "orderId": "0xabc123...",
+                "resultUri": "ipfs://arcpay-x402-result/research-agent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order fulfilled.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FulfillOrderResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/challenge": {
+      "post": {
+        "tags": ["Workspace"],
+        "summary": "Create wallet auth challenge",
+        "description": "Creates a short-lived wallet challenge for ArcPay workspace sign-in.",
+        "operationId": "createWalletChallenge",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["address"],
+                "properties": {
+                  "address": {
+                    "type": "string",
+                    "example": "0xB883e76A4f6841E72cAF1C28ba00f78df974f448"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Wallet challenge."
+          }
+        }
+      }
+    },
+    "/api/auth/verify": {
+      "post": {
+        "tags": ["Workspace"],
+        "summary": "Verify wallet auth signature",
+        "description": "Verifies the wallet challenge signature and creates or resumes a workspace account.",
+        "operationId": "verifyWalletChallenge",
+        "responses": {
+          "200": {
+            "description": "Workspace session result."
+          }
+        }
+      }
+    },
+    "/api/records": {
+      "get": {
+        "tags": ["Workspace"],
+        "summary": "Read workspace evidence records",
+        "description": "Reads indexed ArcPay evidence records mirrored by the Azure worker into Supabase.",
+        "operationId": "getWorkspaceRecords",
+        "responses": {
+          "200": {
+            "description": "Evidence records."
+          }
+        }
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "tags": ["Discovery"],
+        "summary": "Read this OpenAPI document",
+        "description": "Machine-readable API contract for ArcPay Somnia developer tooling.",
+        "operationId": "getOpenApiDocument",
+        "responses": {
+          "200": {
+            "description": "OpenAPI document."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "adminBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "HealthResponse": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "service": { "type": "string" },
+          "network": { "type": "string" },
+          "chainId": { "type": "integer" },
+          "contracts": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          }
+        }
+      },
+      "DemoResponse": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "steps": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "PaymentRequirements": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "x402Version": { "type": "string" },
+          "network": { "type": "string" },
+          "chainId": { "type": "integer" },
+          "currency": { "type": "string" },
+          "agent": { "$ref": "#/components/schemas/Agent" },
+          "accepts": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/AcceptRequirement" }
+          }
+        }
+      },
+      "Agent": {
+        "type": "object",
+        "properties": {
+          "slug": { "type": "string" },
+          "agentId": { "type": "string" },
+          "owner": { "type": "string" },
+          "name": { "type": "string" },
+          "endpoint": { "type": "string" },
+          "capabilities": { "type": "string" }
+        }
+      },
+      "AcceptRequirement": {
+        "type": "object",
+        "properties": {
+          "amountWei": { "type": "string" },
+          "amountStt": { "type": "string" },
+          "payTo": { "type": "string" },
+          "action": { "type": "string" },
+          "args": {
+            "type": "object",
+            "properties": {
+              "agentId": { "type": "string" },
+              "requestUri": { "type": "string" }
+            }
+          },
+          "unlockUrl": { "type": "string" },
+          "verificationUrl": { "type": "string" }
+        }
+      },
+      "VerifyOrderRequest": {
+        "type": "object",
+        "required": ["orderId"],
+        "properties": {
+          "orderId": { "type": "string" },
+          "agentSlug": { "type": "string" },
+          "requester": { "type": "string" }
+        }
+      },
+      "VerificationResult": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "paid": { "type": "boolean" },
+          "unlocked": { "type": "boolean" },
+          "settled": { "type": "boolean" },
+          "statusName": { "type": "string" },
+          "amountStt": { "type": "string" },
+          "requester": { "type": "string" },
+          "provider": { "type": "string" },
+          "resultUri": { "type": "string" }
+        }
+      },
+      "UnlockedWork": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "unlocked": { "type": "boolean" },
+          "result": {
+            "type": "object",
+            "properties": {
+              "summary": { "type": "string" },
+              "evidenceUri": { "type": "string" },
+              "generatedAt": { "type": "string" },
+              "nextAction": { "type": "string" }
+            }
+          }
+        }
+      },
+      "FulfillOrderRequest": {
+        "type": "object",
+        "required": ["orderId", "resultUri"],
+        "properties": {
+          "orderId": { "type": "string" },
+          "resultUri": { "type": "string" }
+        }
+      },
+      "FulfillOrderResponse": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "statusName": { "type": "string" },
+          "txs": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

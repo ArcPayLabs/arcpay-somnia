@@ -1,0 +1,82 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "ArcPay Somnia",
+  "colors": {
+    "primary": "#ff6b2a",
+    "light": "#fff7ed",
+    "dark": "#101414"
+  },
+  "logo": {
+    "light": "apps/frontend/public/icon.svg",
+    "dark": "apps/frontend/public/icon.svg"
+  },
+  "favicon": "apps/frontend/public/favicon.svg",
+  "navbar": {
+    "links": [
+      {
+        "label": "App",
+        "href": "https://arc-pay-frontend.vercel.app"
+      },
+      {
+        "label": "GitHub",
+        "href": "https://github.com/ArcPayLabs/arcpay-somnia"
+      },
+      {
+        "label": "x402",
+        "href": "https://x402.20.208.46.195.nip.io/x402/demo"
+      }
+    ]
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Start",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "mintlify/overview",
+              "mintlify/quickstart",
+              "mintlify/roadmap"
+            ]
+          },
+          {
+            "group": "Operate",
+            "pages": [
+              "mintlify/somnia-contracts",
+              "mintlify/x402-agent-payments",
+              "mintlify/privacy-intents",
+              "mintlify/invoices",
+              "mintlify/somusd-cards"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Developers",
+        "groups": [
+          {
+            "group": "Builder tools",
+            "pages": [
+              "mintlify/cli",
+              "mintlify/mcp",
+              "mintlify/run-locally",
+              "mintlify/demo-script"
+            ]
+          },
+          {
+            "group": "Developer Reference",
+            "openapi": "apps/frontend/public/openapi.json"
+          }
+        ]
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/PaysmithAfrica",
+      "github": "https://github.com/ArcPayLabs/arcpay-somnia"
+    }
+  }
+}

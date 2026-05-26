@@ -1,0 +1,51 @@
+---
+title: "MCP"
+description: "Connect ArcPay Somnia to local MCP hosts like Claude Desktop and Cursor."
+---
+
+ArcPay includes a local MCP server at:
+
+```text
+apps/mcp/server.mjs
+```
+
+Install dependencies:
+
+```bash
+npm run install:mcp
+```
+
+Run manually:
+
+```bash
+npm run mcp
+```
+
+Generate host config:
+
+```bash
+npm run arcpay -- mcp-config
+```
+
+## Tools
+
+The MCP server exposes:
+
+- `get_deployment`
+- `derive_agent_id`
+- `derive_invoice_id`
+- `derive_claim_hash`
+- `derive_privacy_commitment`
+- `privacy_intent_guide`
+- `invoice_guide`
+- `x402_guide`
+- `demo_path`
+- `smoke_commands`
+
+## Claude Desktop
+
+Paste the output of `npm run arcpay -- mcp-config` into Claude Desktop's MCP server config, then restart Claude.
+
+## ChatGPT
+
+Standard ChatGPT web does not directly attach to local stdio MCP servers. For ChatGPT-style usage, use the public `/openapi.json` and `/llms.txt` endpoints, or wrap the same MCP tools behind an HTTP server in a future hosted integration.
