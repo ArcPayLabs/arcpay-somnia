@@ -16,7 +16,7 @@
     "links": [
       {
         "label": "App",
-        "href": "https://arc-pay-frontend.vercel.app"
+        "href": "https://arcpay-somnia.vercel.app"
       },
       {
         "label": "GitHub",
@@ -36,19 +36,20 @@
           {
             "group": "Overview",
             "pages": [
-              "mintlify/overview",
-              "mintlify/quickstart",
-              "mintlify/roadmap"
+              "overview",
+              "quickstart",
+              "verification",
+              "roadmap"
             ]
           },
           {
             "group": "Operate",
             "pages": [
-              "mintlify/somnia-contracts",
-              "mintlify/x402-agent-payments",
-              "mintlify/privacy-intents",
-              "mintlify/invoices",
-              "mintlify/somusd-cards"
+              "somnia-contracts",
+              "x402-agent-payments",
+              "privacy-intents",
+              "invoices",
+              "somusd-cards"
             ]
           }
         ]
@@ -59,10 +60,10 @@
           {
             "group": "Builder tools",
             "pages": [
-              "mintlify/cli",
-              "mintlify/mcp",
-              "mintlify/run-locally",
-              "mintlify/demo-script"
+              "cli",
+              "mcp",
+              "run-locally",
+              "demo-script"
             ]
           },
           {

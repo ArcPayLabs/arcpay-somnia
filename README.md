@@ -246,7 +246,7 @@ Current SOMUSD testnet token:
 ArcPay includes a Mintlify-ready docs site:
 
 - `docs.json` - Mintlify navigation and theme config
-- `mintlify/` - human docs for operators and developers
+- root `*.mdx` pages - human docs for operators and developers
 - `apps/frontend/public/openapi.json` - public OpenAPI-style developer reference served as `/openapi.json`
 - `apps/frontend/public/llms.txt` - agent-readable product context served as `/llms.txt`
 - `apps/frontend/src/app/api/developer/tools` - HTTP wrapper for safe MCP-style developer tools
@@ -255,7 +255,9 @@ ArcPay includes a Mintlify-ready docs site:
 
 For Mintlify deployment, connect this repository and use the repo root as the
 docs root so `docs.json` can reference the existing app assets and OpenAPI
-file.
+file. The Vercel app rewrites `/docs` and `/docs/*` to the deployed Mintlify
+site, so public marketing links resolve to the full docs instead of the app's
+old lightweight docs page.
 
 ## Frontend Routes
 

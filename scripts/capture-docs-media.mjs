@@ -7,7 +7,7 @@ const require = createRequire(new URL("../apps/frontend/package.json", import.me
 const { chromium } = require("playwright");
 
 const baseUrl = (process.env.ARCPAY_DOCS_CAPTURE_URL || "http://127.0.0.1:3000").replace(/\/+$/, "");
-const outDir = path.resolve("mintlify", "images");
+const outDir = path.resolve("images");
 
 const shots = [
   { name: "landing", path: "/" },
