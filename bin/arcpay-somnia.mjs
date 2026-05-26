@@ -27,7 +27,7 @@ Commands:
   arcpay-somnia privacy-guide          Print builder integration guide
   arcpay-somnia invoice-guide          Print invoice settlement guide
   arcpay-somnia x402-guide             Print x402 HTTP payment gate guide
-  arcpay-somnia demo-path              Print judge demo steps
+  arcpay-somnia demo-path              Print operator demo steps
   arcpay-somnia smoke                  Print smoke-test commands
   arcpay-somnia mcp-config             Print MCP host config
 `);

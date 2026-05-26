@@ -109,7 +109,7 @@ server.tool("x402_guide", "Return builder instructions for the ArcPay Somnia x40
   };
 });
 
-server.tool("demo_path", "Return the judge demo path for ArcPay Somnia.", {}, async () => ({
+server.tool("demo_path", "Return the operator demo path for ArcPay Somnia.", {}, async () => ({
   content: [{
     type: "text",
     text: [
@@ -126,7 +126,7 @@ server.tool("demo_path", "Return the judge demo path for ArcPay Somnia.", {}, as
   }],
 }));
 
-server.tool("smoke_commands", "Return the verification commands judges can run locally and against Somnia testnet.", {}, async () => ({
+server.tool("smoke_commands", "Return the verification commands operators can run locally and against Somnia testnet.", {}, async () => ({
   content: [{
     type: "text",
     text: [
