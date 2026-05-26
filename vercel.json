@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/docs",
-      "destination": "https://csi-58c5959c.mintlify.app/docs"
+      "destination": "https://csi-58c5959c.mintlify.app/overview"
     },
     {
       "source": "/docs/:match*",
-      "destination": "https://csi-58c5959c.mintlify.app/docs/:match*"
+      "destination": "https://csi-58c5959c.mintlify.app/:match*"
     }
   ]
 }
