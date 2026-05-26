@@ -249,6 +249,9 @@ ArcPay includes a Mintlify-ready docs site:
 - `mintlify/` - human docs for operators and developers
 - `apps/frontend/public/openapi.json` - public OpenAPI-style developer reference served as `/openapi.json`
 - `apps/frontend/public/llms.txt` - agent-readable product context served as `/llms.txt`
+- `apps/frontend/src/app/api/developer/tools` - HTTP wrapper for safe MCP-style developer tools
+- `starter-kits/somnia-x402-agent` - reusable Somnia x402 client starter
+- `examples/privacy-intents` and `examples/agent-reputation` - integration patterns for builders
 
 For Mintlify deployment, connect this repository and use the repo root as the
 docs root so `docs.json` can reference the existing app assets and OpenAPI

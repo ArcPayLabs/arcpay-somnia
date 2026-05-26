@@ -21,6 +21,8 @@
     "worker:once": "node scripts/worker-once.mjs",
     "x402": "npm run start --prefix apps/x402-server",
     "check:x402": "npm run check --prefix apps/x402-server",
+    "docs:media": "node scripts/capture-docs-media.mjs",
+    "docs:check": "node -e \"JSON.parse(require('fs').readFileSync('docs.json','utf8')); JSON.parse(require('fs').readFileSync('apps/frontend/public/openapi.json','utf8')); console.log('docs ok')\"",
     "smoke:auth": "node scripts/smoke-auth.mjs",
     "smoke:live": "node scripts/smoke-live.mjs",
     "smoke:x402": "node scripts/smoke-x402.mjs",

@@ -28,6 +28,10 @@
     {
       "name": "Discovery",
       "description": "Machine-readable docs and integration discovery."
+    },
+    {
+      "name": "Developer Tools",
+      "description": "HTTP wrapper around safe ArcPay MCP-style tools."
     }
   ],
   "paths": {
@@ -301,6 +305,95 @@
         }
       }
     },
+    "/api/developer/tools": {
+      "get": {
+        "tags": ["Developer Tools"],
+        "summary": "List developer tools",
+        "description": "Returns the safe HTTP-callable tools also exposed by the local MCP server.",
+        "operationId": "listDeveloperTools",
+        "responses": {
+          "200": {
+            "description": "Developer tool manifest.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeveloperToolList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Developer Tools"],
+        "summary": "Run a developer tool",
+        "description": "Calls a safe/read-only ArcPay developer tool by name.",
+        "operationId": "runDeveloperTool",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeveloperToolRequest"
+              },
+              "example": {
+                "tool": "derive_agent_id",
+                "args": {
+                  "slug": "research-agent"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tool result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeveloperToolResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/developer/tools/{tool}": {
+      "get": {
+        "tags": ["Developer Tools"],
+        "summary": "Run a developer tool by URL",
+        "description": "Runs a tool with query-string arguments. Text tools return text/plain; JSON tools return application/json.",
+        "operationId": "runDeveloperToolByUrl",
+        "parameters": [
+          {
+            "name": "tool",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "get_deployment",
+                "derive_agent_id",
+                "derive_invoice_id",
+                "derive_claim_hash",
+                "derive_privacy_commitment",
+                "privacy_intent_guide",
+                "invoice_guide",
+                "x402_guide",
+                "starter_kit",
+                "roadmap"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tool result."
+          }
+        }
+      }
+    },
     "/openapi.json": {
       "get": {
         "tags": ["Discovery"],
@@ -446,6 +539,46 @@
             "type": "array",
             "items": { "type": "string" }
           }
+        }
+      },
+      "DeveloperToolList": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "service": { "type": "string" },
+          "transport": { "type": "string" },
+          "tools": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/DeveloperTool" }
+          }
+        }
+      },
+      "DeveloperTool": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "inputSchema": { "type": "object" }
+        }
+      },
+      "DeveloperToolRequest": {
+        "type": "object",
+        "required": ["tool"],
+        "properties": {
+          "tool": { "type": "string" },
+          "args": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "DeveloperToolResponse": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "tool": { "type": "string" },
+          "contentType": { "type": "string" },
+          "result": {}
         }
       }
     }

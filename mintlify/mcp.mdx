@@ -48,4 +48,26 @@ Paste the output of `npm run arcpay -- mcp-config` into Claude Desktop's MCP ser
 
 ## ChatGPT
 
-Standard ChatGPT web does not directly attach to local stdio MCP servers. For ChatGPT-style usage, use the public `/openapi.json` and `/llms.txt` endpoints, or wrap the same MCP tools behind an HTTP server in a future hosted integration.
+Standard ChatGPT web does not directly attach to local stdio MCP servers. For ChatGPT-style usage, use the public `/openapi.json`, `/llms.txt`, and HTTP tool wrapper.
+
+## HTTP Tool Wrapper
+
+List tools:
+
+```bash
+curl https://arc-pay-frontend.vercel.app/api/developer/tools
+```
+
+Call a tool:
+
+```bash
+curl -X POST https://arc-pay-frontend.vercel.app/api/developer/tools \
+  -H "content-type: application/json" \
+  -d '{"tool":"derive_agent_id","args":{"slug":"research-agent"}}'
+```
+
+URL form:
+
+```bash
+curl "https://arc-pay-frontend.vercel.app/api/developer/tools/derive_agent_id?slug=research-agent"
+```

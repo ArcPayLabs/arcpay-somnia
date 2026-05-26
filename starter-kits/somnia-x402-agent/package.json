@@ -1,0 +1,15 @@
+{
+  "name": "@arcpay/somnia-x402-agent-starter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "quote": "node src/agent-client.mjs quote research-agent",
+    "locked": "node src/agent-client.mjs locked research-agent",
+    "agent-id": "node src/agent-client.mjs agent-id research-agent"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "ethers": "^6.13.5"
+  }
+}
