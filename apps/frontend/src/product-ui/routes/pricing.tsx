@@ -31,9 +31,9 @@ const TIERS = [
     ],
   },
   {
-    name: "Buildathon",
+    name: "Agent OS",
     price: "Open",
-    sub: "for judges and testers",
+    sub: "for early operators",
     cta: "Open app",
     highlight: true,
     features: [
@@ -68,7 +68,7 @@ function PricingPage() {
             align="center"
             eyebrow="Pricing"
             title={<>Pay only when value <span className="text-primary">settles</span>.</>}
-            description="The Somnia buildathon version is free to test. Pricing is future-facing and only applies after production hardening."
+            description="The Somnia testnet version is free to use while ArcPay hardens hosted infrastructure, observability, and production support."
           />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12">
             {TIERS.map((t) => (

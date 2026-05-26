@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { Download, Eye, EyeOff, KeyRound, ScrollText, Search } from "lucide-react";
 import { PageHeader } from "@/components/app/PageHeader";
 import { StatCard } from "@/components/primitives/StatCard";
-import { readRecords, shortAddress, writeRecord, type LocalRecord } from "@somnia/lib/somnia";
+import { fetchRecords, readRecords, shortAddress, writeRecord, type LocalRecord } from "@somnia/lib/somnia";
 
 export const Route = { options: { component: AuditPage } };
 
@@ -20,8 +20,8 @@ function AuditPage() {
     return records.filter((item) => `${item.type} ${item.title} ${item.status} ${item.txHash ?? ""}`.toLowerCase().includes(text));
   }, [query, records]);
 
-  function refresh() {
-    setRecords(readRecords());
+  async function refresh() {
+    setRecords(await fetchRecords());
     setMessage("Audit records refreshed from this browser and server mirror.");
   }
 
@@ -83,7 +83,7 @@ function AuditPage() {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Audit rows" value={records.length} hint="Somnia local + server records" />
         <StatCard label="Filtered" value={filtered.length} hint="Current search result" />
-        <StatCard label="Tx proofs" value={records.filter((item) => item.txHash).length} hint="Explorer-backed evidence" />
+        <StatCard label="Tx evidence" value={records.filter((item) => item.txHash).length} hint="Explorer-backed records" />
         <StatCard label="Private fields" value={reveal ? "Visible" : "Hidden"} hint="Viewing-key controlled" emphasis />
       </div>
 
@@ -99,7 +99,7 @@ function AuditPage() {
             <button onClick={() => setReveal((value) => !value)} className="inline-flex items-center gap-2 rounded-full bg-muted px-4 py-2 text-sm font-semibold">
               {reveal ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />} {reveal ? "Hide private" : "Reveal private"}
             </button>
-            <button onClick={refresh} className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Refresh</button>
+            <button onClick={() => void refresh()} className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Refresh</button>
           </div>
         </div>
       </section>

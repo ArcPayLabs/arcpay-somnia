@@ -21,9 +21,10 @@ Somnia is positioned as an Agentic L1. ArcPay uses that premise directly:
 2. Operator configures hourly/daily treasury policy in `TreasuryPolicy`.
 3. Operator allowlists an agent if allowlist mode is enabled.
 4. Requester creates an escrowed order in `AgentOrderBook`.
-5. Provider accepts, processes, and fulfills the order.
-6. Requester settles the order, releasing funds through `AgentTreasury`.
-7. Dashboard, audit, and proof pages show the order lifecycle and contract events.
+5. x402 server verifies the paid order before protected agent work unlocks.
+6. Provider accepts, processes, and fulfills the order.
+7. Requester settles the order, releasing funds through `AgentTreasury`.
+8. Dashboard, audit, and proof pages show the order lifecycle and contract events.
 
 ## Somnia Testnet
 
@@ -42,6 +43,7 @@ Somnia is positioned as an Agentic L1. ArcPay uses that premise directly:
 - `TreasuryPolicy.sol`: hourly/daily spend limits, approval threshold, allowlist, emergency pause
 - `AgentTreasury.sol`: escrow and settlement
 - `AgentOrderBook.sol`: order state machine
+- `apps/x402-server`: HTTP 402 quote, verification, fulfillment helper, and unlock surface
 
 ## Deployment
 
@@ -65,7 +67,7 @@ deployments/somnia-testnet.json
 ## Judging Alignment
 
 - Functionality: deployable Solidity contracts and deterministic order lifecycle
-- Agent-first design: registry plus autonomous order flow for agent services
+- Agent-first design: registry plus x402-compatible autonomous order flow for agent services
 - Innovation: treasury policy controls around agent-to-agent commerce
 - Autonomous performance: order lifecycle can be driven by MCP/agent tools
 
@@ -76,6 +78,7 @@ system into a Somnia-only testnet app:
 
 - wallet-first onboarding through EVM wallet switching to chain `50312`
 - agent discovery and service pricing through live Somnia contracts
+- x402-style paid agent endpoints that quote exact STT requirements and unlock after on-chain fulfillment
 - escrowed agent orders with explicit lifecycle actions
 - real policy enforcement before order creation
 - direct STT payouts for operator-controlled payments

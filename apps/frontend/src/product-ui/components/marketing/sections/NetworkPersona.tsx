@@ -11,7 +11,7 @@ export function NetworkPersona() {
               One interface. Somnia Testnet only. Always explicit.
             </h3>
             <p className="mt-3 text-muted-foreground">
-              This build is fixed to Somnia Testnet so judges can verify the same contracts, chain ID, explorer links, and wallet signing flow without network ambiguity.
+              This build is fixed to Somnia Testnet so operators always see the same contracts, chain ID, explorer links, and wallet signing flow without network ambiguity.
             </p>
           </div>
           <div className="mt-8 grid grid-cols-2 gap-3">

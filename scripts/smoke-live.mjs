@@ -54,9 +54,18 @@ const somusd = new Contract(deployment.somUsdToken, [
 ], deployer);
 const privacy = new Contract(c.SomniaPrivacyVault, [
   "function createNativeIntent(bytes32,string) payable",
+  "function createTokenIntent(bytes32,address,uint256,string)",
   "function releaseIntent(bytes32,bytes32,address)",
   "function intents(bytes32) view returns (address,address,uint256,string,bool,bool,uint256)",
 ], deployer);
+const invoiceIssuer = c.AgentInvoiceBook ? new Contract(c.AgentInvoiceBook, [
+  "function createInvoice(bytes32,address,address,uint256,string)",
+  "function invoices(bytes32) view returns (bytes32,address,address,address,uint256,string,uint8,uint256,uint256,uint256)",
+], deployer) : null;
+const invoicePayer = c.AgentInvoiceBook ? new Contract(c.AgentInvoiceBook, [
+  "function payNativeInvoice(bytes32) payable",
+  "function invoices(bytes32) view returns (bytes32,address,address,address,uint256,string,uint8,uint256,uint256,uint256)",
+], requester) : null;
 const oracle = new Contract(c.SomniaAgentRiskOracle, [
   "function setAgentBudget(uint256,uint256)",
   "function requestRisk(bytes32,string) payable returns (uint256)",
@@ -153,6 +162,32 @@ await run("Privacy vault release", async () => {
   const intent = await privacy.intents(commitment);
   if (!intent[4]) throw new Error("intent not released");
   return `${commitment.slice(0, 10)}... released`;
+});
+
+await run("SOMUSD privacy vault release", async () => {
+  const decimals = Number(await somusd.decimals().catch(() => 6));
+  const amount = 1n;
+  const balance = await somusd.balanceOf(deployer.address);
+  if (balance < amount) return `SKIP balance too low: ${balance.toString()} base units`;
+  const commitment = id(`somusd-privacy-${Date.now()}`);
+  const nullifier = id(`somusd-release-${Date.now()}`);
+  await wait(somusd.approve(c.SomniaPrivacyVault, amount));
+  await wait(privacy.createTokenIntent(commitment, deployment.somUsdToken, amount, "encrypted://arcpay-somusd-smoke"));
+  await wait(privacy.releaseIntent(commitment, nullifier, requester.address));
+  const intent = await privacy.intents(commitment);
+  if (!intent[4]) throw new Error("SOMUSD intent not released");
+  return `${amount.toString()} base units released (${decimals} decimals)`;
+});
+
+await run("On-chain invoice settlement", async () => {
+  if (!invoiceIssuer || !invoicePayer) return "SKIP AgentInvoiceBook not deployed";
+  const invoiceId = id(`invoice-${Date.now()}`);
+  const amount = parseEther("0.0001");
+  await wait(invoiceIssuer.createInvoice(invoiceId, requester.address, "0x0000000000000000000000000000000000000000", amount, "arcpay://invoice/smoke"));
+  await wait(invoicePayer.payNativeInvoice(invoiceId, { value: amount }));
+  const row = await invoiceIssuer.invoices(invoiceId);
+  if (Number(row[6]) !== 1) throw new Error(`invoice not paid: status ${row[6]}`);
+  return `${invoiceId.slice(0, 10)}... paid`;
 });
 
 await run("Somnia agent risk oracle", async () => {

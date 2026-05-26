@@ -20,7 +20,7 @@ const STEPS = [
   {
     icon: Shield,
     name: "Prove",
-    body: "Risk oracle requests, privacy commitments, audit exports, MCP docs, and the Azure event worker give judges verifiable evidence.",
+    body: "Risk oracle requests, privacy commitments, audit exports, MCP docs, and the Azure event worker give operators verifiable evidence.",
   },
 ];
 

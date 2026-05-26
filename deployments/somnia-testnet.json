@@ -11,9 +11,11 @@
     "OperatorControls": "0xb7b26AD2cCBf6613A43f2Db4a550eDF1D7dB8b32",
     "SomniaAgentRiskOracle": "0xA5Ec905B95E5b166EF846849eaB8FDD1dB134D0C",
     "AgentSpendCardVault": "0x0480E467bA12E33DA163FeA45a20C30133F84B93",
-    "SomniaPrivacyVault": "0x6948a15dED7F6708BD4DfD8c3Ee5314bC5B53D14"
+    "SomniaPrivacyVault": "0x6948a15dED7F6708BD4DfD8c3Ee5314bC5B53D14",
+    "AgentInvoiceBook": "0x643De19f32B1d0c396Cf8B5cD677549c442Fbbf7"
   },
   "somniaAgentPlatform": "0x037Bb9C718F3f7fe5eCBDB0b600D607b52706776",
   "somniaRiskAgentId": "13174292974160097713",
-  "somUsdToken": "0x02b8316775057e2096471473663d51ceafbe3e3b"
+  "somUsdToken": "0x02b8316775057e2096471473663d51ceafbe3e3b",
+  "updatedAt": "2026-05-26T11:18:21.361Z"
 }

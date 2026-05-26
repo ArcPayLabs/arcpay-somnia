@@ -16,6 +16,7 @@ import {
   CreditCard,
   Gauge,
   Workflow,
+  RadioTower,
 } from "lucide-react";
 import {
   Sidebar,
@@ -37,6 +38,7 @@ const ITEMS = [
   { title: "Wallet", url: "/wallet", icon: Wallet, networks: ["somnia"] },
   { title: "Agents", url: "/app/agents", icon: Bot, networks: ["somnia"] },
   { title: "Orders", url: "/app/orders", icon: Workflow, networks: ["somnia"] },
+  { title: "x402", url: "/x402", icon: RadioTower, networks: ["somnia"] },
   { title: "Cards", url: "/app/cards", icon: CreditCard, networks: ["somnia"] },
   { title: "Payments", url: "/payments", icon: Send, networks: ["somnia"] },
   { title: "Invoices", url: "/invoices", icon: FileText, networks: ["somnia"] },

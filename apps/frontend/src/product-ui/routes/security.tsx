@@ -30,7 +30,7 @@ const ITEMS = [
   {
     icon: Lock,
     title: "Privacy-intent layer",
-    body: "SomniaPrivacyVault creates commitment-based intents and encrypted memo pointers. We label it as a testnet privacy-intent layer with production hardening still ahead.",
+    body: "SomniaPrivacyVault creates STT or SOMUSD commitments, encrypted memo pointers, delayed recipient release, cancel/refund, and nullifier protection. It is not marketed as a full shielded pool.",
   },
   {
     icon: FileSearch,
@@ -58,7 +58,7 @@ function SecurityPage() {
             align="center"
             eyebrow="Security"
             title={<>What we secure, and how <span className="text-primary">honestly</span>.</>}
-            description="ArcPay is a control plane, not a custodian. We separate live Somnia Testnet contracts from future production extensions."
+            description="ArcPay is a control plane, not a custodian. We separate live Somnia Testnet contracts, wallet signatures, and hosted infrastructure responsibilities clearly."
           />
           <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {ITEMS.map((i) => (

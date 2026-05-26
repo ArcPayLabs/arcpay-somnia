@@ -29,6 +29,12 @@ server.tool("derive_agent_id", "Derive the bytes32 agent id used by AgentRegistr
   content: [{ type: "text", text: id(slug) }],
 }));
 
+server.tool("derive_invoice_id", "Derive the bytes32 invoice id used by AgentInvoiceBook.", {
+  publicId: z.string().min(1),
+}, async ({ publicId }) => ({
+  content: [{ type: "text", text: keccak256(toUtf8Bytes(publicId)) }],
+}));
+
 server.tool("derive_claim_hash", "Derive the on-chain claim-code hash for OperatorControls.", {
   code: z.string().min(1),
 }, async ({ code }) => ({
@@ -61,6 +67,48 @@ server.tool("privacy_intent_guide", "Return builder instructions for integrating
   };
 });
 
+server.tool("invoice_guide", "Return builder instructions for ArcPay STT/SOMUSD invoices on Somnia.", {}, async () => {
+  const deployment = readDeployment();
+  return {
+    content: [{
+      type: "text",
+      text: [
+        "ArcPay Somnia Invoices",
+        `InvoiceBook: ${deployment.contracts.AgentInvoiceBook}`,
+        `SOMUSD: ${deployment.somUsdToken}`,
+        "invoiceId = keccak256(publicInvoiceId)",
+        "Create STT invoice: createInvoice(invoiceId, payerOrZero, address(0), amountWei, metadataUri).",
+        "Create SOMUSD invoice: createInvoice(invoiceId, payerOrZero, SOMUSD, amountBaseUnits, metadataUri).",
+        "Pay STT: payNativeInvoice(invoiceId) with exact msg.value.",
+        "Pay SOMUSD: approve InvoiceBook, then payTokenInvoice(invoiceId).",
+        "Cancel unpaid: issuer calls cancelInvoice(invoiceId).",
+        "Proof: npm run smoke:live includes on-chain invoice settlement.",
+      ].join("\n"),
+    }],
+  };
+});
+
+server.tool("x402_guide", "Return builder instructions for the ArcPay Somnia x402 payment-gated agent server.", {}, async () => {
+  const deployment = readDeployment();
+  return {
+    content: [{
+      type: "text",
+      text: [
+        "ArcPay Somnia x402",
+        `OrderBook: ${deployment.contracts.AgentOrderBook}`,
+        `Registry: ${deployment.contracts.AgentRegistry}`,
+        "Run: npm run x402",
+        "Protected resource: GET /agent/:slug/work",
+        "No order returns HTTP 402 with exact STT payment requirements.",
+        "Pay by calling AgentOrderBook.createOrder(agentId, requestUri) with quoted msg.value.",
+        "Verify: POST /x402/verify with { orderId, agentSlug }.",
+        "Unlock: GET /agent/:slug/work?orderId=... after Fulfilled or Settled.",
+        "Proof: npm run smoke:x402.",
+      ].join("\n"),
+    }],
+  };
+});
+
 server.tool("demo_path", "Return the judge demo path for ArcPay Somnia.", {}, async () => ({
   content: [{
     type: "text",
@@ -72,6 +120,7 @@ server.tool("demo_path", "Return the judge demo path for ArcPay Somnia.", {}, as
       "Create/redeem claim codes and trigger webhook breaker on /operator.",
       "Request and fulfill risk oracle result on /oracle.",
       "Create and release encrypted Privacy Intents with nullifiers on /privacy.",
+      "Create, pay, cancel, and sync STT/SOMUSD invoices on /invoices.",
       "Show /audit and /proofs.",
     ].join("\n"),
   }],
@@ -84,8 +133,10 @@ server.tool("smoke_commands", "Return the verification commands judges can run l
       "npm run build:frontend",
       "npm test",
       "npm run check:worker",
+      "npm run check:x402",
       "npm run smoke:auth",
       "npm run smoke:live",
+      "npm run smoke:x402",
     ].join("\n"),
   }],
 }));

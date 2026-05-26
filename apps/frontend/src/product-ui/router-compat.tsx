@@ -30,6 +30,7 @@ function toRouterPath(value: string): string {
   const appRoutes = [
     "wallet",
     "payments",
+    "x402",
     "invoices",
     "contractors",
     "swaps",

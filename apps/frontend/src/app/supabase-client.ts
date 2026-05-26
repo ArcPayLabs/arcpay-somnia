@@ -144,6 +144,12 @@ type ArcPayDatabase = {
           memo: string;
           status: "paid" | "pending" | "overdue" | "failed" | "cancelled";
           payment_url: string;
+          onchain_invoice_id: string | null;
+          onchain_tx_hash: string | null;
+          settlement_tx_hash: string | null;
+          cancel_tx_hash: string | null;
+          payer_wallet: string | null;
+          amount_units: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -160,6 +166,12 @@ type ArcPayDatabase = {
           memo?: string;
           status?: "paid" | "pending" | "overdue" | "failed" | "cancelled";
           payment_url?: string;
+          onchain_invoice_id?: string | null;
+          onchain_tx_hash?: string | null;
+          settlement_tx_hash?: string | null;
+          cancel_tx_hash?: string | null;
+          payer_wallet?: string | null;
+          amount_units?: string | null;
           created_at?: string;
           updated_at?: string;
         };

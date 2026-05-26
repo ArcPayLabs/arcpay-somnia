@@ -13,7 +13,7 @@ const NAV = [
   { title: "Company", links: [
     { label: "Sign in", to: "/sign-in" },
     { label: "Sign up", to: "/sign-up" },
-    { label: "Proofs", to: "/proofs" },
+    { label: "Trust center", to: "/proofs" },
   ]},
 ];
 

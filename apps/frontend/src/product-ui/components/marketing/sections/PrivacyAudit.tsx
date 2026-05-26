@@ -29,7 +29,7 @@ export function PrivacyAudit() {
           <div className="text-xs uppercase tracking-[0.18em] text-white/50">Builder opportunity</div>
           <div>
             <p className="text-2xl font-medium leading-snug md:text-3xl" style={{ letterSpacing: "-0.025em" }}>
-              "Somnia does not need a separate native privacy app for every hackathon team. ArcPay ships a reusable privacy-intent layer agents can build on."
+              "Somnia agents need privacy-aware payment coordination. ArcPay ships a reusable privacy-intent layer operators and agent builders can build on."
             </p>
             <div className="mt-6 text-sm text-white/55">ArcPay privacy principle</div>
           </div>

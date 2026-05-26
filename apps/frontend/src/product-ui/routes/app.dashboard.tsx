@@ -5,7 +5,7 @@ import { Bot, CreditCard, Lock, Route as RouteIcon, ShieldAlert, Wallet, Workflo
 import { useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/app/PageHeader";
 import { StatCard } from "@/components/primitives/StatCard";
-import { CONTRACTS, balances, connectedAddress, readRecords, shortAddress, type LocalRecord } from "@somnia/lib/somnia";
+import { CONTRACTS, balances, connectedAddress, fetchRecords, shortAddress, type LocalRecord } from "@somnia/lib/somnia";
 
 export const Route = { options: { component: DashboardRoute } };
 
@@ -15,7 +15,7 @@ function DashboardRoute() {
   const [balance, setBalance] = useState("");
 
   useEffect(() => {
-    setRecords(readRecords());
+    void fetchRecords().then(setRecords);
     connectedAddress().then(async (address) => {
       setWallet(address);
       setBalance(await balances(address));
@@ -24,6 +24,8 @@ function DashboardRoute() {
 
   const counts = useMemo(() => ({
     payments: records.filter((record) => record.type === "payment").length,
+    orders: records.filter((record) => record.type === "order").length,
+    agents: records.filter((record) => record.type === "agent").length,
     privacy: records.filter((record) => record.type === "privacy").length,
     audit: records.filter((record) => record.type === "audit").length,
     pending: records.filter((record) => ["pending", "escrowed", "requested"].includes(record.status.toLowerCase())).length,
@@ -35,7 +37,7 @@ function DashboardRoute() {
         icon={Workflow}
         eyebrow="Overview"
         title="Good morning, operator."
-        description="Private treasury OS for Somnia agents: wallet-signed STT payments, escrowed work, SOMUSD cards, policy controls, privacy intents, and proof exports."
+        description="Private treasury OS for Somnia agents: x402 paid work, wallet-signed STT payments, escrowed orders, SOMUSD cards, policy controls, privacy intents, and trust exports."
         actions={<Link href="/payments" className="rounded-full bg-foreground px-4 py-2.5 text-sm font-medium text-background">New payment</Link>}
         back={false}
       />
@@ -44,7 +46,7 @@ function DashboardRoute() {
         <div className="flex-1 min-w-[240px]">
           <div className="text-sm font-semibold">Next best action</div>
           <div className="text-sm text-muted-foreground">
-            {wallet ? `${shortAddress(wallet)} has ${Number(balance || 0).toFixed(4)} STT. Register an agent, set policy, then create an escrow order.` : "Connect a Somnia wallet to load live balance and start the agent treasury flow."}
+            {wallet ? `${shortAddress(wallet)} has ${Number(balance || 0).toFixed(4)} STT. Register an agent, set policy, then create an x402 or escrow order.` : "Connect a Somnia wallet to load live balance and start the agent treasury flow."}
           </div>
         </div>
         <Link href={wallet ? "/app/agents" : "/wallet"} className="text-sm font-medium px-4 py-2 rounded-full bg-primary text-primary-foreground">
@@ -53,7 +55,7 @@ function DashboardRoute() {
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard icon={Wallet} label="Operating" value={wallet ? `${Number(balance || 0).toFixed(4)} STT` : "--"} hint="Live Somnia wallet balance" />
-        <StatCard icon={Workflow} label="Agent orders" value={counts.payments} hint="Escrow and direct payment records" />
+        <StatCard icon={Workflow} label="Agent orders" value={counts.orders} hint="Escrow and x402 order records" />
         <StatCard icon={CreditCard} label="SOMUSD cards" value={records.filter((record) => record.title.toLowerCase().includes("card")).length} hint="Agent card events" />
         <StatCard icon={Lock} label="Privacy intents" value={counts.privacy} hint="Commitment-based intents" emphasis />
       </div>
@@ -77,7 +79,7 @@ function DashboardRoute() {
           <div className="mt-4 space-y-3">
             <StatCard icon={RouteIcon} label="Contracts" value={Object.keys(CONTRACTS).length} hint="Deployed modules" />
             <StatCard icon={ShieldAlert} label="Policy queue" value={counts.pending} hint="Pending review records" />
-            <StatCard icon={Bot} label="Audit events" value={counts.audit} hint="Operator actions" />
+            <StatCard icon={Bot} label="Agents indexed" value={counts.agents} hint="Registry events" />
           </div>
         </section>
       </div>

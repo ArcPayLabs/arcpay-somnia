@@ -1,7 +1,7 @@
 # ArcPay Somnia
 
 ArcPay Somnia is an agent-native treasury and autonomous service payment system
-for the Somnia Agentic L1 buildathon.
+for the Somnia Agentic L1.
 
 Agents can register capabilities, discover one another, create paid work orders,
 escrow funds, complete jobs, and settle under programmable treasury policy.
@@ -28,6 +28,7 @@ ArcPay Somnia focuses on:
 | `TreasuryPolicy.sol` | Enforce hourly/daily limits, approval threshold, allowlist, and emergency pause. |
 | `AgentTreasury.sol` | Escrow and release native Somnia funds for orders. |
 | `AgentOrderBook.sol` | Agent order state machine from pending to settled/refunded. |
+| `AgentInvoiceBook.sol` | STT/SOMUSD invoice creation, payment, cancellation, and settlement evidence. |
 
 ## Local Setup
 
@@ -36,11 +37,14 @@ npm install
 npm run install:frontend
 npm run install:mcp
 npm run install:worker
+npm run install:x402
 npm run build
 npm test
 npm run build:frontend
+npm run check:x402
 npm run smoke:auth
 npm run smoke:live
+npm run smoke:x402
 ```
 
 Run the app:
@@ -57,11 +61,14 @@ npm run arcpay -- wallet
 npm run arcpay -- agent-id research-agent
 npm run arcpay -- claim-hash claim-research-agent-001
 npm run arcpay -- privacy-guide
+npm run arcpay -- x402-guide
 npm run arcpay -- demo-path
 npm run arcpay -- smoke
 npm run arcpay -- mcp-config
 npm run mcp
 npm run worker
+npm run worker:once
+npm run x402
 ```
 
 ## Deploy
@@ -112,11 +119,14 @@ Contracts:
 | `SomniaAgentRiskOracle` | `0xA5Ec905B95E5b166EF846849eaB8FDD1dB134D0C` |
 | `AgentSpendCardVault` | `0x0480E467bA12E33DA163FeA45a20C30133F84B93` |
 | `SomniaPrivacyVault` | `0x6948a15dED7F6708BD4DfD8c3Ee5314bC5B53D14` |
+| `AgentInvoiceBook` | `0x643De19f32B1d0c396Cf8B5cD677549c442Fbbf7` |
  
 Machine-readable deployment metadata lives in
 `deployments/somnia-testnet.json`.
 
 Privacy Intent builder docs live in `docs/privacy-intents.md`.
+
+x402 payment-gated agent docs live in `docs/x402-somnia.md`.
 
 ## Persistence
 
@@ -160,12 +170,30 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
 ```
 
-The Azure worker only needs Somnia RPC access and the checked-in deployment
-metadata:
+The Azure worker reconciles Somnia events into Supabase-backed audit records:
 
 ```bash
 SOMNIA_RPC_URL=https://dream-rpc.somnia.network
 ARCPAY_ROOT=/home/arcpay/arcpay-somnia
+SUPABASE_URL=...
+SUPABASE_SERVICE_ROLE_KEY=...
+ARCPAY_RECORDS_TABLE=arcpay_somnia_records
+ARCPAY_WORKER_CHECKPOINT_PATH=/home/arcpay/.arcpay-somnia-worker-checkpoint.json
+```
+
+For a local one-shot reconciliation check:
+
+```bash
+npm run worker:once
+```
+
+The x402 server can run beside the worker on Azure or any Node host:
+
+```bash
+SOMNIA_RPC_URL=https://dream-rpc.somnia.network
+X402_SERVER_PORT=4030
+X402_PROVIDER_PRIVATE_KEY=0x...
+X402_ADMIN_SECRET=...
 ```
 
 ## Depth Contract Redeploy
@@ -176,6 +204,8 @@ The repo now includes and deploys the Cards402-depth layer:
 - `SomniaAgentRiskOracle`
 - `AgentSpendCardVault`
 - `SomniaPrivacyVault`
+- HTTP 402 server for paid agent endpoints
+- on-chain STT/SOMUSD invoices
 - upgraded `TreasuryPolicy`
 - upgraded `AgentOrderBook`
 
@@ -201,8 +231,9 @@ Current SOMUSD testnet token:
 5. Compile and test with `npm run build`, `npm test`, and `npm run build:frontend`.
 6. Run `npm run smoke:auth` for Supabase/auth/workspace and read-only Somnia checks.
 7. Run `npm run smoke:live` with a funded Somnia testnet `PRIVATE_KEY` for live contract writes.
-8. Start the UI with `npm run dev:frontend`.
-9. Register an agent, set a policy, allow the agent, create an order, fulfill it, settle it, request risk, create a card, and release a privacy intent.
+8. Run `npm run smoke:x402` for an HTTP 402 quote, on-chain payment, provider fulfillment, unlock, and settlement proof.
+9. Start the UI with `npm run dev:frontend`.
+10. Register an agent, set a policy, allow the agent, create an order, fulfill it, settle it, request risk, create a card, and release a privacy intent.
 
 ## Frontend Routes
 
@@ -214,13 +245,14 @@ demo paths resolve to Somnia infrastructure.
 | `/dashboard` | Deployment overview, contract links, runtime status, recent records. |
 | `/agents` | Register and load Somnia agent services from `AgentRegistry`. |
 | `/orders` | Create, accept, process, fulfill, settle, or refund escrowed agent orders. |
+| `/x402` | Quote HTTP 402 payment requirements, create an escrowed order, verify, fulfill, and unlock paid agent work. |
 | `/cards` | Create SOMUSD-backed agent spend cards with limits and freeze controls. |
 | `/policies` | Set hourly/daily/weekly limits, approval threshold, UTC-hour windows, emergency pause, and agent allowlist. |
 | `/privacy` | Create and release commitment-based SOMUSD/STT payment intents with encrypted metadata and nullifiers. |
 | `/operator` | Claim-code onboarding and webhook circuit-breaker controls. |
 | `/oracle` | Somnia agent risk request/callback flow. |
 | `/payments` | Wallet-signed direct STT payments for operator payouts. |
-| `/invoices` | Local invoice workflow for demo receivables. |
+| `/invoices` | Create, pay, cancel, and sync STT/SOMUSD invoices through `AgentInvoiceBook`. |
 | `/contractors` | Local contractor/agent workforce records. |
 | `/audit` | Local workflow records and transaction hashes. |
 | `/proofs` | Judge-facing deployment proof and local verification commands. |
@@ -236,7 +268,9 @@ Current Somnia build:
 - ArcPay-style frontend added under `apps/frontend`
 - MCP server added under `apps/mcp`
 - CLI added under `bin/arcpay-somnia.mjs`
+- x402 server added under `apps/x402-server`
 - Cards402-depth operator controls added
+- on-chain invoice book added and deployed
 - agent protocol docs added
 - `llms.txt` and `skill.md` added for agent-facing usage
 - Supabase persistence migration added for audit/workflow records

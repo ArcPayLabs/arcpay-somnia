@@ -9,7 +9,7 @@ import deployment from "../../../../../deployments/somnia-testnet.json";
 export const Route = createFileRoute("/proofs")({
   head: () => ({
     meta: [
-      { title: "Proofs - ArcPay Somnia" },
+      { title: "Trust Center - ArcPay Somnia" },
       { name: "description", content: "Somnia contract deployment, worker, MCP, CLI, and frontend verification evidence." },
     ],
   }),
@@ -25,12 +25,13 @@ const STATUS_STYLE: Record<Status, string> = {
 };
 
 const CHECKS: { surface: string; status: Status; evidence: string }[] = [
-  { surface: "Somnia Testnet contracts", status: "testnet", evidence: "AgentRegistry, TreasuryPolicy, AgentOrderBook, OperatorControls, RiskOracle, SpendCardVault, and PrivacyVault are deployed on chain 50312." },
-  { surface: "Funded live smoke", status: "testnet", evidence: "npm run smoke:live performs live writes for registry, policy, escrowed orders, operator controls, SOMUSD cards, privacy release, and Somnia agent risk fulfillment." },
+  { surface: "Somnia Testnet contracts", status: "testnet", evidence: "AgentRegistry, TreasuryPolicy, AgentOrderBook, OperatorControls, RiskOracle, SpendCardVault, PrivacyVault, and AgentInvoiceBook are deployed on chain 50312." },
+  { surface: "Funded live smoke", status: "testnet", evidence: "npm run smoke:live performs live writes for registry, policy, escrowed orders, operator controls, SOMUSD cards, privacy release, on-chain invoice settlement, and Somnia agent risk fulfillment." },
+  { surface: "x402 payment gate", status: "testnet", evidence: "npm run smoke:x402 starts the HTTP 402 server, registers an agent, creates an on-chain order, fulfills it, unlocks the protected resource, and settles." },
   { surface: "Auth and workspace smoke", status: "live", evidence: "npm run smoke:auth verifies Supabase records, email sign-in workspace upsert, wallet workspace creation, and Somnia contract reads." },
   { surface: "Frontend", status: "live", evidence: "Next.js product UI builds successfully with Somnia-only wallet/auth/dashboard content." },
-  { surface: "Worker", status: "live", evidence: "Azure systemd worker listens to Somnia order, card, and operator events from the deployed contracts." },
-  { surface: "Tests", status: "local", evidence: "Hardhat test suite covers order lifecycle, approvals, emergency pause, weekly limit, cards, claim codes, circuit breakers, oracle, and privacy vault." },
+  { surface: "Worker", status: "live", evidence: "Azure systemd worker listens to Somnia registry, policy, treasury, order, card, operator, privacy, invoice, and risk events from the deployed contracts." },
+  { surface: "Tests", status: "local", evidence: "Hardhat test suite covers order lifecycle, approvals, emergency pause, weekly limit, cards, claim codes, circuit breakers, oracle, privacy vault, and invoice settlement." },
   { surface: "Agent docs", status: "local", evidence: "skill.md and llms.txt describe how AI agents should interact with ArcPay." },
   { surface: "MCP and CLI", status: "local", evidence: "Repo includes MCP server and arcpay-somnia CLI commands for contracts, wallet, agent IDs, claim hashes, privacy guide, and MCP config." },
 ];
@@ -43,9 +44,9 @@ function ProofsPage() {
       <div className="px-6 pb-24 pt-16">
         <div className="mx-auto max-w-[88rem]">
           <SectionHeading
-            eyebrow="Developer evidence"
-            title={<>Proofs that match the <span className="text-primary">actual build</span>.</>}
-            description="No placeholder provider checks. This page lists the Somnia contracts, local commands, worker, and docs that are actually present in the repo."
+            eyebrow="Trust center"
+            title={<>Infrastructure that matches the <span className="text-primary">live build</span>.</>}
+            description="ArcPay publishes its Somnia contracts, verification commands, worker surface, x402 server, and agent tooling so operators can inspect the stack before relying on it."
           />
 
           <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-[1.1fr_0.9fr]">
@@ -67,9 +68,9 @@ function ProofsPage() {
             </section>
 
             <section className="rounded-3xl border border-border bg-card p-6">
-              <div className="text-sm font-semibold">Run locally</div>
+              <div className="text-sm font-semibold">Verify locally</div>
               <div className="mt-4 space-y-3">
-                {["npm run build:frontend", "npm test", "npm run check:worker", "npm run smoke:auth", "npm run smoke:live"].map((cmd) => (
+                {["npm run build:frontend", "npm test", "npm run check:worker", "npm run check:x402", "npm run smoke:auth", "npm run smoke:live", "npm run smoke:x402"].map((cmd) => (
                   <code key={cmd} className="block rounded-2xl bg-muted px-4 py-3 text-sm">{cmd}</code>
                 ))}
               </div>

@@ -10,6 +10,7 @@ Agents can:
 - create paid orders through `AgentOrderBook`
 - operate under `TreasuryPolicy` spend controls
 - settle or refund escrowed funds through `AgentTreasury`
+- create and settle STT/SOMUSD invoices through `AgentInvoiceBook`
 
 Use the contracts for agent-to-agent service payments, not generic transfers.
 
@@ -27,6 +28,7 @@ Important docs:
 - `docs/agent-protocol.md`
 - `docs/cards402-depth-map.md`
 - `docs/privacy-intents.md`
+- `docs/x402-somnia.md`
 
 Agent tooling:
 
@@ -36,5 +38,8 @@ Agent tooling:
 - `/operator` for claim-code onboarding and webhook circuit breakers
 - `/oracle` for Somnia agent requester deposit + risk callback proof
 - `/privacy` for Privacy Intent creation and nullifier release
+- `/invoices` for STT/SOMUSD invoice creation, payment, cancellation, and on-chain sync
+- `apps/x402-server` for HTTP 402 agent work quotes, order verification, and protected resource unlocks
 - `npm run smoke:auth` for Supabase/auth/workspace verification
 - `npm run smoke:live` for funded Somnia testnet writes
+- `npm run smoke:x402` for funded x402 quote/payment/fulfill/unlock proof

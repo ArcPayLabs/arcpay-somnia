@@ -7,6 +7,7 @@ Stellar/card-specific implementation.
 | --- | --- |
 | MCP server | `apps/mcp/server.mjs` exposes deployment lookup, agent ID derivation, claim hash derivation, and demo path. |
 | `skill.md` / `llms.txt` | Root files describe how agents and judges should operate the app. |
+| x402 HTTP payment gate | `apps/x402-server/server.mjs` returns real `402 Payment Required` quotes, verifies Somnia order state, and unlocks agent work after fulfillment. |
 | Order state machine | `AgentOrderBook` supports pending, accepted, processing, fulfilled, settled, refunded, and failed. |
 | Operator dashboard | Frontend includes dashboard, operator, policies, audit, proofs, agents, and orders pages. |
 | Time-window policies | `TreasuryPolicy` enforces hourly, daily, weekly, UTC-hour windows, allowlists, emergency pause, and per-order approvals. |
@@ -63,4 +64,5 @@ platform deposit, an on-chain `RiskRequested` event, and owner demo fulfillment:
 
 ```bash
 npm run smoke:live
+npm run smoke:x402
 ```

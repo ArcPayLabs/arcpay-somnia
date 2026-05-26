@@ -3,7 +3,7 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, Copy, FileText, Plus } from "lucide-react";
+import { Check, Copy, ExternalLink, FileText, Plus, RefreshCw, WalletCards, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -12,6 +12,19 @@ import { PageHeader } from "@/components/app/PageHeader";
 import { ReviewModal } from "@/components/primitives/ReviewModal";
 import { StatCard } from "@/components/primitives/StatCard";
 import { checkActionPolicies } from "@/lib/policy";
+import {
+  CONTRACTS,
+  NATIVE_TOKEN,
+  SOMUSD_TOKEN_ADDRESS,
+  erc20Contract,
+  hashText,
+  invoiceBookContract,
+  shortAddress,
+  toUnits,
+  toWei,
+  txUrl,
+  writeRecord,
+} from "@somnia/lib/somnia";
 import { useNetwork } from "@/store/network";
 
 export const Route = createFileRoute("/app/invoices")({
@@ -20,13 +33,14 @@ export const Route = createFileRoute("/app/invoices")({
 });
 
 const TOKENS = ["STT", "SOMUSD"] as const;
-const TOKENS_BY_NETWORK = {
-  somnia: ["STT", "SOMUSD"],
-} as const;
+const TOKENS_BY_NETWORK = { somnia: ["STT", "SOMUSD"] } as const;
+const ZERO_PAYER = "0x0000000000000000000000000000000000000000";
+const INVOICE_STATUS = ["pending", "paid", "cancelled"] as const;
 
 const schema = z.object({
   client: z.string().trim().min(2, "Client name required").max(80),
   email: z.string().trim().email("Invalid email"),
+  payer: z.string().trim().optional(),
   amount: z.coerce.number().positive("Amount must be positive"),
   token: z.enum(TOKENS),
   due: z.string().min(1, "Pick a due date"),
@@ -37,29 +51,36 @@ type Form = z.infer<typeof schema>;
 type Invoice = {
   id: string;
   publicId: string;
+  onchainId: string;
   client: string;
   email: string;
+  payer: string;
   amount: number;
   token: string;
+  amountUnits: string;
   due: string;
   memo: string;
   status: "paid" | "pending" | "overdue" | "failed" | "cancelled";
   paymentUrl: string;
+  txHash?: string;
+  settlementTxHash?: string;
+  cancelTxHash?: string;
 };
 
 function InvoicesPage() {
   const network = useNetwork((state) => state.mode);
-  const tokenOptions = TOKENS_BY_NETWORK[network];
+  const tokenOptions = TOKENS_BY_NETWORK[network] ?? TOKENS_BY_NETWORK.somnia;
   const [items, setItems] = useState<Invoice[]>([]);
   const [open, setOpen] = useState(false);
   const [review, setReview] = useState<Form | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
-  const [message, setMessage] = useState("Sign in to load and create invoices.");
+  const [message, setMessage] = useState("Connect a Somnia wallet to create or pay invoices.");
   const [loading, setLoading] = useState(false);
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<Form>({
     resolver: zodResolver(schema),
-    defaultValues: { token: "STT" },
+    defaultValues: { token: "STT", payer: "" },
   });
 
   useEffect(() => {
@@ -69,14 +90,15 @@ function InvoicesPage() {
   async function loadInvoices() {
     const supabase = getOptionalSupabaseClient();
     if (!supabase) {
-      setMessage("Supabase is not configured for invoice persistence.");
+      setItems(readLocalInvoices());
+      setMessage("Supabase is not configured; showing browser invoice records.");
       return;
     }
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      setItems([]);
-      setMessage("Sign in to load and create invoices.");
+      setItems(readLocalInvoices());
+      setMessage("Wallet actions still work. Sign in to sync invoices across devices.");
       return;
     }
 
@@ -89,28 +111,22 @@ function InvoicesPage() {
     setLoading(false);
 
     if (error) {
+      setItems(readLocalInvoices());
       setMessage(error.message);
       return;
     }
 
-    setItems((data ?? []).map((row) => ({
-      id: row.id,
-      publicId: row.public_id,
-      client: row.client,
-      email: row.email,
-      amount: Number(row.amount),
-      token: row.token,
-      due: row.due,
-      memo: row.memo,
-      status: row.status,
-      paymentUrl: row.payment_url,
-    })));
-    setMessage("Invoices loaded from Supabase.");
+    const rows = (data ?? []).map(rowToInvoice);
+    setItems(mergeInvoices(rows, readLocalInvoices()));
+    setMessage("Invoices loaded. On-chain status can be refreshed from Somnia.");
   }
 
   const onSubmit = (data: Form) => setReview(data);
+
   const confirm = async () => {
     if (!review) return;
+    if (CONTRACTS.AgentInvoiceBook === NATIVE_TOKEN) throw new Error("AgentInvoiceBook is not deployed yet.");
+
     const blockReason = checkActionPolicies({
       action: "Send",
       network,
@@ -119,36 +135,127 @@ function InvoicesPage() {
       requireWallet: false,
     });
     if (blockReason) throw new Error(blockReason);
-    const supabase = getOptionalSupabaseClient();
-    if (!supabase) throw new Error("Supabase is not configured.");
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error("Sign in before creating invoices.");
 
     const publicId = createInvoiceId();
+    const onchainId = hashText(publicId);
+    const tokenAddress = review.token === "STT" ? NATIVE_TOKEN : SOMUSD_TOKEN_ADDRESS;
+    const amountUnits = review.token === "STT" ? toWei(String(review.amount)) : toUnits(String(review.amount), 6);
+    const payer = normalizePayer(review.payer);
+    const metadataUri = buildMetadataUri(publicId, review);
+    const book = await invoiceBookContract();
+
+    const tx = await book.createInvoice(onchainId, payer, tokenAddress, amountUnits, metadataUri);
+    const receipt = await tx.wait();
+    const txHash = receipt?.hash ?? tx.hash;
     const paymentUrl = `${window.location.origin}/pay/${publicId}`;
-    const { error } = await supabase.from("arcpay_invoices").insert({
-      user_id: user.id,
-      public_id: publicId,
-      network,
+    const invoice = {
+      id: publicId,
+      publicId,
+      onchainId,
       client: review.client,
       email: review.email,
+      payer,
       amount: review.amount,
       token: review.token,
+      amountUnits: amountUnits.toString(),
       due: review.due,
       memo: review.memo ?? "",
       status: "pending",
-      payment_url: paymentUrl,
+      paymentUrl,
+      txHash,
+    };
+
+    saveLocalInvoice(invoice);
+    await saveSupabaseInvoice(invoice);
+    writeRecord({
+      id: `invoice-${publicId}`,
+      type: "invoice",
+      title: `Created invoice ${publicId}`,
+      status: "pending",
+      amount: `${review.amount} ${review.token}`,
+      txHash,
     });
 
-    if (error) throw error;
-
-    await loadInvoices();
-    setMessage("Invoice saved and pay-link generated.");
+    setItems((current) => mergeInvoices([invoice], current));
+    setMessage(`Invoice ${publicId} created on Somnia.`);
     setReview(null);
     setOpen(false);
-    reset({ token: tokenOptions[0] });
+    reset({ token: tokenOptions[0], payer: "" });
   };
+
+  async function payInvoice(invoice: Invoice) {
+    setBusyId(invoice.publicId);
+    try {
+      const book = await invoiceBookContract();
+      let tx;
+      if (invoice.token === "STT") {
+        tx = await book.payNativeInvoice(invoice.onchainId, { value: BigInt(invoice.amountUnits) });
+      } else {
+        const token = await erc20Contract(SOMUSD_TOKEN_ADDRESS);
+        await (await token.approve(CONTRACTS.AgentInvoiceBook, BigInt(invoice.amountUnits))).wait();
+        tx = await book.payTokenInvoice(invoice.onchainId);
+      }
+      const receipt = await tx.wait();
+      updateInvoice(invoice.publicId, { status: "paid", settlementTxHash: receipt?.hash ?? tx.hash });
+      writeRecord({
+        id: `invoice-paid-${invoice.publicId}`,
+        type: "invoice",
+        title: `Paid invoice ${invoice.publicId}`,
+        status: "paid",
+        amount: `${invoice.amount} ${invoice.token}`,
+        txHash: receipt?.hash ?? tx.hash,
+      });
+      setMessage(`Invoice ${invoice.publicId} paid on Somnia.`);
+    } catch (error) {
+      setMessage(error?.shortMessage || error?.message || String(error));
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function cancelInvoice(invoice: Invoice) {
+    setBusyId(invoice.publicId);
+    try {
+      const book = await invoiceBookContract();
+      const tx = await book.cancelInvoice(invoice.onchainId);
+      const receipt = await tx.wait();
+      updateInvoice(invoice.publicId, { status: "cancelled", cancelTxHash: receipt?.hash ?? tx.hash });
+      writeRecord({
+        id: `invoice-cancelled-${invoice.publicId}`,
+        type: "invoice",
+        title: `Cancelled invoice ${invoice.publicId}`,
+        status: "cancelled",
+        amount: `${invoice.amount} ${invoice.token}`,
+        txHash: receipt?.hash ?? tx.hash,
+      });
+      setMessage(`Invoice ${invoice.publicId} cancelled.`);
+    } catch (error) {
+      setMessage(error?.shortMessage || error?.message || String(error));
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function refreshOnchain(invoice: Invoice) {
+    setBusyId(invoice.publicId);
+    try {
+      const book = await invoiceBookContract();
+      const row = await book.invoices(invoice.onchainId);
+      const status = INVOICE_STATUS[Number(row.status)] ?? invoice.status;
+      updateInvoice(invoice.publicId, { status });
+      setMessage(`Invoice ${invoice.publicId} is ${status} on Somnia.`);
+    } catch (error) {
+      setMessage(error?.shortMessage || error?.message || String(error));
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  function updateInvoice(publicId: string, patch: Partial<Invoice>) {
+    const next = items.map((item) => item.publicId === publicId ? { ...item, ...patch } : item);
+    setItems(next);
+    writeLocalInvoices(next);
+  }
 
   async function copyLink(invoice: Invoice) {
     if (!invoice.paymentUrl || typeof navigator === "undefined") return;
@@ -159,6 +266,7 @@ function InvoicesPage() {
 
   const outstanding = items.filter((item) => item.status === "pending" || item.status === "overdue");
   const paid = items.filter((item) => item.status === "paid");
+  const onchainReady = CONTRACTS.AgentInvoiceBook !== NATIVE_TOKEN;
 
   return (
     <div>
@@ -166,7 +274,7 @@ function InvoicesPage() {
         icon={FileText}
         eyebrow="Treasury"
         title="Invoices"
-        description={`Generate persisted ${network} invoices with pay-links and due dates. Payment settlement can be updated by webhook or operator review.`}
+        description="Issue STT or SOMUSD invoices, settle them through wallet signatures, and keep transaction evidence attached to the treasury record."
         actions={
           <button onClick={() => setOpen(true)} className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2.5 text-sm font-medium text-background hover:opacity-90">
             <Plus className="h-4 w-4" /> New invoice
@@ -174,11 +282,11 @@ function InvoicesPage() {
         }
       />
 
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <StatCard label="Outstanding" value={`$${sum(outstanding).toLocaleString()}`} hint={`${outstanding.length} open`} />
-        <StatCard label="Overdue" value={items.filter((item) => item.status === "overdue").length} hint="Webhook/operator status" />
-        <StatCard label="Paid" value={`$${sum(paid).toLocaleString()}`} />
-        <StatCard label="Invoices" value={items.length} hint="Stored in Supabase" />
+      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <StatCard label="Outstanding" value={`${sum(outstanding).toLocaleString()} STT/SOMUSD`} hint={`${outstanding.length} open`} icon={WalletCards} />
+        <StatCard label="Paid" value={paid.length} hint={`${sum(paid).toLocaleString()} total units`} />
+        <StatCard label="Cancelled" value={items.filter((item) => item.status === "cancelled").length} />
+        <StatCard label="Contract" value={onchainReady ? "Live" : "Missing"} hint={onchainReady ? shortAddress(CONTRACTS.AgentInvoiceBook) : "Deploy invoice book"} />
       </div>
 
       <div className="mb-4 rounded-2xl border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
@@ -186,28 +294,52 @@ function InvoicesPage() {
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-border bg-card">
-        <div className="grid grid-cols-12 gap-3 border-b border-border px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          <div className="col-span-2">ID</div><div className="col-span-3">Client</div><div className="col-span-2">Due</div><div className="col-span-2">Amount</div><div className="col-span-2">Status</div><div className="col-span-1 text-right">Link</div>
+        <div className="hidden grid-cols-12 gap-3 border-b border-border px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground md:grid">
+          <div className="col-span-2">ID</div>
+          <div className="col-span-2">Client</div>
+          <div className="col-span-2">Due</div>
+          <div className="col-span-2">Amount</div>
+          <div className="col-span-1">Status</div>
+          <div className="col-span-3 text-right">Actions</div>
         </div>
         <div className="divide-y divide-border">
           {items.length === 0 && <div className="p-8 text-center text-sm text-muted-foreground">No invoices yet.</div>}
           {items.map((invoice) => (
-            <div key={invoice.id} className="grid grid-cols-12 items-center gap-3 px-5 py-3.5 text-sm hover:bg-muted/40">
-              <div className="col-span-2 font-mono text-xs">{invoice.publicId}</div>
-              <div className="col-span-3 truncate">{invoice.client}</div>
-              <div className="col-span-2 text-muted-foreground">{invoice.due}</div>
-              <div className="col-span-2 font-mono">{invoice.amount.toLocaleString()} {invoice.token}</div>
-              <div className="col-span-2">
+            <div key={invoice.publicId} className="grid gap-3 px-5 py-4 text-sm hover:bg-muted/40 md:grid-cols-12 md:items-center">
+              <div className="md:col-span-2">
+                <div className="font-mono text-xs">{invoice.publicId}</div>
+                {invoice.txHash && <a href={txUrl(invoice.txHash)} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground">created <ExternalLink className="h-3 w-3" /></a>}
+              </div>
+              <div className="truncate md:col-span-2">
+                <div className="font-medium">{invoice.client}</div>
+                <div className="text-xs text-muted-foreground">{invoice.email}</div>
+              </div>
+              <div className="text-muted-foreground md:col-span-2">{invoice.due}</div>
+              <div className="font-mono md:col-span-2">{invoice.amount.toLocaleString()} {invoice.token}</div>
+              <div className="md:col-span-1">
                 <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
                   invoice.status === "paid" ? "bg-success/15 text-success" :
                   invoice.status === "pending" ? "bg-warning/30 text-warning-foreground" :
                   "bg-destructive/15 text-destructive"
                 }`}>{invoice.status}</span>
               </div>
-              <div className="col-span-1 text-right">
-                <button onClick={() => void copyLink(invoice)} className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
-                  {copied === invoice.id ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
+              <div className="flex flex-wrap justify-start gap-2 md:col-span-3 md:justify-end">
+                <button onClick={() => void refreshOnchain(invoice)} disabled={busyId === invoice.publicId} className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs hover:bg-muted disabled:opacity-60">
+                  <RefreshCw className="h-3.5 w-3.5" /> Sync
                 </button>
+                <button onClick={() => void copyLink(invoice)} className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs hover:bg-muted">
+                  {copied === invoice.id ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />} Link
+                </button>
+                {invoice.status === "pending" && (
+                  <>
+                    <button onClick={() => void payInvoice(invoice)} disabled={busyId === invoice.publicId} className="rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:brightness-110 disabled:opacity-60">
+                      Pay
+                    </button>
+                    <button onClick={() => void cancelInvoice(invoice)} disabled={busyId === invoice.publicId} className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs hover:bg-muted disabled:opacity-60">
+                      <XCircle className="h-3.5 w-3.5" /> Cancel
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           ))}
@@ -227,8 +359,9 @@ function InvoicesPage() {
             <div className="space-y-4">
               <Field label="Client name" error={errors.client?.message}><input {...register("client")} className="ap-input" placeholder="Acme Robotics" /></Field>
               <Field label="Email" error={errors.email?.message}><input type="email" {...register("email")} className="ap-input" placeholder="ap@acme.io" /></Field>
+              <Field label="Payer wallet optional" error={errors.payer?.message}><input {...register("payer")} className="ap-input font-mono" placeholder="0x... or leave open" /></Field>
               <div className="grid grid-cols-3 gap-2">
-                <Field label="Amount" error={errors.amount?.message} className="col-span-2"><input type="number" step="0.01" {...register("amount")} className="ap-input" placeholder="0.00" /></Field>
+                <Field label="Amount" error={errors.amount?.message} className="col-span-2"><input type="number" step="0.000001" {...register("amount")} className="ap-input" placeholder="0.00" /></Field>
                 <Field label="Token"><select {...register("token")} className="ap-input">{tokenOptions.map((token) => <option key={token}>{token}</option>)}</select></Field>
               </div>
               <Field label="Due date" error={errors.due?.message}><input type="date" {...register("due")} className="ap-input" /></Field>
@@ -246,16 +379,16 @@ function InvoicesPage() {
       <ReviewModal
         open={!!review}
         onOpenChange={(value) => { if (!value) setReview(null); }}
-        title="Review invoice"
-        description="A persisted invoice and payment URL will be created."
+        title="Review on-chain invoice"
+        description="This creates an invoice in AgentInvoiceBook. Payment requires a separate payer wallet signature."
         rows={review ? [
           { label: "Client", value: review.client },
-          { label: "Email", value: review.email },
+          { label: "Payer", value: normalizePayer(review.payer) === ZERO_PAYER ? "Any wallet" : shortAddress(normalizePayer(review.payer)), mono: true },
           { label: "Amount", value: `${review.amount.toLocaleString()} ${review.token}`, mono: true },
           { label: "Due", value: review.due },
         ] : []}
-        warnings={["This saves the invoice. It does not mark funds paid until settlement is detected or manually updated."]}
-        confirmLabel="Save invoice"
+        warnings={["Invoice creation is on-chain and visible on the Somnia explorer.", "SOMUSD payments require token approval before settlement."]}
+        confirmLabel="Create on-chain invoice"
         onConfirm={confirm}
       />
     </div>
@@ -277,6 +410,97 @@ function createInvoiceId() {
     return `inv_${crypto.randomUUID().replaceAll("-", "").slice(0, 16)}`;
   }
   return `inv_${Date.now().toString(36)}`;
+}
+
+function normalizePayer(value?: string) {
+  const text = (value ?? "").trim();
+  return /^0x[a-fA-F0-9]{40}$/.test(text) ? text : ZERO_PAYER;
+}
+
+function buildMetadataUri(publicId: string, review: Form) {
+  const payload = {
+    publicId,
+    client: review.client,
+    email: review.email,
+    due: review.due,
+    memo: review.memo ?? "",
+  };
+  return `arcpay://invoice/${publicId}?data=${encodeURIComponent(JSON.stringify(payload))}`;
+}
+
+function rowToInvoice(row: any): Invoice {
+  const publicId = row.public_id ?? row.publicId ?? row.id;
+  const token = row.token ?? "STT";
+  const amount = Number(row.amount ?? 0);
+  return {
+    id: row.id ?? publicId,
+    publicId,
+    onchainId: row.onchain_invoice_id ?? row.onchainId ?? hashText(publicId),
+    client: row.client ?? "Client",
+    email: row.email ?? "",
+    payer: row.payer_wallet ?? row.payer ?? ZERO_PAYER,
+    amount,
+    token,
+    amountUnits: row.amount_units ?? (token === "STT" ? toWei(String(amount)).toString() : toUnits(String(amount), 6).toString()),
+    due: row.due ?? "",
+    memo: row.memo ?? "",
+    status: row.status ?? "pending",
+    paymentUrl: row.payment_url ?? row.paymentUrl ?? `${window.location.origin}/pay/${publicId}`,
+    txHash: row.onchain_tx_hash ?? row.txHash,
+    settlementTxHash: row.settlement_tx_hash ?? row.settlementTxHash,
+    cancelTxHash: row.cancel_tx_hash ?? row.cancelTxHash,
+  };
+}
+
+async function saveSupabaseInvoice(invoice: Invoice) {
+  const supabase = getOptionalSupabaseClient();
+  if (!supabase) return;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  await supabase.from("arcpay_invoices").insert({
+    user_id: user.id,
+    public_id: invoice.publicId,
+    network: "somnia",
+    client: invoice.client,
+    email: invoice.email,
+    amount: invoice.amount,
+    token: invoice.token,
+    due: invoice.due,
+    memo: invoice.memo,
+    status: invoice.status,
+    payment_url: invoice.paymentUrl,
+    onchain_invoice_id: invoice.onchainId,
+    onchain_tx_hash: invoice.txHash ?? null,
+    payer_wallet: invoice.payer === ZERO_PAYER ? null : invoice.payer,
+    amount_units: invoice.amountUnits,
+  });
+}
+
+function readLocalInvoices(): Invoice[] {
+  if (typeof window === "undefined") return [];
+  try {
+    return JSON.parse(window.localStorage.getItem("arcpay-somnia-invoices") ?? "[]");
+  } catch {
+    return [];
+  }
+}
+
+function writeLocalInvoices(items: Invoice[]) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem("arcpay-somnia-invoices", JSON.stringify(items.slice(0, 100)));
+}
+
+function saveLocalInvoice(invoice: Invoice) {
+  writeLocalInvoices(mergeInvoices([invoice], readLocalInvoices()));
+}
+
+function mergeInvoices(primary: Invoice[], secondary: Invoice[]) {
+  const seen = new Set<string>();
+  return [...primary, ...secondary].filter((invoice) => {
+    if (seen.has(invoice.publicId)) return false;
+    seen.add(invoice.publicId);
+    return true;
+  });
 }
 
 function sum(items: Invoice[]) {

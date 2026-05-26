@@ -20,10 +20,13 @@ Commands:
   arcpay-somnia contracts              Print deployed Somnia addresses
   arcpay-somnia wallet                 Print network wallet instructions
   arcpay-somnia agent-id <slug>        Derive bytes32 agent id
+  arcpay-somnia invoice-id <publicId>  Derive bytes32 invoice id
   arcpay-somnia claim-hash <code>      Derive claim-code hash
   arcpay-somnia privacy-commit <text>  Derive Privacy Intent commitment/nullifier
   arcpay-somnia privacy-abi            Print Privacy Intent contract ABI
   arcpay-somnia privacy-guide          Print builder integration guide
+  arcpay-somnia invoice-guide          Print invoice settlement guide
+  arcpay-somnia x402-guide             Print x402 HTTP payment gate guide
   arcpay-somnia demo-path              Print judge demo steps
   arcpay-somnia smoke                  Print smoke-test commands
   arcpay-somnia mcp-config             Print MCP host config
@@ -46,6 +49,8 @@ try {
     console.log("Explorer: https://somnia-testnet.socialscan.io");
   } else if (command === "agent-id") {
     console.log(id(args.join(" ") || "agent"));
+  } else if (command === "invoice-id") {
+    console.log(keccak256(toUtf8Bytes(args.join(" ") || "invoice")));
   } else if (command === "claim-hash") {
     console.log(keccak256(toUtf8Bytes(args.join(" "))));
   } else if (command === "privacy-commit") {
@@ -74,6 +79,39 @@ try {
       "",
       "Privacy boundary: metadata and recipient are hidden during intent phase; release transfer is public.",
     ].join("\n"));
+  } else if (command === "invoice-guide") {
+    const info = deployment();
+    console.log([
+      "ArcPay Somnia Invoices",
+      "",
+      `InvoiceBook: ${info.contracts.AgentInvoiceBook}`,
+      `SOMUSD: ${info.somUsdToken}`,
+      "",
+      "1. invoiceId = keccak256(publicInvoiceId).",
+      "2. STT invoice: createInvoice(invoiceId, payerOrZero, address(0), amountWei, metadataUri).",
+      "3. SOMUSD invoice: createInvoice(invoiceId, payerOrZero, SOMUSD, amountBaseUnits, metadataUri).",
+      "4. Payer signs payNativeInvoice(invoiceId) with exact msg.value or approves SOMUSD then payTokenInvoice(invoiceId).",
+      "5. Issuer can cancel unpaid invoices with cancelInvoice(invoiceId).",
+      "",
+      "Proof command: npm run smoke:live",
+    ].join("\n"));
+  } else if (command === "x402-guide") {
+    const info = deployment();
+    console.log([
+      "ArcPay Somnia x402",
+      "",
+      `Registry: ${info.contracts.AgentRegistry}`,
+      `OrderBook: ${info.contracts.AgentOrderBook}`,
+      "",
+      "1. Run npm run x402.",
+      "2. Register an agent slug in AgentRegistry.",
+      "3. GET /agent/:slug/work returns HTTP 402 with exact STT payment requirements.",
+      "4. Payer calls AgentOrderBook.createOrder(agentId, requestUri) with quoted msg.value.",
+      "5. Provider fulfills the order.",
+      "6. GET /agent/:slug/work?orderId=... unlocks only after Fulfilled or Settled.",
+      "",
+      "Proof command: npm run smoke:x402",
+    ].join("\n"));
   } else if (command === "demo-path") {
     console.log([
       "1. Connect wallet and switch to Somnia Testnet.",
@@ -84,7 +122,8 @@ try {
       "6. Open /operator for claim-code and webhook circuit-breaker proof.",
       "7. Open /oracle for Somnia agent risk callback proof.",
       "8. Open /privacy for encrypted-metadata payment intents and nullifier release.",
-      "9. Open /proofs for deployed addresses and build commands.",
+      "9. Open /invoices for STT/SOMUSD invoice creation, payment, cancellation, and sync.",
+      "10. Open /proofs for deployed addresses and build commands.",
     ].join("\n"));
   } else if (command === "smoke") {
     console.log([
@@ -92,8 +131,10 @@ try {
       "npm run build:frontend",
       "npm test",
       "npm run check:worker",
+      "npm run check:x402",
       "npm run smoke:auth",
       "npm run smoke:live",
+      "npm run smoke:x402",
     ].join("\n"));
   } else if (command === "mcp-config") {
     console.log(JSON.stringify({

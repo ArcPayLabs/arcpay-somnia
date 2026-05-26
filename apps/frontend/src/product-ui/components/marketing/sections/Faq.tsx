@@ -9,7 +9,7 @@ const FAQS = [
   },
   {
     q: "How is privacy actually delivered?",
-    a: "Through the SomniaPrivacyVault contract: commitment-based intents, encrypted memo URIs, and selective disclosure records. It is a testnet privacy-intent layer with production hardening still ahead.",
+    a: "Through the SomniaPrivacyVault contract: STT or SOMUSD commitments, encrypted memo URIs, delayed recipient release, cancel/refund, nullifier protection, and selective disclosure records. It is a privacy-intent layer, not a full zero-knowledge shielded pool.",
   },
   {
     q: "Do you hold custody of funds?",

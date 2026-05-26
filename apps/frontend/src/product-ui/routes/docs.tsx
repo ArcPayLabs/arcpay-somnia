@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Bot, CreditCard, Gauge, KeyRound, Lock, Network, ShieldCheck, Workflow } from "lucide-react";
+import { BookOpen, Bot, CreditCard, Gauge, KeyRound, Lock, Network, RadioTower, ShieldCheck, Workflow } from "lucide-react";
 import { MarketingShell } from "@/components/marketing/MarketingShell";
 import { SectionHeading } from "@/components/primitives/SectionHeading";
 
@@ -9,6 +9,7 @@ export const Route = { options: { component: DocsPage } };
 const DOCS = [
   { icon: Network, title: "Network", body: "Somnia Testnet, chain 50312, STT gas, SocialScan explorer, and fixed testnet-only routing for this build." },
   { icon: Bot, title: "Agent registry", body: "Operators register agents with capability metadata, endpoints, prices, and active status so other agents can discover services." },
+  { icon: RadioTower, title: "x402 endpoints", body: "Paid agent endpoints return HTTP 402 with exact Somnia order requirements, then unlock after on-chain fulfillment or settlement." },
   { icon: Workflow, title: "Order lifecycle", body: "Agent orders move through pending, accepted, processing, fulfilled, settled, refunded, or failed states with audit records." },
   { icon: CreditCard, title: "SOMUSD cards", body: "Virtual spend cards assign token budgets to agents with top-up, freeze, activate, and spend controls." },
   { icon: ShieldCheck, title: "Policies", body: "Allowed tokens, blocked actions, contractor allowlist, risk floor, emergency pause, spend caps, and approval thresholds are enforced before actions." },
@@ -27,7 +28,7 @@ function DocsPage() {
             align="center"
             eyebrow="Docs"
             title={<>Build with <span className="text-primary">ArcPay on Somnia</span>.</>}
-            description="A judge-friendly map of the product, contracts, agent flows, and testnet operations included in this repo."
+            description="A product map for the contracts, agent flows, x402 endpoints, and Somnia testnet operations behind ArcPay."
           />
           <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             {DOCS.map((item) => (

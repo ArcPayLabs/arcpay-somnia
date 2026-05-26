@@ -6,7 +6,7 @@ import { motion } from "motion/react";
 const footerColumns = [
   {
     title: "Company",
-    links: ["Founding", "Platform", "Proof log"],
+    links: ["Founding", "Platform", "Trust log"],
   },
   {
     title: "Product",

@@ -17,6 +17,7 @@ export const CONTRACTS = {
   SomniaAgentRiskOracle: deployedContracts.SomniaAgentRiskOracle ?? NATIVE_TOKEN,
   AgentSpendCardVault: deployedContracts.AgentSpendCardVault ?? NATIVE_TOKEN,
   SomniaPrivacyVault: deployedContracts.SomniaPrivacyVault ?? NATIVE_TOKEN,
+  AgentInvoiceBook: deployedContracts.AgentInvoiceBook ?? NATIVE_TOKEN,
 } as const;
 
 export const DEPTH_CONTRACTS_READY =
@@ -107,6 +108,17 @@ export const PRIVACY_VAULT_ABI = [
   "function releaseIntent(bytes32 commitment,bytes32 nullifier,address recipient)",
   "function cancelIntent(bytes32 commitment)",
   "function intents(bytes32 commitment) view returns (address operator,address token,uint256 amount,string encryptedMemoUri,bool released,bool cancelled,uint256 createdAt)",
+] as const;
+
+export const INVOICE_BOOK_ABI = [
+  "function createInvoice(bytes32 invoiceId,address payer,address token,uint256 amount,string metadataUri)",
+  "function payNativeInvoice(bytes32 invoiceId) payable",
+  "function payTokenInvoice(bytes32 invoiceId)",
+  "function cancelInvoice(bytes32 invoiceId)",
+  "function invoices(bytes32 invoiceId) view returns (bytes32 invoiceId,address issuer,address payer,address token,uint256 amount,string metadataUri,uint8 status,uint256 createdAt,uint256 paidAt,uint256 cancelledAt)",
+  "event InvoiceCreated(bytes32 indexed invoiceId,address indexed issuer,address indexed payer,address token,uint256 amount,string metadataUri)",
+  "event InvoicePaid(bytes32 indexed invoiceId,address indexed payer,address token,uint256 amount)",
+  "event InvoiceCancelled(bytes32 indexed invoiceId)",
 ] as const;
 
 export const ORDER_STATUS = ["Pending", "Accepted", "Processing", "Fulfilled", "Settled", "Refunded", "Failed"] as const;
@@ -260,6 +272,11 @@ export async function privacyVaultContract() {
   return new Contract(CONTRACTS.SomniaPrivacyVault, PRIVACY_VAULT_ABI, signer);
 }
 
+export async function invoiceBookContract() {
+  const signer = await signerProvider();
+  return new Contract(CONTRACTS.AgentInvoiceBook, INVOICE_BOOK_ABI, signer);
+}
+
 export type LocalRecord = {
   id: string;
   type: string;
@@ -275,6 +292,20 @@ export function readRecords(): LocalRecord[] {
   return JSON.parse(window.localStorage.getItem("arcpay-somnia-records") ?? "[]") as LocalRecord[];
 }
 
+export async function fetchRecords(): Promise<LocalRecord[]> {
+  if (typeof window === "undefined") return [];
+  const local = readRecords();
+  try {
+    const response = await fetch("/api/records", { cache: "no-store" });
+    if (!response.ok) return local;
+    const rows = await response.json();
+    const server = Array.isArray(rows) ? rows.map(normalizeRecord).filter(Boolean) as LocalRecord[] : [];
+    return mergeRecords(local, server);
+  } catch {
+    return local;
+  }
+}
+
 export function writeRecord(record: Omit<LocalRecord, "createdAt">) {
   const next = [{ ...record, createdAt: new Date().toISOString() }, ...readRecords()].slice(0, 100);
   window.localStorage.setItem("arcpay-somnia-records", JSON.stringify(next));
@@ -283,4 +314,30 @@ export function writeRecord(record: Omit<LocalRecord, "createdAt">) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(record),
   }).catch(() => undefined);
+}
+
+function normalizeRecord(row: any): LocalRecord | null {
+  if (!row) return null;
+  return {
+    id: String(row.id ?? crypto.randomUUID()),
+    type: String(row.type ?? "audit"),
+    title: String(row.title ?? "Untitled"),
+    status: String(row.status ?? "created"),
+    amount: row.amount === null || row.amount === undefined ? undefined : String(row.amount),
+    txHash: row.txHash ?? row.tx_hash ?? undefined,
+    createdAt: row.createdAt ?? row.created_at ?? new Date().toISOString(),
+  };
+}
+
+function mergeRecords(local: LocalRecord[], server: LocalRecord[]) {
+  const seen = new Set<string>();
+  return [...server, ...local]
+    .filter((record) => {
+      const key = record.txHash ? `${record.txHash}:${record.type}:${record.title}` : record.id;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
+    .slice(0, 200);
 }

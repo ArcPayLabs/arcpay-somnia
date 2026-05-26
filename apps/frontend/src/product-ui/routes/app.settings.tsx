@@ -232,7 +232,7 @@ function SettingsPage() {
 
         <section className="rounded-2xl border border-border bg-card p-5">
           <div className="text-sm font-medium">Default network</div>
-          <div className="text-xs text-muted-foreground mt-0.5 mb-4">This repo is fixed to Somnia Testnet for hackathon judging.</div>
+          <div className="text-xs text-muted-foreground mt-0.5 mb-4">This deployment is fixed to Somnia Testnet so workspace policy, signing, and contract reads stay deterministic.</div>
           <div className="grid grid-cols-1 gap-2">
             <button
               className="rounded-xl border border-primary bg-primary/10 px-4 py-3 text-sm font-medium text-foreground"
@@ -250,7 +250,7 @@ function SettingsPage() {
         <section className="lg:col-span-3 rounded-2xl border border-border bg-card p-5">
           <div className="text-sm font-medium">Enabled integrations</div>
           <div className="text-xs text-muted-foreground mt-0.5 mb-4">
-            Turning off an integration hides it from recommendations and route review, but proof pages remain available.
+            Turning off an integration hides it from recommendations and route review, while infrastructure evidence remains available in the trust center.
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {INTEGRATIONS.map((item) => (

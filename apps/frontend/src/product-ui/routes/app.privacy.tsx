@@ -8,7 +8,7 @@ import { ReviewModal, type ReviewRow } from "@/components/primitives/ReviewModal
 import { StatCard } from "@/components/primitives/StatCard";
 import { readLocalJson, writeLocalJson } from "@/lib/browser-cache";
 import { checkActionPolicies } from "@/lib/policy";
-import { connectedAddress, hashText, privacyVaultContract, shortAddress, toWei, txUrl, writeRecord } from "@somnia/lib/somnia";
+import { connectedAddress, CONTRACTS, erc20Contract, hashText, privacyVaultContract, shortAddress, SOMUSD_TOKEN_ADDRESS, toUnits, toWei, txUrl, writeRecord } from "@somnia/lib/somnia";
 
 export const Route = { options: { component: PrivacyPage } };
 
@@ -18,8 +18,12 @@ type PrivacyIntent = {
   amount: string;
   memoUri: string;
   recipient: string;
-  status: "Prepared" | "Submitted" | "Disclosure ready";
+  token: "STT" | "SOMUSD";
+  status: "Prepared" | "Submitted" | "Disclosure ready" | "Cancelled";
   txHash?: string;
+  releaseTxHash?: string;
+  cancelTxHash?: string;
+  nullifier?: string;
   createdAt: string;
 };
 
@@ -30,8 +34,8 @@ function PrivacyPage() {
   const [open, setOpen] = useState<"shield" | "key" | null>(null);
   const [review, setReview] = useState<PrivacyIntent | null>(null);
   const [releaseTarget, setReleaseTarget] = useState<PrivacyIntent | null>(null);
-  const [message, setMessage] = useState("Somnia does not ship a native privacy app yet, so ArcPay provides a testnet privacy-intent layer for agents.");
-  const [form, setForm] = useState({ amount: "0.01", recipient: "", memoUri: "ipfs://encrypted-agent-payment-memo", nullifier: "release-secret-001" });
+  const [message, setMessage] = useState("Create STT or SOMUSD privacy intents with encrypted memo pointers, delayed recipient release, cancellation, and one-time nullifiers.");
+  const [form, setForm] = useState({ amount: "0.01", token: "STT" as "STT" | "SOMUSD", recipient: "", memoUri: "ipfs://encrypted-agent-payment-memo", nullifier: "release-secret-001" });
 
   const submitted = items.filter((item) => item.status === "Submitted");
   const disclosures = items.filter((item) => item.status === "Disclosure ready");
@@ -51,7 +55,7 @@ function PrivacyPage() {
     const blockReason = checkActionPolicies({
       action: "Shield",
       network: "somnia",
-      token: "STT",
+      token: form.token,
       amount,
       requireWallet: false,
     });
@@ -64,6 +68,7 @@ function PrivacyPage() {
       id: crypto.randomUUID(),
       commitment,
       amount: form.amount,
+      token: form.token,
       recipient: form.recipient.trim(),
       memoUri: form.memoUri.trim(),
       status: "Prepared",
@@ -75,11 +80,20 @@ function PrivacyPage() {
     if (!review) return;
     const signer = await connectedAddress();
     const contract = await privacyVaultContract() as any;
-    const tx = await contract.createNativeIntent(review.commitment, review.memoUri, { value: toWei(review.amount) });
+    let tx;
+    if (review.token === "SOMUSD") {
+      const token = await erc20Contract(SOMUSD_TOKEN_ADDRESS) as any;
+      const units = toUnits(review.amount);
+      const approve = await token.approve(CONTRACTS.SomniaPrivacyVault, units);
+      await approve.wait();
+      tx = await contract.createTokenIntent(review.commitment, SOMUSD_TOKEN_ADDRESS, units, review.memoUri);
+    } else {
+      tx = await contract.createNativeIntent(review.commitment, review.memoUri, { value: toWei(review.amount) });
+    }
     await tx.wait();
     const next = [{ ...review, status: "Submitted" as const, txHash: tx.hash }, ...items].slice(0, 50);
     persist(next);
-    writeRecord({ id: review.id, type: "privacy", title: `Created privacy commitment ${shortAddress(review.commitment)}`, status: "submitted", amount: review.amount, txHash: tx.hash });
+    writeRecord({ id: review.id, type: "privacy", title: `Created ${review.token} privacy commitment ${shortAddress(review.commitment)}`, status: "submitted", amount: `${review.amount} ${review.token}`, txHash: tx.hash });
     setMessage(`Privacy intent submitted by ${shortAddress(signer)}: ${tx.hash}`);
     setReview(null);
     setOpen(null);
@@ -96,11 +110,21 @@ function PrivacyPage() {
     const nullifier = hashText(`${item.id}:${form.nullifier}:${Date.now()}`);
     const tx = await contract.releaseIntent(item.commitment, nullifier, recipient);
     await tx.wait();
-    const next = items.map((current) => current.id === item.id ? { ...current, status: "Disclosure ready" as const, txHash: tx.hash } : current);
+    const next = items.map((current) => current.id === item.id ? { ...current, status: "Disclosure ready" as const, releaseTxHash: tx.hash, nullifier } : current);
     persist(next);
-    writeRecord({ id: crypto.randomUUID(), type: "privacy", title: `Released privacy commitment ${shortAddress(item.commitment)}`, status: "released", amount: item.amount, txHash: tx.hash });
+    writeRecord({ id: crypto.randomUUID(), type: "privacy", title: `Released ${item.token} privacy commitment ${shortAddress(item.commitment)}`, status: "released", amount: `${item.amount} ${item.token}`, txHash: tx.hash });
     setMessage(`Privacy intent released with nullifier ${shortAddress(nullifier)}: ${tx.hash}`);
     setReleaseTarget(null);
+  }
+
+  async function cancelIntent(item: PrivacyIntent) {
+    const contract = await privacyVaultContract() as any;
+    const tx = await contract.cancelIntent(item.commitment);
+    await tx.wait();
+    const next = items.map((current) => current.id === item.id ? { ...current, status: "Cancelled" as const, cancelTxHash: tx.hash } : current);
+    persist(next);
+    writeRecord({ id: crypto.randomUUID(), type: "privacy", title: `Cancelled ${item.token} privacy commitment ${shortAddress(item.commitment)}`, status: "cancelled", amount: `${item.amount} ${item.token}`, txHash: tx.hash });
+    setMessage(`Privacy intent cancelled and refunded: ${tx.hash}`);
   }
 
   function createDisclosure() {
@@ -109,6 +133,7 @@ function PrivacyPage() {
       id,
       commitment: hashText(`disclosure:${Date.now()}`),
       amount: "0",
+      token: "STT",
       memoUri: "selective-disclosure://workspace-auditor",
       recipient: form.recipient.trim() || "Workspace auditor",
       status: "Disclosure ready",
@@ -121,8 +146,9 @@ function PrivacyPage() {
   }
 
   const rows: ReviewRow[] = review ? [
-    { label: "Amount", value: `${review.amount} STT`, mono: true },
+    { label: "Amount", value: `${review.amount} ${review.token}`, mono: true },
     { label: "Commitment", value: shortAddress(review.commitment), mono: true },
+    { label: "Token route", value: review.token === "SOMUSD" ? `SOMUSD ${shortAddress(SOMUSD_TOKEN_ADDRESS)}` : "Native STT", mono: review.token === "SOMUSD" },
     { label: "Memo URI", value: review.memoUri, mono: true },
     { label: "Vault", value: "SomniaPrivacyVault" },
   ] : [];
@@ -133,7 +159,7 @@ function PrivacyPage() {
         icon={EyeOff}
         eyebrow="Privacy layer"
         title="Private agent treasury"
-        description="A Somnia-native privacy intent layer: operators create commitments, encrypted memo pointers, and selective disclosure records before public settlement."
+        description="A Somnia privacy-intent layer for STT and SOMUSD: commitments, encrypted memo pointers, delayed recipient release, cancellation, and one-time nullifier evidence."
         actions={
           <>
             <button onClick={() => setOpen("key")} className="inline-flex items-center gap-2 rounded-full bg-muted px-4 py-2.5 text-sm font-semibold">
@@ -147,7 +173,7 @@ function PrivacyPage() {
       />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard icon={Lock} label="Privacy intents" value={items.length} hint="Commitments created" />
+        <StatCard icon={Lock} label="Privacy intents" value={items.length} hint="STT + SOMUSD commitments" />
         <StatCard icon={Sparkles} label="Submitted" value={submitted.length} hint="Vault transactions" />
         <StatCard icon={Eye} label="Disclosures" value={disclosures.length} hint="Viewing-key records" />
         <StatCard label="Latest" value={latest ? shortAddress(latest.commitment) : "--"} hint="Commitment hash" emphasis />
@@ -158,7 +184,8 @@ function PrivacyPage() {
       {open && (
         <section className="rounded-3xl border border-border bg-card p-5 md:p-6">
           <div className="grid gap-4 md:grid-cols-3">
-            <Field label="Amount STT"><input value={form.amount} onChange={(event) => setForm({ ...form, amount: event.target.value })} className="ap-in" inputMode="decimal" /></Field>
+            <Field label={`Amount ${form.token}`}><input value={form.amount} onChange={(event) => setForm({ ...form, amount: event.target.value })} className="ap-in" inputMode="decimal" /></Field>
+            <Field label="Token"><select value={form.token} onChange={(event) => setForm({ ...form, token: event.target.value as "STT" | "SOMUSD" })} className="ap-in"><option>STT</option><option>SOMUSD</option></select></Field>
             <Field label="Recipient / auditor"><input value={form.recipient} onChange={(event) => setForm({ ...form, recipient: event.target.value })} className="ap-in" placeholder="0x... or auditor name" /></Field>
             <Field label="Encrypted memo URI"><input value={form.memoUri} onChange={(event) => setForm({ ...form, memoUri: event.target.value })} className="ap-in" /></Field>
             <Field label="Release secret"><input value={form.nullifier} onChange={(event) => setForm({ ...form, nullifier: event.target.value })} className="ap-in" /></Field>
@@ -178,7 +205,7 @@ function PrivacyPage() {
           {items.map((item) => (
             <div key={item.id} className="grid gap-3 px-5 py-4 text-sm md:grid-cols-12 md:items-center">
               <div className="md:col-span-3"><div className="font-medium">{item.status}</div><div className="font-mono text-xs text-muted-foreground">{shortAddress(item.commitment)}</div></div>
-              <div className="md:col-span-2 font-mono">{item.amount} STT</div>
+              <div className="md:col-span-2 font-mono">{item.amount} {item.token}</div>
               <div className="truncate md:col-span-3 text-muted-foreground">{item.memoUri}</div>
               <div className="md:col-span-2">{new Date(item.createdAt).toLocaleString()}</div>
               <div className="md:col-span-2">
@@ -186,10 +213,18 @@ function PrivacyPage() {
               </div>
               <div className="md:col-span-12 flex flex-wrap gap-2">
                 {item.status === "Submitted" && (
-                  <button onClick={() => setReleaseTarget(item)} className="rounded-full bg-foreground px-4 py-2 text-xs font-semibold text-background">
-                    Release with nullifier
-                  </button>
+                  <>
+                    <button onClick={() => setReleaseTarget(item)} className="rounded-full bg-foreground px-4 py-2 text-xs font-semibold text-background">
+                      Release with nullifier
+                    </button>
+                    <button onClick={() => void cancelIntent(item)} className="rounded-full bg-muted px-4 py-2 text-xs font-semibold">
+                      Cancel / refund
+                    </button>
+                  </>
                 )}
+                {item.releaseTxHash ? <a href={txUrl(item.releaseTxHash)} target="_blank" rel="noreferrer" className="rounded-full bg-success/15 px-4 py-2 text-xs font-semibold text-success">Release tx {shortAddress(item.releaseTxHash)}</a> : null}
+                {item.cancelTxHash ? <a href={txUrl(item.cancelTxHash)} target="_blank" rel="noreferrer" className="rounded-full bg-muted px-4 py-2 text-xs font-semibold">Cancel tx {shortAddress(item.cancelTxHash)}</a> : null}
+                {item.nullifier ? <span className="rounded-full bg-muted px-4 py-2 text-xs font-mono text-muted-foreground">Nullifier {shortAddress(item.nullifier)}</span> : null}
               </div>
             </div>
           ))}
@@ -205,7 +240,7 @@ function PrivacyPage() {
           { label: "Commitment", value: shortAddress(releaseTarget.commitment), mono: true },
           { label: "Recipient", value: form.recipient || "Missing recipient", mono: true },
           { label: "Nullifier", value: "Derived at release", mono: true },
-          { label: "Amount", value: `${releaseTarget.amount} STT`, mono: true },
+          { label: "Amount", value: `${releaseTarget.amount} ${releaseTarget.token}`, mono: true },
         ] : []}
         confirmLabel="Sign release"
         onConfirm={() => releaseTarget ? releaseIntent(releaseTarget) : undefined}
