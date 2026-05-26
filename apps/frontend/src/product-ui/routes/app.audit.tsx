@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Download, Eye, EyeOff, KeyRound, ScrollText, Search } from "lucide-react";
+import { EmptyState } from "@/components/app/EmptyState";
 import { PageHeader } from "@/components/app/PageHeader";
 import { StatCard } from "@/components/primitives/StatCard";
 import { fetchRecords, readRecords, shortAddress, writeRecord, type LocalRecord } from "@somnia/lib/somnia";
@@ -113,7 +114,17 @@ function AuditPage() {
           <div className="md:col-span-2">Status</div>
         </div>
         <div className="divide-y divide-border">
-          {filtered.length === 0 ? <div className="p-8 text-center text-sm text-muted-foreground">No audit records yet.</div> : null}
+          {filtered.length === 0 ? (
+            <div className="p-5">
+              <EmptyState
+                icon={ScrollText}
+                title="No audit records"
+                description="Run a wallet action, register an agent, create an order, submit a privacy intent, or refresh the Supabase mirror to populate the evidence trail."
+                actionLabel="Refresh records"
+                onAction={() => void refresh()}
+              />
+            </div>
+          ) : null}
           {filtered.map((item) => (
             <div key={`${item.id}-${item.createdAt}`} className="grid gap-3 px-5 py-4 text-sm md:grid-cols-12 md:items-center">
               <div className="font-mono text-xs text-muted-foreground md:col-span-2">{new Date(item.createdAt).toLocaleString()}</div>

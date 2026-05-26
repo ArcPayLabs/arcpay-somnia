@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { getOptionalSupabaseClient } from "../../app/supabase-client";
+import { EmptyState } from "@/components/app/EmptyState";
 import { PageHeader } from "@/components/app/PageHeader";
 import { ReviewModal } from "@/components/primitives/ReviewModal";
 import { StatCard } from "@/components/primitives/StatCard";
@@ -303,7 +304,17 @@ function InvoicesPage() {
           <div className="col-span-3 text-right">Actions</div>
         </div>
         <div className="divide-y divide-border">
-          {items.length === 0 && <div className="p-8 text-center text-sm text-muted-foreground">No invoices yet.</div>}
+          {items.length === 0 && (
+            <div className="p-5">
+              <EmptyState
+                icon={FileText}
+                title="No invoices yet"
+                description="Create a STT or SOMUSD invoice, attach client metadata, then settle it with a wallet signature and explorer-backed evidence."
+                actionLabel="Create invoice"
+                onAction={() => setOpen(true)}
+              />
+            </div>
+          )}
           {items.map((invoice) => (
             <div key={invoice.publicId} className="grid gap-3 px-5 py-4 text-sm hover:bg-muted/40 md:grid-cols-12 md:items-center">
               <div className="md:col-span-2">

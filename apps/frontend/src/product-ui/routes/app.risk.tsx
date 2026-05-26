@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Ban, Search, Shield, ShieldAlert, ShieldCheck, Sparkles } from "lucide-react";
+import { EmptyState } from "@/components/app/EmptyState";
 import { PageHeader } from "@/components/app/PageHeader";
 import { StatCard } from "@/components/primitives/StatCard";
 import { readLocalJson, writeLocalJson } from "@/lib/browser-cache";
@@ -114,7 +115,15 @@ function RiskPage() {
       <section className="overflow-hidden rounded-3xl border border-border bg-card">
         <div className="border-b border-border p-4 text-sm font-semibold">Lookup history</div>
         <div className="divide-y divide-border">
-          {history.length === 0 ? <div className="p-8 text-center text-sm text-muted-foreground">No scored Somnia wallets yet.</div> : null}
+          {history.length === 0 ? (
+            <div className="p-5">
+              <EmptyState
+                icon={ShieldAlert}
+                title="No scored wallets"
+                description="Paste a Somnia address to generate a policy-aware counterparty score before payments, cards, invoices, or order settlement."
+              />
+            </div>
+          ) : null}
           {history.map((item) => (
             <div key={item.wallet} className="grid gap-3 px-5 py-4 text-sm md:grid-cols-12 md:items-center">
               <div className="font-mono text-xs text-muted-foreground md:col-span-5">{item.wallet}</div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Bot, DatabaseZap, Plus, Sparkles } from "lucide-react";
+import { EmptyState } from "@/components/app/EmptyState";
 import { PageHeader } from "@/components/app/PageHeader";
 import { StatCard } from "@/components/primitives/StatCard";
 import { agentIdFromSlug, fromWei, registryContract, shortAddress, toWei, writeRecord } from "@somnia/lib/somnia";
@@ -94,7 +95,15 @@ function AgentsRoute() {
               ))}
             </div>
           ) : (
-            <div className="mt-5 rounded-2xl bg-muted/50 p-8 text-center text-sm text-muted-foreground">No agent loaded yet.</div>
+            <div className="mt-5">
+              <EmptyState
+                icon={Bot}
+                title="No agent loaded"
+                description="Register a Somnia service agent or load an existing slug to inspect its endpoint, price, capabilities, and registry owner."
+                actionLabel="Load by slug"
+                onAction={() => void loadAgent()}
+              />
+            </div>
           )}
         </section>
       </div>

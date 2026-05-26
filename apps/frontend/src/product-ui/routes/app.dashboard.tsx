@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Bot, CreditCard, Lock, Route as RouteIcon, ShieldAlert, Wallet, Workflow } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/app/PageHeader";
+import { EmptyState } from "@/components/app/EmptyState";
 import { StatCard } from "@/components/primitives/StatCard";
 import { CONTRACTS, balances, connectedAddress, fetchRecords, shortAddress, type LocalRecord } from "@somnia/lib/somnia";
 
@@ -70,7 +71,15 @@ function DashboardRoute() {
                 <code className="text-sm">{record.amount ?? record.status}</code>
               </div>
             ))}
-            {!records.length ? <div className="py-12 text-center text-sm text-muted-foreground">No local records yet. Create a payment, order, card, or privacy intent.</div> : null}
+            {!records.length ? (
+              <EmptyState
+                icon={Workflow}
+                title="No treasury activity yet"
+                description="Start with a wallet, register an agent, then create an order, x402 payment, invoice, card, or privacy intent. Every signed action will appear here and in Audit."
+                actionHref="/app/agents"
+                actionLabel="Register first agent"
+              />
+            ) : null}
           </div>
         </section>
         <section className="rounded-2xl border border-border bg-card p-5">

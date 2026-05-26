@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ScrollText } from "lucide-react";
+import { EmptyState } from "@/components/app/EmptyState";
 import { readRecords, shortAddress, type LocalRecord } from "@somnia/lib/somnia";
 
 export function RecordTable({ type }: { readonly type?: LocalRecord["type"] }) {
@@ -13,9 +15,11 @@ export function RecordTable({ type }: { readonly type?: LocalRecord["type"] }) {
 
   if (!records.length) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-        No records yet.
-      </div>
+      <EmptyState
+        icon={ScrollText}
+        title="No records available"
+        description="Complete a wallet action, agent order, invoice, card, privacy intent, or x402 payment to create audit evidence for this view."
+      />
     );
   }
 

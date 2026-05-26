@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import { CheckCircle2, Copy, Plus, Search, Send, WalletCards } from "lucide-react";
+import { EmptyState } from "@/components/app/EmptyState";
 import { PageHeader } from "@/components/app/PageHeader";
 import { ReviewModal, type ReviewRow } from "@/components/primitives/ReviewModal";
 import { StatCard } from "@/components/primitives/StatCard";
@@ -175,7 +176,17 @@ function PaymentsPage() {
           </div>
         </div>
         <div className="divide-y divide-border">
-          {filtered.length === 0 ? <div className="p-8 text-center text-sm text-muted-foreground">No payment intents yet.</div> : null}
+          {filtered.length === 0 ? (
+            <div className="p-5">
+              <EmptyState
+                icon={Send}
+                title="No payment intents"
+                description="Stage an agent payout, contractor transfer, or SOMUSD card top-up before submitting the wallet-signed transaction."
+                actionLabel="New payment"
+                onAction={() => setOpen(true)}
+              />
+            </div>
+          ) : null}
           {filtered.map((item) => (
             <div key={item.id} className="grid gap-3 px-5 py-4 text-sm md:grid-cols-12 md:items-center">
               <div className="md:col-span-3">

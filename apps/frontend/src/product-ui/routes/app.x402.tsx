@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import { CheckCircle2, Copy, LockKeyhole, RadioTower, RefreshCcw, Send, ServerCog, UnlockKeyhole } from "lucide-react";
+import { EmptyState } from "@/components/app/EmptyState";
 import { PageHeader } from "@/components/app/PageHeader";
 import { StatCard } from "@/components/primitives/StatCard";
 import { agentIdFromSlug, orderBookContract, shortAddress, writeRecord } from "@somnia/lib/somnia";
@@ -274,7 +275,15 @@ function X402Route() {
                 <button onClick={() => void copy(JSON.stringify(quote, null, 2))} className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-2 text-xs font-semibold"><Copy className="h-3.5 w-3.5" /> Copy quote</button>
               </div>
             </div>
-          ) : <Empty text="No quote loaded yet." />}
+          ) : (
+            <EmptyState
+              icon={LockKeyhole}
+              title="No x402 quote loaded"
+              description="Quote the protected endpoint to return exact Somnia payment requirements before creating an escrowed order."
+              actionLabel="Quote endpoint"
+              onAction={() => void quoteEndpoint()}
+            />
+          )}
         </Panel>
 
         <Panel title="Verification and unlock">
@@ -298,7 +307,15 @@ function X402Route() {
                 </div>
               ) : null}
             </div>
-          ) : <Empty text="No verification result yet." />}
+          ) : (
+            <EmptyState
+              icon={UnlockKeyhole}
+              title="No verification result"
+              description="Create or paste an order id, then verify it against the live x402 server before unlocking paid agent work."
+              actionLabel="Verify order"
+              onAction={() => void verifyOrder()}
+            />
+          )}
         </Panel>
       </div>
 
@@ -333,8 +350,4 @@ function Row({ label, value, mono }: { readonly label: string; readonly value: s
       <span className={`max-w-[70%] truncate text-right text-sm ${mono ? "font-mono" : "font-medium"}`}>{value}</span>
     </div>
   );
-}
-
-function Empty({ text }: { readonly text: string }) {
-  return <div className="rounded-2xl bg-muted/50 p-8 text-center text-sm text-muted-foreground">{text}</div>;
 }

@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import { Plus, Search, Send, ShieldCheck, Users } from "lucide-react";
+import { EmptyState } from "@/components/app/EmptyState";
 import { PageHeader } from "@/components/app/PageHeader";
 import { ReviewModal, type ReviewRow } from "@/components/primitives/ReviewModal";
 import { StatCard } from "@/components/primitives/StatCard";
@@ -153,7 +154,17 @@ function ContractorsPage() {
           </div>
         </div>
         <div className="divide-y divide-border">
-          {filtered.length === 0 ? <div className="p-8 text-center text-sm text-muted-foreground">No contractors yet.</div> : null}
+          {filtered.length === 0 ? (
+            <div className="p-5">
+              <EmptyState
+                icon={Users}
+                title="No contractors found"
+                description="Add contractor wallets, assign monthly SOMUSD limits, score counterparties, and prepare policy-checked payout batches."
+                actionLabel="Add contractor"
+                onAction={() => setOpen(true)}
+              />
+            </div>
+          ) : null}
           {filtered.map((item) => (
             <div key={item.id} className="grid gap-3 px-5 py-4 text-sm md:grid-cols-12 md:items-center">
               <div className="md:col-span-1"><input type="checkbox" checked={Boolean(item.selected)} onChange={() => toggle(item.id)} className="accent-primary" /></div>

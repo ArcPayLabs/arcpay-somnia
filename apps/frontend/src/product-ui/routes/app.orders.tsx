@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { Play, RefreshCcw, Workflow } from "lucide-react";
+import { EmptyState } from "@/components/app/EmptyState";
 import { PageHeader } from "@/components/app/PageHeader";
 import { StatCard } from "@/components/primitives/StatCard";
 import { agentIdFromSlug, fromWei, orderBookContract, shortAddress, toWei, writeRecord } from "@somnia/lib/somnia";
@@ -73,7 +74,7 @@ function OrdersRoute() {
           <button onClick={() => void loadOrder()} className="inline-flex items-center gap-2 rounded-full bg-muted px-5 py-2.5 text-sm font-semibold"><RefreshCcw className="h-4 w-4" /> Load order</button>
         </div>
       </section>
-      <ResultCard record={order} empty="No order loaded yet." />
+      <ResultCard record={order} />
     </div>
   );
 }
@@ -82,10 +83,16 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   return <label className="block"><span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{label}</span>{children}</label>;
 }
 
-function ResultCard({ record, empty }: { record: Record<string, string> | null; empty: string }) {
+function ResultCard({ record }: { record: Record<string, string> | null }) {
   return (
     <section className="rounded-3xl border border-border bg-card p-5 md:p-6">
-      {record ? <div className="grid gap-3 md:grid-cols-2">{Object.entries(record).map(([key, value]) => <div key={key} className="rounded-2xl bg-muted/50 p-3"><div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">{key}</div><div className="mt-1 truncate font-mono text-sm">{value.startsWith("0x") ? shortAddress(value) : value}</div></div>)}</div> : <div className="rounded-2xl bg-muted/50 p-8 text-center text-sm text-muted-foreground">{empty}</div>}
+      {record ? <div className="grid gap-3 md:grid-cols-2">{Object.entries(record).map(([key, value]) => <div key={key} className="rounded-2xl bg-muted/50 p-3"><div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">{key}</div><div className="mt-1 truncate font-mono text-sm">{value.startsWith("0x") ? shortAddress(value) : value}</div></div>)}</div> : (
+        <EmptyState
+          icon={Workflow}
+          title="No order selected"
+          description="Create an escrowed agent order, or paste an existing order id to load state-machine evidence from the Somnia contract."
+        />
+      )}
     </section>
   );
 }

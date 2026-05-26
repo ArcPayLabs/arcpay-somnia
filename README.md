@@ -228,11 +228,11 @@ that file automatically. Current Somnia agent platform:
 Current SOMUSD testnet token:
 `0x02b8316775057e2096471473663d51ceafbe3e3b`.
 
-## Judge Path
+## Operator Demo Path
 
 1. Read `docs/somnia-buildathon.md`.
 2. Read `docs/agent-protocol.md`.
-3. Read `docs/judge-demo-script.md`.
+3. Read `docs/demo-script.md`.
 4. Install with `npm install` and `npm run install:frontend`.
 5. Compile and test with `npm run build`, `npm test`, and `npm run build:frontend`.
 6. Run `npm run smoke:auth` for Supabase/auth/workspace and read-only Somnia checks.
