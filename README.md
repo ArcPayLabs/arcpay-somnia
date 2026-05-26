@@ -191,9 +191,15 @@ The x402 server can run beside the worker on Azure or any Node host:
 
 ```bash
 SOMNIA_RPC_URL=https://dream-rpc.somnia.network
-X402_SERVER_PORT=4030
+X402_SERVER_PORT=4032
 X402_PROVIDER_PRIVATE_KEY=0x...
 X402_ADMIN_SECRET=...
+```
+
+Current public x402 endpoint:
+
+```text
+https://x402.20.208.46.195.nip.io
 ```
 
 ## Depth Contract Redeploy

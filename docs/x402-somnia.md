@@ -15,14 +15,14 @@ npm run x402
 Default endpoint:
 
 ```text
-http://127.0.0.1:4030
+https://x402.20.208.46.195.nip.io
 ```
 
 Useful env:
 
 ```bash
 SOMNIA_RPC_URL=https://dream-rpc.somnia.network
-X402_SERVER_PORT=4030
+X402_SERVER_PORT=4032
 X402_PROVIDER_PRIVATE_KEY=0x...
 X402_ADMIN_SECRET=...
 ```

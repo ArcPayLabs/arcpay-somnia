@@ -62,7 +62,7 @@ type UnlockResult = {
 
 function X402Route() {
   const [form, setForm] = useState({
-    serverUrl: process.env.NEXT_PUBLIC_X402_SERVER_URL || "http://127.0.0.1:4030",
+    serverUrl: process.env.NEXT_PUBLIC_X402_SERVER_URL || "https://x402.20.208.46.195.nip.io",
     agentSlug: "research-agent",
     orderId: "",
     resultUri: "ipfs://arcpay-x402-result/research-agent",
