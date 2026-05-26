@@ -255,9 +255,8 @@ ArcPay includes a Mintlify-ready docs site:
 
 For Mintlify deployment, connect this repository and use the repo root as the
 docs root so `docs.json` can reference the existing app assets and OpenAPI
-file. The Vercel app rewrites `/docs` and `/docs/*` to the deployed Mintlify
-site, so public marketing links resolve to the full docs instead of the app's
-old lightweight docs page.
+file. The Vercel app redirects `/docs` and `/docs/*` to the deployed Mintlify
+site so Mintlify serves its own CSS/JS assets correctly.
 
 ## Frontend Routes
 

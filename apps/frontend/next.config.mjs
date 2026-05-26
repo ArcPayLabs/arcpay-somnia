@@ -7,15 +7,17 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const nextConfig = {
   output: "standalone",
   outputFileTracingRoot: join(__dirname, "../../"),
-  async rewrites() {
+  async redirects() {
     return [
       {
         source: "/docs",
         destination: "https://csi-58c5959c.mintlify.app/overview",
+        permanent: false,
       },
       {
         source: "/docs/:path*",
         destination: "https://csi-58c5959c.mintlify.app/:path*",
+        permanent: false,
       },
     ];
   },
