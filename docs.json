@@ -7,11 +7,6 @@
     "light": "#fff7ed",
     "dark": "#101414"
   },
-  "logo": {
-    "light": "apps/frontend/public/icon.svg",
-    "dark": "apps/frontend/public/icon.svg"
-  },
-  "favicon": "apps/frontend/public/favicon.svg",
   "navbar": {
     "links": [
       {
