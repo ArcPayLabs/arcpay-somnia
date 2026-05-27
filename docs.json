@@ -60,6 +60,7 @@
             "pages": [
               "cli",
               "mcp",
+              "agent-onboarding",
               "run-locally",
               "demo-script"
             ]
