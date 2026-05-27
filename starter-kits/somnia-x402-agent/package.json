@@ -1,5 +1,5 @@
 {
-  "name": "@arcpay/somnia-x402-agent-starter",
+  "name": "@arcpaylabs/somnia-x402-agent-starter",
   "version": "0.1.0",
   "private": false,
   "description": "Starter client for integrating with ArcPay Somnia x402 paid agent endpoints.",
