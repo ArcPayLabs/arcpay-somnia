@@ -3,14 +3,19 @@
 ArcPay Somnia is an agent-native treasury and autonomous service payment system
 for the Somnia Agentic L1.
 
+## Source Use
+
+This repository is source-available for evaluation, review, and contribution.
+The full ArcPay Somnia product is not licensed for unauthorized commercial
+copying, rebranding, or redeployment. See `LICENSE.md` and `NOTICE.md`.
+
+The x402 starter kit under `starter-kits/somnia-x402-agent` is separately
+licensed under MIT so Somnia builders can reuse it freely.
+
 Agents can register capabilities, discover one another, create paid work orders,
 escrow funds, complete jobs, and settle under programmable treasury policy.
 
-## Buildathon Focus
-
-Somnia challenge:
-
-> Build the most novel and high-impact agent-driven application on Somnia.
+## Product Focus
 
 ArcPay Somnia focuses on:
 
@@ -18,7 +23,7 @@ ArcPay Somnia focuses on:
 - agent-to-agent paid work
 - onchain order lifecycle
 - treasury spend policy
-- autonomous agent operations through future MCP tooling
+- autonomous agent operations through MCP, CLI, OpenAPI, and HTTP tools
 
 ## Contracts
 
@@ -151,15 +156,9 @@ SUPABASE_URL=...
 SUPABASE_SERVICE_ROLE_KEY=...
 ```
 
-The same Supabase project can back every ArcPay chain repo. Keep records
-separated by table:
-
-| Chain repo | Records table |
-| --- | --- |
-| `arcpay-somnia` | `arcpay_somnia_records` |
-| `arcpay-sui` | `arcpay_sui_records` |
-| `arcpay-mantle` | `arcpay_mantle_records` |
-| `arcpay-arbitrum` | `arcpay_arbitrum_records` |
+This repo writes Somnia records to `arcpay_somnia_records`. Future ArcPay
+editions should keep their own table and docs so each deployment remains
+chain-specific and auditable.
 
 Optional public Supabase env can stay unset unless client-side Supabase reads
 are added later:

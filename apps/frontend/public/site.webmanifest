@@ -1,7 +1,7 @@
 {
   "name": "ArcPay",
   "short_name": "ArcPay",
-  "description": "Private, policy-controlled treasury OS for AI agents on Solana.",
+  "description": "Private, policy-controlled treasury OS for AI agents on Somnia.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FFF7E8",

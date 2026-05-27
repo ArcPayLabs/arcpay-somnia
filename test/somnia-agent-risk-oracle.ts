@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 
 describe("SomniaAgentRiskOracle", () => {
-  it("stores owner-provided demo fulfillment for judge walkthroughs", async () => {
+  it("stores owner-provided demo fulfillment for operator walkthroughs", async () => {
     const [owner, requester] = await ethers.getSigners();
     const platform = await ethers.deployContract("MockSomniaAgentPlatform");
     const oracle = await ethers.deployContract("SomniaAgentRiskOracle", [await platform.getAddress(), 7]);

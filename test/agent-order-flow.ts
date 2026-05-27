@@ -163,6 +163,11 @@ describe("ArcPay Somnia agent order flow", () => {
     );
     await policy.connect(requester).setAgentAllowed(agentId, true);
 
+    const week = 7 * 24 * 60 * 60;
+    const current = await time.latest();
+    const nextWeekStart = Math.floor(current / week) * week + week;
+    await time.increaseTo(nextWeekStart + 24 * 60 * 60);
+
     await orderBook.connect(requester).createOrder(agentId, "ipfs://weekly-1", { value: price });
     await time.increase(1 * 24 * 60 * 60);
     await expect(orderBook.connect(requester).createOrder(agentId, "ipfs://weekly-2", { value: price }))

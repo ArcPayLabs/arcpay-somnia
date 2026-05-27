@@ -55,13 +55,13 @@ Standard ChatGPT web does not directly attach to local stdio MCP servers. For Ch
 List tools:
 
 ```bash
-curl https://arc-pay-frontend.vercel.app/api/developer/tools
+curl https://arcpay-somnia.vercel.app/api/developer/tools
 ```
 
 Call a tool:
 
 ```bash
-curl -X POST https://arc-pay-frontend.vercel.app/api/developer/tools \
+curl -X POST https://arcpay-somnia.vercel.app/api/developer/tools \
   -H "content-type: application/json" \
   -d '{"tool":"derive_agent_id","args":{"slug":"research-agent"}}'
 ```
@@ -69,5 +69,5 @@ curl -X POST https://arc-pay-frontend.vercel.app/api/developer/tools \
 URL form:
 
 ```bash
-curl "https://arc-pay-frontend.vercel.app/api/developer/tools/derive_agent_id?slug=research-agent"
+curl "https://arcpay-somnia.vercel.app/api/developer/tools/derive_agent_id?slug=research-agent"
 ```

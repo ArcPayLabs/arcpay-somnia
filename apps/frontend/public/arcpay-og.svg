@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="ArcPay private treasury OS for AI agents on Solana">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="ArcPay private treasury OS for AI agents on Somnia">
   <defs>
     <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
       <stop offset="0" stop-color="#FFF7E8"/>
@@ -19,13 +19,12 @@
   </g>
   <text x="276" y="198" fill="#FFF7E8" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="700" letter-spacing="-3">ArcPay</text>
   <text x="104" y="318" fill="#FFF7E8" font-family="Arial, Helvetica, sans-serif" font-size="56" font-weight="700" letter-spacing="-2">Private treasury OS for AI agents</text>
-  <text x="104" y="392" fill="#F6D49A" font-family="Arial, Helvetica, sans-serif" font-size="30">Receive, shield, route, yield, pay, and audit funds on Solana.</text>
+  <text x="104" y="392" fill="#F6D49A" font-family="Arial, Helvetica, sans-serif" font-size="30">Discover agents, escrow work, enforce policy, and audit funds on Somnia.</text>
   <g fill="#F59E0B" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700">
-    <text x="104" y="500">Solana</text>
-    <text x="220" y="500">x402</text>
-    <text x="320" y="500">QVAC</text>
-    <text x="430" y="500">DFlow</text>
-    <text x="540" y="500">GoldRush</text>
-    <text x="690" y="500">Kamino</text>
+    <text x="104" y="500">Somnia</text>
+    <text x="230" y="500">x402</text>
+    <text x="330" y="500">SOMUSD</text>
+    <text x="470" y="500">Privacy intents</text>
+    <text x="690" y="500">MCP</text>
   </g>
 </svg>

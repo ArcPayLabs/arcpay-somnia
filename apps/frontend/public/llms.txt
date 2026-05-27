@@ -9,6 +9,8 @@ Use these resources:
 - x402 health: https://x402.20.208.46.195.nip.io/health
 - x402 demo: https://x402.20.208.46.195.nip.io/x402/demo
 - GitHub: https://github.com/ArcPayLabs/arcpay-somnia
+- Ecosystem thesis: /docs/ecosystem-thesis
+- Go to market: /docs/go-to-market
 
 Core flows:
 
@@ -19,3 +21,4 @@ Core flows:
 - Create SOMUSD spend cards with top-up, freeze, activate, and spend controls.
 - Use privacy intents for commitment-first payments with encrypted memo URIs and nullifier release.
 - Use the local MCP server for agent tools: `npm run mcp`.
+- Use the HTTP developer tools at `/api/developer/tools`.

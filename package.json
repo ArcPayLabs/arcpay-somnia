@@ -2,6 +2,7 @@
   "name": "arcpay-somnia",
   "version": "0.1.0",
   "private": true,
+  "license": "SEE LICENSE.md",
   "description": "Agent-native treasury and autonomous service payments on Somnia.",
   "bin": {
     "arcpay-somnia": "bin/arcpay-somnia.mjs"

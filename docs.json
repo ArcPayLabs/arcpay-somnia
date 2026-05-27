@@ -32,8 +32,10 @@
             "group": "Overview",
             "pages": [
               "overview",
+              "ecosystem-thesis",
               "quickstart",
               "verification",
+              "go-to-market",
               "roadmap"
             ]
           },

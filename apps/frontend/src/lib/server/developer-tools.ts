@@ -141,7 +141,7 @@ export async function runDeveloperTool(name: string, args: Record<string, unknow
           "Publish Somnia x402 starter kit and privacy-intent examples.",
           "Host an HTTP wrapper for safe MCP tools.",
           "Expand agent discovery with reputation and service analytics.",
-          "Port ArcPay standards to Mantle, Arbitrum, and Sui.",
+          "Package the Somnia x402 gateway, privacy intents, and policy controls as reusable builder infrastructure.",
         ],
       });
     default:

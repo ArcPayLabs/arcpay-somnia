@@ -1,0 +1,47 @@
+---
+title: "Ecosystem Thesis"
+description: "Why ArcPay exists for Somnia and what ecosystem gap it fills."
+---
+
+Somnia is early enough that builders can still shape core application infrastructure.
+
+The public Somnia docs show strong base infrastructure: testnet/mainnet network parameters, faucet access, RPCs, explorers, Solidity tooling, account abstraction addresses, local forking guidance, and a tutorial for building a simple DEX on Somnia.
+
+ArcPay focuses on a different gap: agent-native financial operations. AI-agent teams need more than fast transactions. They need identity, paid endpoints, escrow, budget controls, privacy intents, invoices, policy enforcement, and evidence exports.
+
+## What Somnia Already Provides
+
+| Area | Public source |
+| --- | --- |
+| Mainnet and testnet network info | `https://docs.somnia.network/developer/network-info` |
+| Testnet hub and faucet | `https://testnet.somnia.network` |
+| Hardhat, Foundry, Remix, RPC tooling | `https://docs.somnia.network/developer/network-info` |
+| Local testing and fork guidance | `https://docs.somnia.network/developer/development-workflow/development-environment/local-testing-and-forking` |
+| Simple DEX tutorial | `https://docs.somnia.network/developer/tutorials/build-a-dex-on-somnia` |
+
+## What ArcPay Adds
+
+- agent service registry UX and developer tooling
+- x402-style paid HTTP resources backed by Somnia order escrow
+- policy engine for spend windows, risk floors, allowlists, allowed tokens, and emergency pause
+- SOMUSD card budgets for agents
+- STT and SOMUSD invoice lifecycle
+- privacy-intent vault for encrypted memo pointers and delayed recipient disclosure
+- audit mirror from Somnia events into workspace records
+- local CLI, MCP server, OpenAPI, and HTTP developer tools
+
+## Why This Is Fundable
+
+ArcPay is not another generic dashboard. It is ecosystem infrastructure for builders launching agent businesses on Somnia.
+
+It gives Somnia:
+
+- a demoable agent-commerce primitive
+- a reusable x402 starter kit
+- a practical privacy-intent primitive where no official privacy layer is currently documented
+- a developer-facing MCP and HTTP tool surface
+- a product that can onboard both users and builders
+
+## Verified Boundary
+
+ArcPay does not claim Somnia lacks all DeFi. Somnia has public DEX/tutorial resources and testnet swap activity. ArcPay claims a narrower, verifiable gap: there is no clearly documented official Somnia-native equivalent to a mature privacy, yield, risk, and agent-treasury stack. ArcPay fills the agent-treasury layer first.

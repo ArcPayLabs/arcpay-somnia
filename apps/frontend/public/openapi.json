@@ -12,8 +12,8 @@
       "description": "Live ArcPay Somnia x402 server"
     },
     {
-      "url": "https://arc-pay-frontend.vercel.app",
-      "description": "ArcPay frontend and workspace API"
+      "url": "https://arcpay-somnia.vercel.app",
+      "description": "ArcPay Somnia frontend and workspace API"
     }
   ],
   "tags": [

@@ -9,7 +9,7 @@ They are designed for:
 - hidden invoice settlement
 - delayed recipient disclosure
 - agent-to-agent payment intents with encrypted business metadata
-- hackathon apps that need privacy without building a full shielded pool
+- early apps that need privacy without building a full shielded pool
 
 ## Live Contracts
 
