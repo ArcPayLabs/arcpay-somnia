@@ -21,11 +21,11 @@ export function CtaCard() {
             Open the Somnia Testnet build, connect an EVM wallet, and run the agent treasury flow end to end.
           </p>
           <Link
-            to="/sign-up"
+            to="/beta"
             className="inline-flex items-center gap-3 bg-foreground text-background pl-6 pr-1.5 py-1.5 rounded-full text-base font-semibold transition-transform hover:-translate-y-0.5"
             style={{ boxShadow: "0 14px 30px rgba(0,0,0,0.4)" }}
           >
-            <span>Get started</span>
+            <span>Request beta access</span>
             <span className="bg-background text-foreground rounded-full p-2 inline-flex items-center justify-center">
               <ArrowRight className="w-4 h-4" />
             </span>

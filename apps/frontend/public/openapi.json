@@ -26,6 +26,10 @@
       "description": "Workspace authentication and evidence mirror endpoints."
     },
     {
+      "name": "Beta",
+      "description": "Public beta access requests for Somnia builders and operators."
+    },
+    {
       "name": "Discovery",
       "description": "Machine-readable docs and integration discovery."
     },
@@ -309,6 +313,39 @@
         "responses": {
           "200": {
             "description": "Evidence records."
+          }
+        }
+      }
+    },
+    "/api/beta": {
+      "post": {
+        "tags": ["Beta"],
+        "summary": "Request ArcPay Somnia beta access",
+        "description": "Stores a beta request in the dedicated beta table when available, or falls back to the audit records table until the migration is applied.",
+        "operationId": "requestBetaAccess",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BetaSignupRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Beta request stored in the beta queue.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BetaSignupResponse"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Beta request stored in the records fallback table."
           }
         }
       }
@@ -704,6 +741,28 @@
               }
             }
           }
+        }
+      },
+      "BetaSignupRequest": {
+        "type": "object",
+        "required": ["name", "email", "role", "useCase"],
+        "properties": {
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "telegram": { "type": "string" },
+          "walletAddress": { "type": "string" },
+          "role": { "type": "string" },
+          "useCase": { "type": "string" },
+          "agentUrl": { "type": "string" }
+        }
+      },
+      "BetaSignupResponse": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "mode": { "type": "string", "enum": ["beta_table", "records_fallback"] },
+          "message": { "type": "string" },
+          "telegramUrl": { "type": "string" }
         }
       },
       "DeveloperTool": {

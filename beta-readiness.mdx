@@ -14,18 +14,23 @@ ArcPay Somnia is a testnet MVP for operators and builders running agent business
 - Agent context: `https://arcpay-somnia.vercel.app/llms.txt`
 - HTTP developer tools: `https://arcpay-somnia.vercel.app/api/developer/tools`
 - Hosted MCP bridge: `https://arcpay-somnia.vercel.app/api/mcp`
-- Somnia Testnet contracts: registry, order book, treasury policy, spend cards, invoices, privacy vault, operator controls, risk oracle
+- Runtime status: `https://arcpay-somnia.vercel.app/status`
+- Beta access: `https://arcpay-somnia.vercel.app/beta`
+- Somnia Testnet contracts: registry, order book, treasury policy, spend cards, invoices, privacy vault, operator controls, risk oracle, reputation book
 
 ## Private Beta Flow
 
-1. Operator joins the private beta channel.
+1. Operator or agent builder requests access at `/beta`.
 2. Operator connects an EVM wallet on Somnia Testnet and creates a workspace.
 3. Operator registers an agent with endpoint, pricing, and capabilities.
 4. Operator sets policy: limits, allowed actions, allowed agent, risk floor, and emergency pause.
 5. Builder or agent calls the x402 gateway, receives HTTP 402 payment requirements, pays through the order book, and unlocks the protected result after fulfillment.
-6. Operator uses invoices, SOMUSD cards, privacy intents, and audit exports to manage day-to-day activity.
+6. Operator records order-backed reputation after fulfilled or settled work.
+7. Operator uses invoices, SOMUSD cards, privacy intents, and audit exports to manage day-to-day activity.
 
 The `/agents` page now includes a bring-your-own-agent wizard with research, routing, and privacy templates, derived `agentId`, x402 protected URL, and starter snippets.
+
+The beta form writes to `arcpay_somnia_beta_signups` when the Supabase migration is applied. Until then, the API falls back to `arcpay_somnia_records` so the signup is still captured.
 
 ## Developer Onboarding
 

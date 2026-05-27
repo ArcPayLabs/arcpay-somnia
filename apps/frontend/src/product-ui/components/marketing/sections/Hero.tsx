@@ -46,7 +46,7 @@ export function Hero() {
               </p>
               <div className="flex flex-wrap items-center gap-3">
                 <Link
-                  to={access.canOpenApp ? "/dashboard" : "/onboard"}
+                  to={access.canOpenApp ? "/dashboard" : "/beta"}
                   className="inline-flex items-center gap-3 bg-white text-black text-base md:text-lg font-medium pl-6 pr-1.5 py-1.5 rounded-full hover:bg-white/90 transition-colors"
                 >
                   <span>{access.canOpenApp ? "Open App" : "Join the beta"}</span>
