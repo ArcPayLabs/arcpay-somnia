@@ -27,7 +27,7 @@ export function requireAdmin(request: Request) {
   const session = sessionFromRequest(request);
   if (!session) return null;
   const admins = adminAddressSet();
-  if (!admins.size) return session;
+  if (!admins.size && process.env.NODE_ENV !== "production") return session;
   return admins.has(session.address.toLowerCase()) ? session : null;
 }
 
