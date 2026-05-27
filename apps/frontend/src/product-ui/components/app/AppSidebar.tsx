@@ -18,6 +18,7 @@ import {
   Workflow,
   RadioTower,
   Trophy,
+  Activity,
 } from "lucide-react";
 import {
   Sidebar,
@@ -52,6 +53,7 @@ const ITEMS = [
   { title: "Oracle", url: "/app/oracle", icon: Gauge, networks: ["somnia"] },
   { title: "Policies", url: "/policies", icon: SlidersHorizontal, networks: ["somnia"] },
   { title: "Audit", url: "/audit", icon: ScrollText, networks: ["somnia"] },
+  { title: "Status", url: "/status", icon: Activity, networks: ["somnia"] },
 ] as const;
 
 export function AppSidebar() {

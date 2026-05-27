@@ -40,6 +40,7 @@ function toRouterPath(value: string): string {
     "reputation",
     "policies",
     "audit",
+    "status",
     "settings",
   ];
 

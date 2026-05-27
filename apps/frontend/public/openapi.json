@@ -36,6 +36,10 @@
     {
       "name": "MCP",
       "description": "Hosted MCP-style JSON-RPC bridge for agent clients."
+    },
+    {
+      "name": "Status",
+      "description": "Runtime health checks for ArcPay Somnia production surfaces."
     }
   ],
   "paths": {
@@ -305,6 +309,36 @@
         "responses": {
           "200": {
             "description": "Evidence records."
+          }
+        }
+      }
+    },
+    "/api/status": {
+      "get": {
+        "tags": ["Status"],
+        "summary": "Read ArcPay runtime status",
+        "description": "Checks Somnia RPC, deployed contract bytecode, x402 gateway health, Mintlify docs, and latest worker-indexed Supabase record.",
+        "operationId": "getRuntimeStatus",
+        "responses": {
+          "200": {
+            "description": "All runtime checks are healthy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuntimeStatus"
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "One or more runtime checks are degraded, down, or unknown.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuntimeStatus"
+                }
+              }
+            }
           }
         }
       }
@@ -640,6 +674,35 @@
           "tools": {
             "type": "array",
             "items": { "$ref": "#/components/schemas/DeveloperTool" }
+          }
+        }
+      },
+      "RuntimeStatus": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "generatedAt": { "type": "string", "format": "date-time" },
+          "network": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "chainId": { "type": "integer" },
+              "rpcUrl": { "type": "string" },
+              "explorerUrl": { "type": "string" }
+            }
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "state": { "type": "string", "enum": ["ok", "degraded", "down", "unknown"] },
+                "summary": { "type": "string" },
+                "detail": { "type": "string" },
+                "checkedAt": { "type": "string", "format": "date-time" }
+              }
+            }
           }
         }
       },

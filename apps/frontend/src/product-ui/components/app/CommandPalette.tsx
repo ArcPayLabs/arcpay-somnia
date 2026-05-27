@@ -22,6 +22,7 @@ import {
   Settings as SettingsIcon,
   RadioTower,
   Trophy,
+  Activity,
 } from "lucide-react";
 
 const NAV = [
@@ -38,6 +39,7 @@ const NAV = [
   { label: "Reputation", to: "/app/reputation", icon: Trophy },
   { label: "Policies", to: "/app/policies", icon: SlidersHorizontal },
   { label: "Audit", to: "/app/audit", icon: ScrollText },
+  { label: "Status", to: "/app/status", icon: Activity },
   { label: "Settings", to: "/app/settings", icon: SettingsIcon },
 ];
 
