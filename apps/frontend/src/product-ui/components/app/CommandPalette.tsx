@@ -21,6 +21,7 @@ import {
   ScrollText,
   Settings as SettingsIcon,
   RadioTower,
+  Trophy,
 } from "lucide-react";
 
 const NAV = [
@@ -34,6 +35,7 @@ const NAV = [
   { label: "Yield", to: "/app/yield", icon: TrendingUp },
   { label: "Privacy", to: "/app/privacy", icon: EyeOff },
   { label: "Risk", to: "/app/risk", icon: ShieldAlert },
+  { label: "Reputation", to: "/app/reputation", icon: Trophy },
   { label: "Policies", to: "/app/policies", icon: SlidersHorizontal },
   { label: "Audit", to: "/app/audit", icon: ScrollText },
   { label: "Settings", to: "/app/settings", icon: SettingsIcon },

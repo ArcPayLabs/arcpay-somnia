@@ -74,6 +74,11 @@ const oracle = new Contract(c.SomniaAgentRiskOracle, [
   "event RiskRequested(uint256 indexed requestId,bytes32 indexed orderId,address indexed requester,string prompt)",
 ], deployer);
 const platform = new Contract(deployment.somniaAgentPlatform, ["function getRequestDeposit() view returns (uint256)"], provider);
+const reputation = c.AgentReputationBook ? new Contract(c.AgentReputationBook, [
+  "function recordReview(bytes32,bytes32,uint8,bool,string) returns (bytes32)",
+  "function reputationScore(bytes32) view returns (uint256)",
+  "function reputations(bytes32) view returns (uint256,uint256,uint256,uint256,uint256)",
+], requester) : null;
 
 const results = [];
 let agentId;
@@ -128,6 +133,15 @@ await run("Order escrow lifecycle", async () => {
   const row = await orderProvider.orders(orderId);
   if (Number(row[7]) !== 4) throw new Error(`unexpected order status ${row[7]}`);
   return `${orderId.slice(0, 10)}... settled`;
+});
+
+await run("Agent reputation book", async () => {
+  if (!reputation) return "SKIP AgentReputationBook not deployed";
+  await wait(reputation.recordReview(orderId, agentId, 91, false, "ipfs://arcpay-smoke-reputation"));
+  const score = await reputation.reputationScore(agentId);
+  const row = await reputation.reputations(agentId);
+  if (score !== 91n || row[0] < 1n) throw new Error("reputation not recorded");
+  return `score ${score.toString()} recorded`;
 });
 
 await run("Operator controls", async () => {

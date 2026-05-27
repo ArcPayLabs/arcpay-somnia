@@ -37,6 +37,7 @@ function toRouterPath(value: string): string {
     "yield",
     "privacy",
     "risk",
+    "reputation",
     "policies",
     "audit",
     "settings",

@@ -47,7 +47,8 @@
               "x402-agent-payments",
               "privacy-intents",
               "invoices",
-              "somusd-cards"
+              "somusd-cards",
+              "reputation"
             ]
           }
         ]

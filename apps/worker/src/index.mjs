@@ -72,6 +72,12 @@ const riskAbi = [
   "event RiskFulfilled(uint256 indexed requestId,bytes32 indexed orderId,uint256 score,string verdict,string evidenceUri)",
   "function results(uint256 requestId) view returns (uint256 requestId,bytes32 orderId,address requester,uint256 score,string verdict,string evidenceUri,bool fulfilled,uint8 responseStatus,uint256 requestedAt,uint256 fulfilledAt)",
 ];
+const reputationAbi = [
+  "event ReputationRecorded(bytes32 indexed reviewId,bytes32 indexed agentId,bytes32 indexed orderId,address reviewer,uint8 score,bool disputed,string evidenceUri)",
+  "function reviews(bytes32 reviewId) view returns (bytes32 orderId,bytes32 agentId,address reviewer,uint8 score,bool disputed,string evidenceUri,uint256 createdAt)",
+  "function reputations(bytes32 agentId) view returns (uint256 reviewCount,uint256 totalScore,uint256 completedCount,uint256 disputeCount,uint256 lastUpdatedAt)",
+  "function reputationScore(bytes32 agentId) view returns (uint256)",
+];
 
 const sources = [
   { key: "agents", address: deployment.contracts.AgentRegistry, abi: registryAbi, contractName: "AgentRegistry" },
@@ -83,6 +89,7 @@ const sources = [
   { key: "privacy", address: deployment.contracts.SomniaPrivacyVault, abi: privacyAbi, contractName: "SomniaPrivacyVault" },
   { key: "invoice", address: deployment.contracts.AgentInvoiceBook, abi: invoiceAbi, contractName: "AgentInvoiceBook" },
   { key: "risk", address: deployment.contracts.SomniaAgentRiskOracle, abi: riskAbi, contractName: "SomniaAgentRiskOracle" },
+  { key: "reputation", address: deployment.contracts.AgentReputationBook, abi: reputationAbi, contractName: "AgentReputationBook" },
 ].filter((source) => Boolean(source.address)).map((source) => ({ ...source, contract: new Contract(source.address, source.abi, provider) }));
 
 let checkpoint = readCheckpoint();
@@ -168,6 +175,7 @@ async function eventToRecord(source, event) {
   if (source.key === "privacy") return privacyRecord(source.contract, base);
   if (source.key === "invoice") return invoiceRecord(source.contract, base);
   if (source.key === "risk") return riskRecord(source.contract, base);
+  if (source.key === "reputation") return reputationRecord(source.contract, base);
   return fallbackRecord(base);
 }
 
@@ -332,6 +340,25 @@ async function riskRecord(contract, base) {
     title: requestId !== undefined ? `${base.eventName} #${requestId.toString()}` : base.eventName,
     status: verdict ? String(verdict).toLowerCase() : eventStatus(base.eventName),
     amount: base.args.score !== undefined ? `score ${base.args.score.toString()}` : undefined,
+  };
+}
+
+async function reputationRecord(contract, base) {
+  const reviewId = base.args.reviewId;
+  const agentId = base.args.agentId;
+  let score;
+  try {
+    if (agentId) score = await contract.reputationScore(agentId);
+  } catch {
+    score = base.args.score;
+  }
+  return {
+    ...base,
+    owner: ownerFor(base.args.reviewer),
+    type: "reputation",
+    title: reviewId ? `${base.eventName} ${short(reviewId)}` : base.eventName,
+    status: base.args.disputed ? "disputed" : eventStatus(base.eventName),
+    amount: score !== undefined ? `score ${score.toString()}` : undefined,
   };
 }
 

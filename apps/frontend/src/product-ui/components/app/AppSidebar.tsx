@@ -17,6 +17,7 @@ import {
   Gauge,
   Workflow,
   RadioTower,
+  Trophy,
 } from "lucide-react";
 import {
   Sidebar,
@@ -47,6 +48,7 @@ const ITEMS = [
   { title: "Yield", url: "/yield", icon: TrendingUp, networks: ["somnia"] },
   { title: "Privacy", url: "/privacy", icon: EyeOff, networks: ["somnia"] },
   { title: "Risk", url: "/risk", icon: ShieldAlert, networks: ["somnia"] },
+  { title: "Reputation", url: "/reputation", icon: Trophy, networks: ["somnia"] },
   { title: "Oracle", url: "/app/oracle", icon: Gauge, networks: ["somnia"] },
   { title: "Policies", url: "/policies", icon: SlidersHorizontal, networks: ["somnia"] },
   { title: "Audit", url: "/audit", icon: ScrollText, networks: ["somnia"] },

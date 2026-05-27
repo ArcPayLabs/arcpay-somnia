@@ -25,13 +25,13 @@ const STATUS_STYLE: Record<Status, string> = {
 };
 
 const CHECKS: { surface: string; status: Status; evidence: string }[] = [
-  { surface: "Somnia Testnet contracts", status: "testnet", evidence: "AgentRegistry, TreasuryPolicy, AgentOrderBook, OperatorControls, RiskOracle, SpendCardVault, PrivacyVault, and AgentInvoiceBook are deployed on chain 50312." },
-  { surface: "Funded live smoke", status: "testnet", evidence: "npm run smoke:live performs live writes for registry, policy, escrowed orders, operator controls, SOMUSD cards, privacy release, on-chain invoice settlement, and Somnia agent risk fulfillment." },
+  { surface: "Somnia Testnet contracts", status: "testnet", evidence: "AgentRegistry, TreasuryPolicy, AgentOrderBook, OperatorControls, RiskOracle, SpendCardVault, PrivacyVault, AgentInvoiceBook, and AgentReputationBook are deployed on chain 50312." },
+  { surface: "Funded live smoke", status: "testnet", evidence: "npm run smoke:live performs live writes for registry, policy, escrowed orders, reputation reviews, operator controls, SOMUSD cards, privacy release, on-chain invoice settlement, and Somnia agent risk fulfillment." },
   { surface: "x402 payment gate", status: "testnet", evidence: "npm run smoke:x402 starts the HTTP 402 server, registers an agent, creates an on-chain order, fulfills it, unlocks the protected resource, and settles." },
   { surface: "Auth and workspace smoke", status: "live", evidence: "npm run smoke:auth verifies Supabase records, email sign-in workspace upsert, wallet workspace creation, and Somnia contract reads." },
   { surface: "Frontend", status: "live", evidence: "Next.js product UI builds successfully with Somnia-only wallet/auth/dashboard content." },
-  { surface: "Worker", status: "live", evidence: "Azure systemd worker listens to Somnia registry, policy, treasury, order, card, operator, privacy, invoice, and risk events from the deployed contracts." },
-  { surface: "Tests", status: "local", evidence: "Hardhat test suite covers order lifecycle, approvals, emergency pause, weekly limit, cards, claim codes, circuit breakers, oracle, privacy vault, and invoice settlement." },
+  { surface: "Worker", status: "live", evidence: "Azure systemd worker listens to Somnia registry, policy, treasury, order, card, operator, privacy, invoice, risk, and reputation events from the deployed contracts." },
+  { surface: "Tests", status: "local", evidence: "Hardhat test suite covers order lifecycle, approvals, emergency pause, weekly limit, cards, claim codes, circuit breakers, oracle, privacy vault, invoice settlement, and reputation reviews." },
   { surface: "Agent docs", status: "local", evidence: "skill.md and llms.txt describe how AI agents should interact with ArcPay." },
   { surface: "MCP and CLI", status: "local", evidence: "Repo includes MCP server and arcpay-somnia CLI commands for contracts, wallet, agent IDs, claim hashes, privacy guide, and MCP config." },
 ];

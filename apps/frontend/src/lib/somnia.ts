@@ -18,6 +18,7 @@ export const CONTRACTS = {
   AgentSpendCardVault: deployedContracts.AgentSpendCardVault ?? NATIVE_TOKEN,
   SomniaPrivacyVault: deployedContracts.SomniaPrivacyVault ?? NATIVE_TOKEN,
   AgentInvoiceBook: deployedContracts.AgentInvoiceBook ?? NATIVE_TOKEN,
+  AgentReputationBook: deployedContracts.AgentReputationBook ?? NATIVE_TOKEN,
 } as const;
 
 export const DEPTH_CONTRACTS_READY =
@@ -119,6 +120,15 @@ export const INVOICE_BOOK_ABI = [
   "event InvoiceCreated(bytes32 indexed invoiceId,address indexed issuer,address indexed payer,address token,uint256 amount,string metadataUri)",
   "event InvoicePaid(bytes32 indexed invoiceId,address indexed payer,address token,uint256 amount)",
   "event InvoiceCancelled(bytes32 indexed invoiceId)",
+] as const;
+
+export const REPUTATION_BOOK_ABI = [
+  "function recordReview(bytes32 orderId,bytes32 agentId,uint8 score,bool disputed,string evidenceUri) returns (bytes32 reviewId)",
+  "function reputations(bytes32 agentId) view returns (uint256 reviewCount,uint256 totalScore,uint256 completedCount,uint256 disputeCount,uint256 lastUpdatedAt)",
+  "function reviews(bytes32 reviewId) view returns (bytes32 orderId,bytes32 agentId,address reviewer,uint8 score,bool disputed,string evidenceUri,uint256 createdAt)",
+  "function reviewedBy(bytes32 orderId,address reviewer) view returns (bool)",
+  "function reputationScore(bytes32 agentId) view returns (uint256)",
+  "event ReputationRecorded(bytes32 indexed reviewId,bytes32 indexed agentId,bytes32 indexed orderId,address reviewer,uint8 score,bool disputed,string evidenceUri)",
 ] as const;
 
 export const ORDER_STATUS = ["Pending", "Accepted", "Processing", "Fulfilled", "Settled", "Refunded", "Failed"] as const;
@@ -275,6 +285,11 @@ export async function privacyVaultContract() {
 export async function invoiceBookContract() {
   const signer = await signerProvider();
   return new Contract(CONTRACTS.AgentInvoiceBook, INVOICE_BOOK_ABI, signer);
+}
+
+export async function reputationBookContract() {
+  const signer = await signerProvider();
+  return new Contract(CONTRACTS.AgentReputationBook, REPUTATION_BOOK_ABI, signer);
 }
 
 export type LocalRecord = {
