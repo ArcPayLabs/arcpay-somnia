@@ -1,14 +1,12 @@
 {
-  "redirects": [
+  "rewrites": [
     {
       "source": "/docs",
-      "destination": "https://csi-58c5959c.mintlify.app/overview",
-      "permanent": false
+      "destination": "https://csi-58c5959c.mintlify.dev/docs"
     },
     {
-      "source": "/docs/:match*",
-      "destination": "https://csi-58c5959c.mintlify.app/:match*",
-      "permanent": false
+      "source": "/docs/:path*",
+      "destination": "https://csi-58c5959c.mintlify.dev/docs/:path*"
     }
   ]
 }
