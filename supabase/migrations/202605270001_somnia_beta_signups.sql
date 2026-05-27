@@ -21,6 +21,8 @@ on public.arcpay_somnia_beta_signups (lower(email));
 create index if not exists arcpay_somnia_beta_signups_status_created_idx
 on public.arcpay_somnia_beta_signups (status, created_at desc);
 
+grant select, insert, update, delete on public.arcpay_somnia_beta_signups to service_role;
+
 alter table public.arcpay_somnia_beta_signups enable row level security;
 
 do $$
