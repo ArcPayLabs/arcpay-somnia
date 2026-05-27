@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -9,9 +10,11 @@ import { z } from "zod";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "../..");
 const deploymentPath = path.join(root, "deployments", "somnia-testnet.json");
+const packagedDeploymentPath = path.join(__dirname, "deployment.json");
 
 function readDeployment() {
-  return JSON.parse(fs.readFileSync(deploymentPath, "utf8"));
+  const file = fs.existsSync(deploymentPath) ? deploymentPath : packagedDeploymentPath;
+  return JSON.parse(fs.readFileSync(file, "utf8"));
 }
 
 const server = new McpServer({

@@ -63,6 +63,7 @@
               "cli",
               "mcp",
               "agent-onboarding",
+              "publish-checklist",
               "run-locally",
               "demo-script"
             ]

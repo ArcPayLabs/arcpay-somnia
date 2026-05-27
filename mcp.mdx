@@ -21,10 +21,29 @@ Run manually:
 npm run mcp
 ```
 
+For external developers, the MCP package is prepared for npm release:
+
+```bash
+npm install -g @arcpaylabs/somnia-mcp
+arcpay-somnia-mcp
+```
+
 Generate host config:
 
 ```bash
 npm run arcpay -- mcp-config
+```
+
+After the npm package is published, Claude Desktop can use:
+
+```json
+{
+  "mcpServers": {
+    "arcpay-somnia": {
+      "command": "arcpay-somnia-mcp"
+    }
+  }
+}
 ```
 
 ## Tools

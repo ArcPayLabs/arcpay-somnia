@@ -1,0 +1,63 @@
+---
+title: "Publish Checklist"
+description: "Release checklist for ArcPay Somnia developer packages, MCP, beta launch, and runtime security."
+---
+
+ArcPay Somnia has three developer-facing packages prepared for public release:
+
+| Package | Purpose | Publish directory |
+| --- | --- | --- |
+| `@arcpaylabs/somnia-cli` | Local CLI for contract addresses, IDs, guides, and MCP config | `apps/cli` |
+| `@arcpaylabs/somnia-mcp` | Local stdio MCP server for Claude Desktop and compatible hosts | `apps/mcp` |
+| `@arcpay/somnia-x402-agent-starter` | Starter client for paid Somnia x402 agent endpoints | `starter-kits/somnia-x402-agent` |
+
+## Pre-Publish Verification
+
+```bash
+npm run audit:runtime
+npm run package:all
+npm run build:frontend
+npm run docs:check
+npm run check:worker
+npm run check:x402
+```
+
+## Publish Commands
+
+Requires npm login and either the `@arcpaylabs` npm organization or a renamed scope.
+
+```bash
+npm publish --prefix apps/cli --access public
+npm publish --prefix apps/mcp --access public
+npm publish --prefix starter-kits/somnia-x402-agent --access public
+```
+
+## Claude Desktop MCP Config
+
+After publishing:
+
+```json
+{
+  "mcpServers": {
+    "arcpay-somnia": {
+      "command": "arcpay-somnia-mcp"
+    }
+  }
+}
+```
+
+## Beta Launch Checklist
+
+- Create/confirm X account for ArcPay Somnia.
+- Create Telegram beta group.
+- Pin `https://arcpay-somnia.vercel.app/beta` as the signup link.
+- Share docs: `https://arcpay-somnia.vercel.app/docs/overview`.
+- Share status: `https://arcpay-somnia.vercel.app/status`.
+- Share x402 demo: `https://x402.20.208.46.195.nip.io/x402/demo`.
+- Invite agent builders to install the CLI/MCP and test paid endpoints.
+
+## Security Boundary
+
+Runtime audit is clean with `npm run audit:runtime`.
+
+The full root audit still reports dev-only Hardhat v2/toolbox dependency findings. Those do not ship in frontend, worker, x402, MCP, or starter-kit runtime packages. A Hardhat v3 migration should be handled separately because it can change deploy/test behavior.
