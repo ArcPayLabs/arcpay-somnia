@@ -42,6 +42,14 @@
       "description": "Hosted MCP-style JSON-RPC bridge for agent clients."
     },
     {
+      "name": "Developer Keys",
+      "description": "Workspace-scoped bearer keys for hosted MCP access."
+    },
+    {
+      "name": "Admin",
+      "description": "Operator-only beta queue management endpoints."
+    },
+    {
       "name": "Status",
       "description": "Runtime health checks for ArcPay Somnia production surfaces."
     }
@@ -469,6 +477,89 @@
         }
       }
     },
+    "/api/developer/keys": {
+      "get": {
+        "tags": ["Developer Keys"],
+        "summary": "List developer keys",
+        "description": "Returns the current workspace's MCP developer keys. Requires an ArcPay session.",
+        "operationId": "listDeveloperKeys",
+        "responses": {
+          "200": {
+            "description": "Developer key list.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DeveloperKeyList" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Developer Keys"],
+        "summary": "Create developer key",
+        "description": "Creates a scoped hosted MCP bearer key. The raw key is returned once and only stored as a hash.",
+        "operationId": "createDeveloperKey",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateDeveloperKeyRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Developer key created.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CreateDeveloperKeyResponse" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Developer Keys"],
+        "summary": "Revoke developer key",
+        "description": "Revokes a workspace-owned hosted MCP key.",
+        "operationId": "revokeDeveloperKey",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["id"],
+                "properties": { "id": { "type": "string" } }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Developer key revoked." }
+        }
+      }
+    },
+    "/api/admin/beta": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "List beta requests",
+        "description": "Lists private beta access requests. Requires an admin wallet session when ARCPAY_ADMIN_WALLETS is configured.",
+        "operationId": "listBetaRequests",
+        "responses": {
+          "200": { "description": "Beta requests." }
+        }
+      },
+      "patch": {
+        "tags": ["Admin"],
+        "summary": "Update beta request status",
+        "description": "Updates a beta request to new, invited, active, paused, or rejected.",
+        "operationId": "updateBetaRequestStatus",
+        "responses": {
+          "200": { "description": "Beta request updated." }
+        }
+      }
+    },
     "/api/mcp": {
       "get": {
         "tags": ["MCP"],
@@ -763,6 +854,45 @@
           "mode": { "type": "string", "enum": ["beta_table", "records_fallback"] },
           "message": { "type": "string" },
           "telegramUrl": { "type": "string" }
+        }
+      },
+      "DeveloperKey": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "key_prefix": { "type": "string" },
+          "scopes": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "created_at": { "type": "string", "format": "date-time" },
+          "last_used_at": { "type": ["string", "null"], "format": "date-time" },
+          "revoked_at": { "type": ["string", "null"], "format": "date-time" }
+        }
+      },
+      "DeveloperKeyList": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "keys": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/DeveloperKey" }
+          }
+        }
+      },
+      "CreateDeveloperKeyRequest": {
+        "type": "object",
+        "properties": {
+          "label": { "type": "string" }
+        }
+      },
+      "CreateDeveloperKeyResponse": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean" },
+          "key": { "type": "string" },
+          "record": { "$ref": "#/components/schemas/DeveloperKey" }
         }
       },
       "DeveloperTool": {

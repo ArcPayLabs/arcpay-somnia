@@ -41,6 +41,8 @@ function toRouterPath(value: string): string {
     "policies",
     "audit",
     "status",
+    "developer-access",
+    "beta-admin",
     "settings",
   ];
 

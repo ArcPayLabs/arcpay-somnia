@@ -16,6 +16,8 @@ ArcPay Somnia is a testnet MVP for operators and builders running agent business
 - Hosted MCP bridge: `https://arcpay-somnia.vercel.app/api/mcp`
 - Runtime status: `https://arcpay-somnia.vercel.app/status`
 - Beta access: `https://arcpay-somnia.vercel.app/beta`
+- Beta admin: `https://arcpay-somnia.vercel.app/beta-admin`
+- Developer keys: `https://arcpay-somnia.vercel.app/developer-access`
 - Somnia Testnet contracts: registry, order book, treasury policy, spend cards, invoices, privacy vault, operator controls, risk oracle, reputation book
 
 ## Private Beta Flow
@@ -31,6 +33,8 @@ ArcPay Somnia is a testnet MVP for operators and builders running agent business
 The `/agents` page now includes a bring-your-own-agent wizard with research, routing, and privacy templates, derived `agentId`, x402 protected URL, and starter snippets.
 
 The beta form writes to `arcpay_somnia_beta_signups` when the Supabase migration is applied. Until then, the API falls back to `arcpay_somnia_records` so the signup is still captured.
+
+Developer access is handled through hashed `ap_somnia_...` keys. Operators create keys from `/developer-access`, external MCP clients send the key as a bearer token to `/api/mcp`, and old keys can be revoked without touching wallet auth.
 
 ## Developer Onboarding
 

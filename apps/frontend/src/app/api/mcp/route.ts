@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { developerTools, runDeveloperTool } from "@somnia/lib/server/developer-tools";
+import { validateDeveloperKey } from "@somnia/lib/server/developer-keys";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +16,7 @@ type JsonRpcRequest = {
 };
 
 export async function GET(request: Request) {
-  const blocked = guardRequest(request);
+  const blocked = await guardRequest(request);
   if (blocked) return blocked;
 
   return NextResponse.json({
@@ -30,7 +31,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const blocked = guardRequest(request);
+  const blocked = await guardRequest(request);
   if (blocked) return blocked;
 
   let body: JsonRpcRequest;
@@ -74,19 +75,22 @@ export async function POST(request: Request) {
   }
 }
 
-function guardRequest(request: Request) {
-  const auth = checkAuth(request);
+async function guardRequest(request: Request) {
+  const auth = await checkAuth(request);
   if (auth) return auth;
   const limited = checkRateLimit(request);
   if (limited) return limited;
   return null;
 }
 
-function checkAuth(request: Request) {
+async function checkAuth(request: Request) {
   const token = mcpBearerToken();
-  if (!token) return null;
   const authorization = request.headers.get("authorization") ?? "";
-  if (authorization === `Bearer ${token}`) return null;
+  const bearer = authorization.startsWith("Bearer ") ? authorization.slice("Bearer ".length).trim() : "";
+  if (!token && !bearer) return null;
+  if (token && bearer === token) return null;
+  if (bearer && await validateDeveloperKey(bearer)) return null;
+  if (!token && !bearer) return null;
   return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
 }
 

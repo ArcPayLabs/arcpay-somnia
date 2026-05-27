@@ -72,11 +72,13 @@ curl -X POST https://arcpay-somnia.vercel.app/api/mcp \
   -d '{"jsonrpc":"2.0","id":"2","method":"tools/call","params":{"name":"derive_agent_id","arguments":{"slug":"research-agent"}}}'
 ```
 
-If `ARCPAY_MCP_BEARER_TOKEN` is set in the deployment, include:
+If `ARCPAY_MCP_BEARER_TOKEN` is set in the deployment, or if you create a workspace developer key in ArcPay, include:
 
 ```bash
 Authorization: Bearer <token>
 ```
+
+Developer keys are issued from `/developer-access`. They are stored as hashes, scoped to `mcp:tools`, and can be revoked without rotating the global deployment token.
 
 The hosted bridge only exposes safe developer tools. It does not sign transactions, reveal private keys, or mutate treasury state.
 
