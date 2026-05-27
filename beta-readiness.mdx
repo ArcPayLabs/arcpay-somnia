@@ -1,0 +1,63 @@
+---
+title: "Beta Readiness"
+description: "What is live today, what is private beta ready, and what still needs hardening."
+---
+
+ArcPay Somnia is a testnet MVP for operators and builders running agent businesses on Somnia. It is not positioned as a throwaway demo: the core flows write to deployed Somnia Testnet contracts, the x402 gateway is live, and the app supports wallet onboarding, workspace setup, policy controls, privacy intents, invoices, cards, audit records, CLI, MCP, and HTTP developer tools.
+
+## Live Today
+
+- Public app: `https://arcpay-somnia.vercel.app`
+- Public docs: `https://arcpay-somnia.vercel.app/docs/overview`
+- x402 gateway: `https://x402.20.208.46.195.nip.io`
+- OpenAPI: `https://arcpay-somnia.vercel.app/openapi.json`
+- Agent context: `https://arcpay-somnia.vercel.app/llms.txt`
+- HTTP developer tools: `https://arcpay-somnia.vercel.app/api/developer/tools`
+- Somnia Testnet contracts: registry, order book, treasury policy, spend cards, invoices, privacy vault, operator controls, risk oracle
+
+## Private Beta Flow
+
+1. Operator joins the private beta channel.
+2. Operator connects an EVM wallet on Somnia Testnet and creates a workspace.
+3. Operator registers an agent with endpoint, pricing, and capabilities.
+4. Operator sets policy: limits, allowed actions, allowed agent, risk floor, and emergency pause.
+5. Builder or agent calls the x402 gateway, receives HTTP 402 payment requirements, pays through the order book, and unlocks the protected result after fulfillment.
+6. Operator uses invoices, SOMUSD cards, privacy intents, and audit exports to manage day-to-day activity.
+
+## Developer Onboarding
+
+Builders can onboard their own agents without asking ArcPay to host the agent:
+
+- register the agent slug and endpoint in the app
+- derive `agentId` with the CLI, MCP server, or HTTP tool wrapper
+- expose a paid resource behind the x402 starter kit
+- use ArcPay order escrow for payment state
+- use privacy intents for encrypted memo pointers and delayed recipient disclosure
+- use audit exports and records as proof of activity
+
+## Current Production Boundary
+
+ArcPay is production-shaped but intentionally scoped to Somnia Testnet right now:
+
+- x402 is an ArcPay Somnia implementation of the HTTP 402 paid-resource pattern, backed by the deployed ArcPay order book.
+- Privacy is a privacy-intent layer. It hides memo/recipient timing until release and prevents double release with nullifiers, but it is not a full zero-knowledge shielded pool.
+- Swap and yield pages record governed intents because Somnia does not yet expose a mature official router/vault SDK equivalent to what ArcPay used on Solana.
+- Local MCP works with stdio hosts such as Claude Desktop and Cursor. Browser/ChatGPT-style usage should use OpenAPI, `llms.txt`, and the HTTP developer tools until a hosted remote MCP endpoint is shipped.
+
+## Verification Status
+
+Latest local/live checks run successfully:
+
+```bash
+npm run build:frontend
+npm test
+npm run check:worker
+npm run check:x402
+npm run smoke:auth
+npm run smoke:live
+npm run smoke:x402
+```
+
+`smoke:live` writes small Somnia Testnet transactions across registry, policy, orders, cards, privacy intents, invoices, and risk oracle. `smoke:x402` starts the x402 server, registers a fresh agent, returns HTTP 402, creates an on-chain order, fulfills it, unlocks the protected resource, and settles the order.
+
+Run live smoke tests sequentially because they share the funded signer nonce.

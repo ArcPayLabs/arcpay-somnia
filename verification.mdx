@@ -44,6 +44,16 @@ npm run smoke:x402
 
 `smoke:live` requires a funded Somnia Testnet wallet. It writes small live transactions to validate registry, policy, orders, cards, privacy intents, invoices, and risk oracle flow.
 
+Run `smoke:live` and `smoke:x402` sequentially. They share the funded signer and should not be run in parallel because public RPC nonce handling can reject concurrent transactions.
+
+## Latest Verified Scope
+
+- Contract suite: registry, order book, treasury policy, spend cards, operator controls, privacy vault, invoices, and risk oracle
+- Live smoke: registry write, policy write, order escrow/settle, claim code, webhook breaker, SOMUSD card, STT privacy release, SOMUSD privacy release, invoice settlement, risk oracle
+- x402 smoke: health, agent registration, HTTP 402 quote, on-chain payment order, verification, provider fulfillment, protected resource unlock, requester settlement
+- Frontend build: all public, auth, dashboard, and operator pages compile
+- Developer surfaces: CLI syntax, MCP syntax, x402 server syntax, worker syntax, OpenAPI JSON, and docs config
+
 ## Contract Proofs
 
 All deployed contract addresses are listed in `somnia-contracts`. Each address links to the Somnia Testnet explorer from the app's public docs page and from the product `/proofs` page.
