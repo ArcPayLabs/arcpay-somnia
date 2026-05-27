@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
-import { CheckCircle2, Copy, LockKeyhole, RadioTower, RefreshCcw, Send, ServerCog, UnlockKeyhole } from "lucide-react";
+import { CheckCircle2, Copy, ExternalLink, LockKeyhole, RadioTower, RefreshCcw, Send, ServerCog, UnlockKeyhole } from "lucide-react";
 import { EmptyState } from "@/components/app/EmptyState";
 import { PageHeader } from "@/components/app/PageHeader";
 import { StatCard } from "@/components/primitives/StatCard";
@@ -80,6 +80,9 @@ function X402Route() {
     return `${base}/agent/${encodeURIComponent(form.agentSlug)}/work`;
   }, [form.agentSlug, form.serverUrl]);
   const quotedPayment = quote?.accepts[0];
+  const serverHost = serverLabel(form.serverUrl);
+  const canPay = Boolean(quote) && !busy;
+  const payDisabledReason = busy ? "Action in progress." : quote ? "" : "Quote endpoint first.";
 
   async function quoteEndpoint() {
     setBusy(true);
@@ -231,7 +234,7 @@ function X402Route() {
       />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard icon={ServerCog} label="Server" value={serverLabel(form.serverUrl)} hint="x402 HTTP surface" />
+        <StatCard icon={ServerCog} label="Gateway" value="Live" hint={serverHost} />
         <StatCard icon={LockKeyhole} label="Resource" value={quote ? "Quoted" : "Locked"} hint="HTTP 402 until paid" />
         <StatCard icon={CheckCircle2} label="Order" value={verification?.statusName || "--"} hint="On-chain state" />
         <StatCard icon={UnlockKeyhole} label="Unlock" value={unlock?.unlocked ? "Open" : "Closed"} hint="Fulfilled or settled" emphasis />
@@ -240,6 +243,20 @@ function X402Route() {
       <div className="rounded-2xl border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">{status}</div>
 
       <section className="rounded-3xl border border-border bg-card p-5 md:p-6">
+        <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-border bg-muted/30 p-4 text-sm md:flex-row md:items-center md:justify-between">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Live x402 gateway</div>
+            <div className="mt-1 break-all font-mono text-xs text-foreground">{cleanServerUrl(form.serverUrl)}</div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={() => void copy(cleanServerUrl(form.serverUrl))} className="inline-flex items-center gap-2 rounded-full bg-background px-3 py-2 text-xs font-semibold">
+              <Copy className="h-3.5 w-3.5" /> Copy server
+            </button>
+            <a href={cleanServerUrl(form.serverUrl)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-foreground px-3 py-2 text-xs font-semibold text-background">
+              <ExternalLink className="h-3.5 w-3.5" /> Open
+            </a>
+          </div>
+        </div>
         <div className="grid gap-4 lg:grid-cols-2">
           <Field label="x402 server URL"><input className="ap-in" value={form.serverUrl} onChange={(event) => setForm({ ...form, serverUrl: event.target.value })} /></Field>
           <Field label="Agent slug"><input className="ap-in" value={form.agentSlug} onChange={(event) => setForm({ ...form, agentSlug: event.target.value })} /></Field>
@@ -254,7 +271,10 @@ function X402Route() {
         <div className="mt-5 flex flex-wrap gap-2">
           <button disabled={busy} onClick={() => void quoteEndpoint()} className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50">Quote</button>
           <button disabled={busy} onClick={() => void checkProtected()} className="rounded-full bg-muted px-5 py-2.5 text-sm font-semibold disabled:opacity-50">Check 402</button>
-          <button disabled={busy || !quote} onClick={() => void payOrder()} className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-background disabled:opacity-50"><Send className="h-4 w-4" /> Pay order</button>
+          <div className="flex flex-col">
+            <button disabled={!canPay} onClick={() => void payOrder()} className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-background disabled:opacity-50"><Send className="h-4 w-4" /> Pay order</button>
+            {payDisabledReason ? <span className="mt-1 px-2 text-[11px] font-medium text-muted-foreground">{payDisabledReason}</span> : null}
+          </div>
           <button disabled={busy} onClick={() => void verifyOrder()} className="rounded-full bg-muted px-5 py-2.5 text-sm font-semibold disabled:opacity-50">Verify</button>
           <button disabled={busy} onClick={() => void fulfillOrder()} className="rounded-full bg-muted px-5 py-2.5 text-sm font-semibold disabled:opacity-50">Provider fulfill</button>
           <button disabled={busy} onClick={() => void unlockResource()} className="rounded-full bg-success px-5 py-2.5 text-sm font-semibold text-success-foreground disabled:opacity-50">Unlock</button>

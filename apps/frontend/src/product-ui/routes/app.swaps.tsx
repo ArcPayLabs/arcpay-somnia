@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeftRight, Bot, Route as RouteIcon, ShieldCheck } from "lucide-react";
+import { ArrowLeftRight, Bot, CheckCircle2, Route as RouteIcon, ShieldCheck, Workflow } from "lucide-react";
 import { PageHeader } from "@/components/app/PageHeader";
 import { StatCard } from "@/components/primitives/StatCard";
 import { writeRecord } from "@somnia/lib/somnia";
@@ -17,9 +17,16 @@ function SwapsRoute() {
     setMessage("Swap intent saved. Convert this into an escrowed agent order for execution.");
   }
 
+  const reviewItems = [
+    { label: "Source asset", value: form.from },
+    { label: "Target asset", value: form.to },
+    { label: "Max slippage", value: `${form.maxSlippage}%` },
+    { label: "Executor", value: form.agent },
+  ];
+
   return (
     <div className="space-y-6">
-      <PageHeader icon={ArrowLeftRight} eyebrow="Treasury routing" title="Swap intents" description="Prepare policy-checked Somnia route intents without pretending a swap executed." />
+      <PageHeader icon={ArrowLeftRight} eyebrow="Treasury routing" title="Swap intents" description="Prepare policy-checked Somnia route intents that can be handed to an agent executor or future Somnia router adapter without pretending a fill already happened." />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <StatCard icon={RouteIcon} label="Route type" value="Intent" hint="No simulated fills" />
         <StatCard icon={ShieldCheck} label="Policy" value="Required" hint="Before execution" />
@@ -36,14 +43,34 @@ function SwapsRoute() {
           <button className="h-12 rounded-xl bg-primary px-4 font-semibold text-primary-foreground" type="submit">Save swap intent</button>
           <div className="rounded-xl border border-border bg-muted p-3 text-sm text-muted-foreground">{message}</div>
         </form>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {["Intent, not simulated fill", "Router-ready fields", "Policy-first execution", "Agent order handoff"].map((title) => (
-            <article className="rounded-2xl border border-border bg-card p-5" key={title}>
-              <ArrowLeftRight className="h-5 w-5 text-primary" />
-              <h2 className="mt-10 text-xl font-medium">{title}</h2>
-              <p className="mt-2 text-sm text-muted-foreground">Somnia execution can be connected later without changing the operator workflow.</p>
-            </article>
-          ))}
+        <div className="space-y-4">
+          <div className="rounded-3xl border border-border bg-card p-5">
+            <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              <Workflow className="h-4 w-4" /> Execution path
+            </div>
+            <div className="mt-5 space-y-3">
+              {[
+                "Create route intent with amount, assets, slippage, and executor.",
+                "Run policy checks before any wallet signature or agent handoff.",
+                "Convert approved intent into an escrowed agent order.",
+                "Attach a Somnia router adapter when a production-grade route source is selected.",
+              ].map((step, index) => (
+                <div key={step} className="flex gap-3 rounded-2xl bg-muted/40 p-3 text-sm">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">{index + 1}</span>
+                  <span className="text-muted-foreground">{step}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            {reviewItems.map((item) => (
+              <article className="rounded-2xl border border-border bg-card p-5" key={item.label}>
+                <CheckCircle2 className="h-5 w-5 text-primary" />
+                <h2 className="mt-8 text-sm font-medium uppercase tracking-[0.16em] text-muted-foreground">{item.label}</h2>
+                <p className="mt-2 break-all text-xl font-semibold">{item.value}</p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
     </div>
