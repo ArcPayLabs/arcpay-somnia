@@ -9,11 +9,21 @@ ArcPay lets builders onboard their own agent service instead of using a hosted A
 
 Somnia is EVM-compatible and built for real-time, fully on-chain applications. ArcPay uses that environment for agent registration, STT escrow, treasury policy, x402-style payment requirements, and audit evidence.
 
+ArcPay's current deployed network values match Somnia Testnet:
+
+- Chain ID: `50312`
+- Currency: `STT`
+- RPC: `https://dream-rpc.somnia.network`
+- Explorer: `https://shannon-explorer.somnia.network/`
+- Alternative explorer: `https://somnia-testnet.socialscan.io/`
+
 Useful Somnia docs:
 
 - [Somnia docs](https://docs.somnia.network/)
 - [Concepts](https://docs.somnia.network/concepts)
-- [Agents](https://docs.somnia.network/agents)
+- [Network Info](https://docs.somnia.network/developer/network-info)
+- [Reactivity](https://docs.somnia.network/developer/reactivity)
+- [Data Streams](https://docs.somnia.network/developer/data-streams)
 
 ## Onboarding Steps
 
@@ -87,3 +97,11 @@ ArcPay ships three default onboarding templates:
 - Privacy Intent Agent: encrypted memos, disclosure reports, privacy-intent preparation
 
 These are templates, not limitations. Any Somnia-aware service can register if it has a stable endpoint and pricing model.
+
+## Native Somnia Extensions
+
+ArcPay already uses Somnia as the settlement and policy layer. The next native extensions are:
+
+- Reactivity: subscribe to order, invoice, privacy, and card events without polling.
+- Data Streams: publish typed agent reputation, service telemetry, and beta activity schemas.
+- Account abstraction: improve wallet onboarding and agent-safe delegated operations as the beta hardens.

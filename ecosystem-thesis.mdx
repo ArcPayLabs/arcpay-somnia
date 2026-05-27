@@ -5,7 +5,7 @@ description: "Why ArcPay exists for Somnia and what ecosystem gap it fills."
 
 Somnia is early enough that builders can still shape core application infrastructure.
 
-The public Somnia docs show strong base infrastructure: testnet/mainnet network parameters, faucet access, RPCs, explorers, Solidity tooling, account abstraction addresses, local forking guidance, and a tutorial for building a simple DEX on Somnia.
+The public Somnia docs show strong base infrastructure: testnet/mainnet network parameters, faucet access, RPCs, explorers, Solidity tooling, account abstraction addresses, local forking guidance, Reactivity, Data Streams, and a tutorial for building a simple DEX on Somnia.
 
 ArcPay focuses on a different gap: agent-native financial operations. AI-agent teams need more than fast transactions. They need identity, paid endpoints, escrow, budget controls, privacy intents, invoices, policy enforcement, and evidence exports.
 
@@ -16,6 +16,8 @@ ArcPay focuses on a different gap: agent-native financial operations. AI-agent t
 | Mainnet and testnet network info | `https://docs.somnia.network/developer/network-info` |
 | Testnet hub and faucet | `https://testnet.somnia.network` |
 | Hardhat, Foundry, Remix, RPC tooling | `https://docs.somnia.network/developer/network-info` |
+| Reactivity for event-driven dApps | `https://docs.somnia.network/developer/reactivity` |
+| Data Streams for typed publish/subscribe data | `https://docs.somnia.network/developer/data-streams` |
 | Local testing and fork guidance | `https://docs.somnia.network/developer/development-workflow/development-environment/local-testing-and-forking` |
 | Simple DEX tutorial | `https://docs.somnia.network/developer/tutorials/build-a-dex-on-somnia` |
 
@@ -29,6 +31,15 @@ ArcPay focuses on a different gap: agent-native financial operations. AI-agent t
 - privacy-intent vault for encrypted memo pointers and delayed recipient disclosure
 - audit mirror from Somnia events into workspace records
 - local CLI, MCP server, OpenAPI, and HTTP developer tools
+
+## Native Somnia Fit
+
+ArcPay uses Solidity and standard EVM wallets today, then layers Somnia-specific product behavior on top:
+
+- sub-second agent payment UX through STT escrow and fast testnet confirmation
+- event-heavy treasury workflows that can move from Azure polling to Somnia Reactivity
+- typed agent telemetry and reputation that can move into Somnia Data Streams
+- account-abstraction-ready onboarding for future gasless/delegated agent operations
 
 ## Why This Is Fundable
 
