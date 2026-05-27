@@ -13,6 +13,7 @@ ArcPay Somnia is a testnet MVP for operators and builders running agent business
 - OpenAPI: `https://arcpay-somnia.vercel.app/openapi.json`
 - Agent context: `https://arcpay-somnia.vercel.app/llms.txt`
 - HTTP developer tools: `https://arcpay-somnia.vercel.app/api/developer/tools`
+- Hosted MCP bridge: `https://arcpay-somnia.vercel.app/api/mcp`
 - Somnia Testnet contracts: registry, order book, treasury policy, spend cards, invoices, privacy vault, operator controls, risk oracle
 
 ## Private Beta Flow
@@ -42,7 +43,7 @@ ArcPay is production-shaped but intentionally scoped to Somnia Testnet right now
 - x402 is an ArcPay Somnia implementation of the HTTP 402 paid-resource pattern, backed by the deployed ArcPay order book.
 - Privacy is a privacy-intent layer. It hides memo/recipient timing until release and prevents double release with nullifiers, but it is not a full zero-knowledge shielded pool.
 - Swap and yield pages record governed intents because Somnia does not yet expose a mature official router/vault SDK equivalent to what ArcPay used on Solana.
-- Local MCP works with stdio hosts such as Claude Desktop and Cursor. Browser/ChatGPT-style usage should use OpenAPI, `llms.txt`, and the HTTP developer tools until a hosted remote MCP endpoint is shipped.
+- Local MCP works with stdio hosts such as Claude Desktop and Cursor. Browser/ChatGPT-style usage should use OpenAPI, `llms.txt`, HTTP developer tools, or the hosted MCP-style JSON-RPC bridge.
 
 ## Verification Status
 

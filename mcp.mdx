@@ -48,13 +48,45 @@ Paste the output of `npm run arcpay -- mcp-config` into Claude Desktop's MCP ser
 
 This is a local stdio MCP server. It is ready for local hosts that support stdio MCP, but it is not yet a public remote MCP endpoint.
 
+## Hosted MCP Bridge
+
+ArcPay also exposes a hosted MCP-style JSON-RPC bridge:
+
+```bash
+curl https://arcpay-somnia.vercel.app/api/mcp
+```
+
+List tools:
+
+```bash
+curl -X POST https://arcpay-somnia.vercel.app/api/mcp \
+  -H "content-type: application/json" \
+  -d '{"jsonrpc":"2.0","id":"1","method":"tools/list","params":{}}'
+```
+
+Call a tool:
+
+```bash
+curl -X POST https://arcpay-somnia.vercel.app/api/mcp \
+  -H "content-type: application/json" \
+  -d '{"jsonrpc":"2.0","id":"2","method":"tools/call","params":{"name":"derive_agent_id","arguments":{"slug":"research-agent"}}}'
+```
+
+If `ARCPAY_MCP_BEARER_TOKEN` is set in the deployment, include:
+
+```bash
+Authorization: Bearer <token>
+```
+
+The hosted bridge only exposes safe developer tools. It does not sign transactions, reveal private keys, or mutate treasury state.
+
 ## ChatGPT
 
 Standard ChatGPT web does not directly attach to local stdio MCP servers. For ChatGPT-style usage, use the public `/openapi.json`, `/llms.txt`, and HTTP tool wrapper.
 
 ## Perplexity and Browser Agents
 
-Use the public docs, `/llms.txt`, `/openapi.json`, and HTTP tool wrapper. If the agent product supports remote MCP, the next ArcPay milestone is to expose the safe read-only tools through a hosted remote MCP bridge with auth and rate limits.
+Use the public docs, `/llms.txt`, `/openapi.json`, `/api/developer/tools`, and `/api/mcp`. If the agent product supports custom OpenAPI actions, point it at `https://arcpay-somnia.vercel.app/openapi.json`.
 
 ## HTTP Tool Wrapper
 

@@ -139,7 +139,7 @@ export async function runDeveloperTool(name: string, args: Record<string, unknow
         phases: [
           "Deploy Mintlify and keep /openapi.json + /llms.txt public.",
           "Publish Somnia x402 starter kit and privacy-intent examples.",
-          "Host an HTTP wrapper for safe MCP tools.",
+          "Operate the hosted MCP-style JSON-RPC bridge with auth and rate limits.",
           "Expand agent discovery with reputation and service analytics.",
           "Package the Somnia x402 gateway, privacy intents, and policy controls as reusable builder infrastructure.",
         ],

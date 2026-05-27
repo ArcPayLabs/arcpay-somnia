@@ -15,6 +15,7 @@ Use this page to verify that the app, docs, x402 backend, developer API, and Som
 | OpenAPI | `https://arcpay-somnia.vercel.app/openapi.json` |
 | Agent context | `https://arcpay-somnia.vercel.app/llms.txt` |
 | HTTP developer tools | `https://arcpay-somnia.vercel.app/api/developer/tools` |
+| Hosted MCP bridge | `https://arcpay-somnia.vercel.app/api/mcp` |
 | x402 health | `https://x402.20.208.46.195.nip.io/health` |
 | x402 demo | `https://x402.20.208.46.195.nip.io/x402/demo` |
 
@@ -25,6 +26,9 @@ curl https://arcpay-somnia.vercel.app/openapi.json
 curl https://arcpay-somnia.vercel.app/llms.txt
 curl https://arcpay-somnia.vercel.app/api/developer/tools
 curl https://arcpay-somnia.vercel.app/api/developer/tools/derive_agent_id?slug=research-agent
+curl -X POST https://arcpay-somnia.vercel.app/api/mcp \
+  -H "content-type: application/json" \
+  -d '{"jsonrpc":"2.0","id":"1","method":"tools/list","params":{}}'
 curl https://x402.20.208.46.195.nip.io/health
 curl https://x402.20.208.46.195.nip.io/x402/payment-requirements/research-agent
 ```
@@ -52,7 +56,7 @@ Run `smoke:live` and `smoke:x402` sequentially. They share the funded signer and
 - Live smoke: registry write, policy write, order escrow/settle, claim code, webhook breaker, SOMUSD card, STT privacy release, SOMUSD privacy release, invoice settlement, risk oracle
 - x402 smoke: health, agent registration, HTTP 402 quote, on-chain payment order, verification, provider fulfillment, protected resource unlock, requester settlement
 - Frontend build: all public, auth, dashboard, and operator pages compile
-- Developer surfaces: CLI syntax, MCP syntax, x402 server syntax, worker syntax, OpenAPI JSON, and docs config
+- Developer surfaces: CLI syntax, local MCP syntax, hosted MCP bridge, x402 server syntax, worker syntax, OpenAPI JSON, and docs config
 
 ## Contract Proofs
 
