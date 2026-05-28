@@ -3,7 +3,7 @@ title: "Publish Checklist"
 description: "Release checklist for ArcPay Somnia developer packages, MCP, beta launch, and runtime security."
 ---
 
-ArcPay Somnia has three developer-facing packages prepared for public release:
+ArcPay Somnia has three developer-facing packages published on npm:
 
 | Package | Purpose | Publish directory |
 | --- | --- | --- |
@@ -22,15 +22,15 @@ npm run check:worker
 npm run check:x402
 ```
 
-## Publish Commands
-
-Requires npm login and either the `@arcpaylabs` npm organization or a renamed scope.
+## Published Packages
 
 ```bash
-npm publish --prefix apps/cli --access public
-npm publish --prefix apps/mcp --access public
-npm publish --prefix starter-kits/somnia-x402-agent --access public
+npm view @arcpaylabs/somnia-cli version
+npm view @arcpaylabs/somnia-mcp version
+npm view @arcpaylabs/somnia-x402-agent-starter version
 ```
+
+If republishing a new version, run `npm version patch` inside the package folder, then publish from that folder. Do not publish from the repo root.
 
 ## Claude Desktop MCP Config
 
