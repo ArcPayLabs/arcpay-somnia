@@ -43,6 +43,12 @@ Somnia is positioned as an Agentic L1. ArcPay uses that premise directly:
 - `TreasuryPolicy.sol`: hourly/daily spend limits, approval threshold, allowlist, emergency pause
 - `AgentTreasury.sol`: escrow and settlement
 - `AgentOrderBook.sol`: order state machine
+- `AgentInvoiceBook.sol`: STT/SOMUSD invoice lifecycle
+- `OperatorControls.sol`: claim-code onboarding and webhook circuit breakers
+- `SomniaAgentRiskOracle.sol`: agent risk request/callback evidence
+- `AgentSpendCardVault.sol`: SOMUSD agent budget cards
+- `SomniaPrivacyVault.sol`: commitment-based privacy intents
+- `AgentReputationBook.sol`: order-backed agent reputation
 - `apps/x402-server`: HTTP 402 quote, verification, fulfillment helper, and unlock surface
 
 ## Deployment
@@ -63,6 +69,8 @@ deployments/somnia-testnet.json
 | `SomniaAgentRiskOracle` | `0xA5Ec905B95E5b166EF846849eaB8FDD1dB134D0C` |
 | `AgentSpendCardVault` | `0x0480E467bA12E33DA163FeA45a20C30133F84B93` |
 | `SomniaPrivacyVault` | `0x6948a15dED7F6708BD4DfD8c3Ee5314bC5B53D14` |
+| `AgentInvoiceBook` | `0x643De19f32B1d0c396Cf8B5cD677549c442Fbbf7` |
+| `AgentReputationBook` | `0xBB9aB7d9e2ad5205F390580119b139bce84C8096` |
 
 ## Judging Alignment
 

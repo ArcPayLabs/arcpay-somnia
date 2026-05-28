@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "ArcPay Somnia Developer API",
-    "version": "0.1.0",
+    "version": "0.1.2",
     "summary": "Public developer surface for ArcPay's Somnia x402, workspace evidence, and agent integration flows.",
     "description": "ArcPay Somnia exposes a wallet-first app, a live x402 payment server, an MCP server for local agent hosts, and OpenAPI-compatible endpoint docs for developers building on Somnia Testnet."
   },

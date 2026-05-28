@@ -42,4 +42,8 @@ https://x402.20.208.46.195.nip.io
 3. Provider fulfills the order.
 4. `unlock` the resource with `orderId`.
 
-See the main docs at `../../mintlify/x402-agent-payments.mdx`.
+See the main docs at:
+
+```text
+https://arcpay-somnia.vercel.app/docs/x402-agent-payments
+```

@@ -52,6 +52,11 @@ arcpay-somnia-x402-agent quote research-agent
 | `AgentTreasury.sol` | Escrow and release native Somnia funds for orders. |
 | `AgentOrderBook.sol` | Agent order state machine from pending to settled/refunded. |
 | `AgentInvoiceBook.sol` | STT/SOMUSD invoice creation, payment, cancellation, and settlement evidence. |
+| `OperatorControls.sol` | Agent claim-code onboarding and webhook circuit-breaker controls. |
+| `SomniaAgentRiskOracle.sol` | Agentic risk request/callback flow for treasury policy decisions. |
+| `AgentSpendCardVault.sol` | SOMUSD-backed virtual spend cards for agent budgets. |
+| `SomniaPrivacyVault.sol` | Commitment-based payment intents with encrypted memo URIs and nullifier release. |
+| `AgentReputationBook.sol` | Order-backed score, review, and dispute evidence for service agents. |
 
 ## Local Setup
 
@@ -155,6 +160,7 @@ Contracts:
 | `AgentSpendCardVault` | `0x0480E467bA12E33DA163FeA45a20C30133F84B93` |
 | `SomniaPrivacyVault` | `0x6948a15dED7F6708BD4DfD8c3Ee5314bC5B53D14` |
 | `AgentInvoiceBook` | `0x643De19f32B1d0c396Cf8B5cD677549c442Fbbf7` |
+| `AgentReputationBook` | `0xBB9aB7d9e2ad5205F390580119b139bce84C8096` |
  
 Machine-readable deployment metadata lives in
 `deployments/somnia-testnet.json`.
