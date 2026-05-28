@@ -1,11 +1,11 @@
 {
   "name": "@arcpaylabs/somnia-mcp",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": false,
   "description": "MCP server for ArcPay Somnia contracts, x402, privacy intents, invoices, and demo flows.",
   "type": "module",
   "license": "MIT",
-  "author": "Henry Sammarfo <jasonneil4040@gmail.com>",
+  "author": "Henry Sam Marfo <jasonneil4040@gmail.com>",
   "homepage": "https://arcpay-somnia.vercel.app/docs/mcp",
   "repository": {
     "type": "git",

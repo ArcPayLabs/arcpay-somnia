@@ -1,6 +1,6 @@
 # ArcPay Somnia Source-Available License
 
-Copyright (c) 2026 Henry Sammarfo.
+Copyright (c) 2026 Henry Sam Marfo.
 
 The ArcPay Somnia application, contracts, frontend, backend services, docs, and brand assets are source-available for evaluation, grant review, security review, and non-commercial developer learning.
 

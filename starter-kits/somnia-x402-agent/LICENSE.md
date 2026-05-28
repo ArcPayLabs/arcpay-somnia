@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 Henry Sammarfo
+Copyright (c) 2026 Henry Sam Marfo
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this starter kit and associated documentation files (the "Starter Kit"), to deal

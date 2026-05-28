@@ -1,11 +1,11 @@
 {
   "name": "@arcpaylabs/somnia-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "description": "Developer CLI for ArcPay Somnia contracts, x402, invoices, privacy intents, and MCP setup.",
   "type": "module",
   "license": "MIT",
-  "author": "Henry Sammarfo <jasonneil4040@gmail.com>",
+  "author": "Henry Sam Marfo <jasonneil4040@gmail.com>",
   "homepage": "https://arcpay-somnia.vercel.app/docs/cli",
   "repository": {
     "type": "git",

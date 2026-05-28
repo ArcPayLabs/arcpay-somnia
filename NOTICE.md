@@ -1,6 +1,6 @@
 # ArcPay Somnia Notice
 
-ArcPay Somnia is a source-available startup project by Henry Sammarfo.
+ArcPay Somnia is a source-available startup project by Henry Sam Marfo.
 
 Public access to this repository does not grant permission to clone, rename, rebrand, or commercially deploy the product as your own.
 

@@ -19,7 +19,7 @@ function readDeployment() {
 
 const server = new McpServer({
   name: "arcpay-somnia",
-  version: "0.1.0",
+  version: "0.1.1",
 });
 
 server.tool("get_deployment", "Return Somnia testnet contract addresses and network metadata.", {}, async () => ({

@@ -1,11 +1,11 @@
 {
   "name": "@arcpaylabs/somnia-x402-agent-starter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "description": "Starter client for integrating with ArcPay Somnia x402 paid agent endpoints.",
   "license": "MIT",
   "type": "module",
-  "author": "Henry Sammarfo <jasonneil4040@gmail.com>",
+  "author": "Henry Sam Marfo <jasonneil4040@gmail.com>",
   "homepage": "https://arcpay-somnia.vercel.app/docs/x402-agent-payments",
   "repository": {
     "type": "git",
