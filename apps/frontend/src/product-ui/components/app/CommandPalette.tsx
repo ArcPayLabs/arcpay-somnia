@@ -24,6 +24,7 @@ import {
   Trophy,
   Activity,
   KeyRound,
+  BarChart3,
 } from "lucide-react";
 
 const NAV = [
@@ -41,6 +42,7 @@ const NAV = [
   { label: "Policies", to: "/app/policies", icon: SlidersHorizontal },
   { label: "Audit", to: "/app/audit", icon: ScrollText },
   { label: "Status", to: "/app/status", icon: Activity },
+  { label: "Analytics", to: "/app/analytics", icon: BarChart3 },
   { label: "Developer Access", to: "/app/developer-access", icon: KeyRound },
   { label: "Beta Admin", to: "/app/beta-admin", icon: Users },
   { label: "Settings", to: "/app/settings", icon: SettingsIcon },

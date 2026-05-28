@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { trackUsageEvent } from "@somnia/lib/server/usage";
 
 const BETA_TABLE = "arcpay_somnia_beta_signups";
 const RECORDS_TABLE = validRecordsTable(process.env.ARCPAY_RECORDS_TABLE ?? "arcpay_somnia_records");
@@ -25,6 +26,7 @@ export async function POST(request: Request) {
 
   const betaResult = await writeBetaSignup(payload, request);
   if (betaResult.ok) {
+    await trackBetaSignup(payload, "beta_table");
     return NextResponse.json({
       ok: true,
       mode: "beta_table",
@@ -35,6 +37,7 @@ export async function POST(request: Request) {
 
   const fallback = await writeFallbackRecord(payload, betaResult.error);
   if (fallback.ok) {
+    await trackBetaSignup(payload, "records_fallback");
     return NextResponse.json({
       ok: true,
       mode: "records_fallback",
@@ -135,4 +138,21 @@ function validRecordsTable(table: string) {
 
 function clean(value: unknown, max: number) {
   return String(value ?? "").trim().slice(0, max);
+}
+
+async function trackBetaSignup(payload: BetaPayload, mode: string) {
+  await trackUsageEvent({
+    eventType: "beta_signup_created",
+    owner: payload.walletAddress || payload.email,
+    agentSlug: payload.agentUrl ? "external-agent" : null,
+    source: "beta",
+    path: "/api/beta",
+    status: mode,
+    metadata: {
+      role: payload.role,
+      hasTelegram: Boolean(payload.telegram),
+      hasWallet: Boolean(payload.walletAddress),
+      hasAgentUrl: Boolean(payload.agentUrl),
+    },
+  });
 }

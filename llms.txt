@@ -45,6 +45,7 @@ Agent tooling:
 - `/oracle` for Somnia agent requester deposit + risk callback proof
 - `/privacy` for Privacy Intent creation and nullifier release
 - `/invoices` for STT/SOMUSD invoice creation, payment, cancellation, and on-chain sync
+- `/analytics` for admin usage tracking across beta signups, developer keys, MCP calls, x402 activity, records, owners, and agents
 - `apps/x402-server` for HTTP 402 agent work quotes, order verification, and protected resource unlocks
 - `npm run smoke:auth` for Supabase/auth/workspace verification
 - `npm run smoke:live` for funded Somnia testnet writes

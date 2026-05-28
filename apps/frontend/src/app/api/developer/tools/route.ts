@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
 import { developerTools, runDeveloperTool } from "@somnia/lib/server/developer-tools";
+import { trackUsageEvent } from "@somnia/lib/server/usage";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  await trackUsageEvent({
+    eventType: "developer_tools_listed",
+    source: "developer-tools",
+    path: "/api/developer/tools",
+  });
   return NextResponse.json({
     ok: true,
     service: "arcpay-somnia-developer-tools",
@@ -13,16 +19,21 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  let tool = "";
   try {
     const body = await request.json();
-    const result = await runDeveloperTool(String(body.tool ?? ""), asRecord(body.args));
+    tool = String(body.tool ?? "");
+    const args = asRecord(body.args);
+    const result = await runDeveloperTool(tool, args);
+    await trackDeveloperTool(tool, args, "ok");
     return NextResponse.json({
       ok: true,
-      tool: String(body.tool ?? ""),
+      tool,
       contentType: result.contentType,
       result: result.body,
     });
   } catch (error) {
+    await trackDeveloperTool(tool || "unknown", {}, "error");
     return NextResponse.json({
       ok: false,
       error: error instanceof Error ? error.message : String(error),
@@ -32,4 +43,15 @@ export async function POST(request: Request) {
 
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+async function trackDeveloperTool(toolName: string, args: Record<string, unknown>, status: string) {
+  await trackUsageEvent({
+    eventType: "developer_tool_called",
+    source: "developer-tools",
+    path: "/api/developer/tools",
+    toolName,
+    status,
+    metadata: { argKeys: Object.keys(args).slice(0, 20) },
+  });
 }

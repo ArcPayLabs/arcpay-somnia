@@ -580,6 +580,18 @@
         }
       }
     },
+    "/api/admin/analytics": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Read usage analytics",
+        "description": "Returns admin-only usage totals for app records, beta signups, developer keys, MCP/developer tool calls, x402 gateway activity, owners, and agents.",
+        "operationId": "getUsageAnalytics",
+        "responses": {
+          "200": { "description": "Usage analytics." },
+          "401": { "description": "Admin wallet session required." }
+        }
+      }
+    },
     "/api/mcp": {
       "get": {
         "tags": ["MCP"],

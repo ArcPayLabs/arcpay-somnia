@@ -192,6 +192,10 @@ SUPABASE_URL=...
 SUPABASE_SERVICE_ROLE_KEY=...
 ```
 
+To track app, x402, MCP, developer-tool, beta, and audit-record usage, also
+apply `supabase/migrations/202605280001_somnia_usage_events.sql`. The admin
+analytics page reads this table from `/analytics`.
+
 This repo writes Somnia records to `arcpay_somnia_records`. Future ArcPay
 editions should keep their own table and docs so each deployment remains
 chain-specific and auditable.
@@ -322,6 +326,7 @@ demo paths resolve to Somnia infrastructure.
 | `/invoices` | Create, pay, cancel, and sync STT/SOMUSD invoices through `AgentInvoiceBook`. |
 | `/contractors` | Local contractor/agent workforce records. |
 | `/audit` | Local workflow records and transaction hashes. |
+| `/analytics` | Admin usage analytics for beta signups, developer keys, MCP/tool calls, x402 activity, records, owners, and agents. |
 | `/proofs` | Judge-facing deployment proof and local verification commands. |
 | `/settings` | Somnia-only testnet runtime configuration. |
 
@@ -344,3 +349,4 @@ Current Somnia build:
 - Supabase persistence migration added for audit/workflow records
 - Azure worker package added for live event monitoring
 - repeatable smoke scripts added for auth/workspace and funded Somnia testnet writes
+- Supabase usage analytics added for app, x402, MCP, developer tools, beta, and records

@@ -77,11 +77,25 @@ async function route(ctx) {
   }
 
   if (req.method === "GET" && url.pathname === "/x402/demo") {
+    void trackUsageEvent({
+      eventType: "x402_demo_read",
+      source: "x402",
+      path: url.pathname,
+    });
     return sendJson(res, 200, demoPayload(deployment));
   }
 
   if (req.method === "GET" && parts[0] === "x402" && parts[1] === "payment-requirements" && parts[2]) {
     const requirements = await paymentRequirements({ slug: parts[2], req, registry, deployment });
+    void trackUsageEvent({
+      eventType: "x402_quote_created",
+      agentId: requirements.agent.agentId,
+      agentSlug: parts[2],
+      source: "x402",
+      path: url.pathname,
+      status: "payment_required",
+      metadata: { amountWei: requirements.accepts[0]?.amountWei, currency: requirements.currency },
+    });
     return sendJson(res, 200, requirements);
   }
 
@@ -93,6 +107,16 @@ async function route(ctx) {
       requester: body.requester,
       orderBook,
     });
+    void trackUsageEvent({
+      eventType: "x402_order_verified",
+      owner: result.requester,
+      agentId: result.agentId,
+      agentSlug: body.agentSlug || body.slug || null,
+      source: "x402",
+      path: url.pathname,
+      status: result.unlocked ? "unlocked" : result.statusName || "not_unlocked",
+      metadata: { orderId: result.orderId, paid: result.paid, settled: result.settled },
+    });
     return sendJson(res, 200, result);
   }
 
@@ -101,15 +125,43 @@ async function route(ctx) {
     const orderId = url.searchParams.get("orderId") || paymentProofOrderId(req);
     if (!orderId) {
       const requirements = await paymentRequirements({ slug, req, registry, deployment });
+      void trackUsageEvent({
+        eventType: "x402_payment_required",
+        agentId: requirements.agent.agentId,
+        agentSlug: slug,
+        source: "x402",
+        path: url.pathname,
+        status: "missing_order_id",
+      });
       return sendPaymentRequired(res, requirements, { reason: "missing_order_id" });
     }
 
     const verification = await verifyOrder({ orderId, slug, orderBook });
     if (!verification.unlocked) {
       const requirements = await paymentRequirements({ slug, req, registry, deployment });
+      void trackUsageEvent({
+        eventType: "x402_payment_required",
+        owner: verification.requester,
+        agentId: verification.agentId || requirements.agent.agentId,
+        agentSlug: slug,
+        source: "x402",
+        path: url.pathname,
+        status: "order_not_fulfilled",
+        metadata: { orderId, orderStatus: verification.statusName },
+      });
       return sendPaymentRequired(res, requirements, { reason: "order_not_fulfilled", verification });
     }
 
+    void trackUsageEvent({
+      eventType: "x402_resource_unlocked",
+      owner: verification.requester,
+      agentId: verification.agentId,
+      agentSlug: slug,
+      source: "x402",
+      path: url.pathname,
+      status: verification.statusName,
+      metadata: { orderId, resultUri: verification.resultUri },
+    });
     return sendJson(res, 200, {
       ok: true,
       unlocked: true,
@@ -139,6 +191,14 @@ async function route(ctx) {
       orderBookSigner,
       orderId: body.orderId,
       resultUri: body.resultUri || `x402://arcpay-somnia/${parts[1]}/${body.orderId}`,
+    });
+    void trackUsageEvent({
+      eventType: "x402_provider_fulfilled",
+      agentSlug: parts[1],
+      source: "x402",
+      path: url.pathname,
+      status: result.statusName || (result.ok ? "fulfilled" : "error"),
+      metadata: { orderId: result.orderId, txs: result.txs || [] },
     });
     return sendJson(res, 200, result);
   }
@@ -363,6 +423,46 @@ function parsePaymentProof(value) {
       return null;
     }
   }
+}
+
+async function trackUsageEvent(input) {
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) return;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const payload = {
+    event_type: clean(input.eventType, 120),
+    owner: cleanNullable(input.owner, 120),
+    agent_id: cleanNullable(input.agentId, 140),
+    agent_slug: cleanNullable(input.agentSlug, 120),
+    source: clean(input.source || "x402", 80),
+    path: cleanNullable(input.path, 300),
+    tool_name: cleanNullable(input.toolName, 120),
+    status: clean(input.status || "ok", 80),
+    tx_hash: cleanNullable(input.txHash, 140),
+    metadata: input.metadata || {},
+  };
+  try {
+    await fetch(`${process.env.SUPABASE_URL}/rest/v1/arcpay_somnia_usage_events`, {
+      method: "POST",
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    // Analytics must never block paid resource delivery.
+  }
+}
+
+function clean(value, max) {
+  return String(value || "unknown").trim().slice(0, max) || "unknown";
+}
+
+function cleanNullable(value, max) {
+  const next = String(value ?? "").trim().slice(0, max);
+  return next || null;
 }
 
 function readDeployment() {

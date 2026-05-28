@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { developerTools, runDeveloperTool } from "@somnia/lib/server/developer-tools";
 import { validateDeveloperKey } from "@somnia/lib/server/developer-keys";
+import { trackUsageEvent } from "@somnia/lib/server/usage";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,11 @@ export async function GET(request: Request) {
   const blocked = await guardRequest(request);
   if (blocked) return blocked;
 
+  await trackUsageEvent({
+    eventType: "mcp_manifest_read",
+    source: "mcp",
+    path: "/api/mcp",
+  });
   return NextResponse.json({
     ok: true,
     service: "arcpay-somnia-remote-mcp",
@@ -46,6 +52,7 @@ export async function POST(request: Request) {
 
   try {
     if (method === "initialize") {
+      await trackMcp(method, "ok");
       return jsonRpcResult(id, {
         protocolVersion: "2024-11-05",
         serverInfo: { name: "arcpay-somnia", version: "0.1.0" },
@@ -54,6 +61,7 @@ export async function POST(request: Request) {
     }
 
     if (method === "tools/list") {
+      await trackMcp(method, "ok");
       return jsonRpcResult(id, { tools: developerTools });
     }
 
@@ -62,6 +70,7 @@ export async function POST(request: Request) {
       const toolName = String(params.name ?? "");
       const args = asRecord(params.arguments ?? params.args);
       const result = await runDeveloperTool(toolName, args);
+      await trackMcp(method, "ok", toolName, args);
       return jsonRpcResult(id, {
         content: [{ type: "text", text: typeof result.body === "string" ? result.body : JSON.stringify(result.body, null, 2) }],
         structuredContent: result.contentType === "application/json" ? result.body : undefined,
@@ -71,6 +80,7 @@ export async function POST(request: Request) {
 
     return jsonRpcError(id, -32601, `Method not found: ${method}`, 404);
   } catch (error) {
+    await trackMcp(method || "unknown", "error");
     return jsonRpcError(id, -32000, error instanceof Error ? error.message : String(error), 400);
   }
 }
@@ -129,4 +139,15 @@ function jsonRpcError(id: JsonRpcRequest["id"], code: number, message: string, s
 
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+async function trackMcp(method: string, status: string, toolName?: string, args: Record<string, unknown> = {}) {
+  await trackUsageEvent({
+    eventType: method === "tools/call" ? "mcp_tool_called" : "mcp_method_called",
+    source: "mcp",
+    path: "/api/mcp",
+    toolName: toolName || method,
+    status,
+    metadata: { method, argKeys: Object.keys(args).slice(0, 20) },
+  });
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createRecord, listRecords } from "@somnia/lib/server/records";
 import { readSession, sessionCookie } from "@somnia/lib/server/session";
+import { trackUsageEvent } from "@somnia/lib/server/usage";
 
 function sessionFromRequest(request: Request) {
   return readSession(request.headers.get("cookie")?.match(new RegExp(`${sessionCookie}=([^;]+)`))?.[1]);
@@ -16,12 +17,24 @@ export async function POST(request: Request) {
   const session = sessionFromRequest(request);
   if (!session) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const body = await request.json();
+  const type = String(body.type ?? "audit");
+  const status = String(body.status ?? "created");
+  const txHash = body.txHash ? String(body.txHash) : undefined;
   const record = await createRecord(session.address, {
-    type: String(body.type ?? "audit"),
+    type,
     title: String(body.title ?? "Untitled"),
-    status: String(body.status ?? "created"),
+    status,
     amount: body.amount ? String(body.amount) : undefined,
-    txHash: body.txHash ? String(body.txHash) : undefined,
+    txHash,
+  });
+  await trackUsageEvent({
+    eventType: "record_created",
+    owner: session.address,
+    source: "app",
+    path: "/api/records",
+    status,
+    txHash,
+    metadata: { recordType: type, title: String(body.title ?? "Untitled").slice(0, 160) },
   });
   return NextResponse.json(record);
 }
