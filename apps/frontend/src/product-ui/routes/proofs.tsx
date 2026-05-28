@@ -32,8 +32,8 @@ const CHECKS: { surface: string; status: Status; evidence: string }[] = [
   { surface: "Frontend", status: "live", evidence: "Next.js product UI builds successfully with Somnia-only wallet/auth/dashboard content." },
   { surface: "Worker", status: "live", evidence: "Azure systemd worker listens to Somnia registry, policy, treasury, order, card, operator, privacy, invoice, risk, and reputation events from the deployed contracts." },
   { surface: "Tests", status: "local", evidence: "Hardhat test suite covers order lifecycle, approvals, emergency pause, weekly limit, cards, claim codes, circuit breakers, oracle, privacy vault, invoice settlement, and reputation reviews." },
-  { surface: "Agent docs", status: "local", evidence: "skill.md and llms.txt describe how AI agents should interact with ArcPay." },
-  { surface: "MCP and CLI", status: "local", evidence: "Repo includes MCP server and arcpay-somnia CLI commands for contracts, wallet, agent IDs, claim hashes, privacy guide, and MCP config." },
+  { surface: "Agent docs", status: "live", evidence: "skill.md, /llms.txt, and /openapi.json describe how AI agents should interact with ArcPay." },
+  { surface: "MCP, CLI, starter kit", status: "live", evidence: "Published npm packages: @arcpaylabs/somnia-cli, @arcpaylabs/somnia-mcp, and @arcpaylabs/somnia-x402-agent-starter." },
 ];
 
 function ProofsPage() {

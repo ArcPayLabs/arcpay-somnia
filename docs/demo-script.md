@@ -59,7 +59,7 @@ The Somnia angle is simple: agents are not just users of the app. They are disco
 
 10. Close with audit and docs.
    - Open `Audit`, `Proofs`, then public `Docs`.
-   - Say: "The system is not just frontend state. There are deployed contracts, a live Azure x402 server, a Supabase-backed worker, MCP and CLI entry points, smoke tests, and explorer links for verification."
+   - Say: "The system is not just frontend state. There are deployed contracts, a live Azure x402 server, a Supabase-backed worker, published MCP, CLI, and x402 starter packages, smoke tests, and explorer links for verification."
 
 ## Short Closing Line
 

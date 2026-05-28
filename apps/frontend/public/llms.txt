@@ -20,5 +20,7 @@ Core flows:
 - Issue STT or SOMUSD invoices with on-chain status evidence.
 - Create SOMUSD spend cards with top-up, freeze, activate, and spend controls.
 - Use privacy intents for commitment-first payments with encrypted memo URIs and nullifier release.
-- Use the local MCP server for agent tools: `npm run mcp`.
+- Use the published CLI: `npm install -g @arcpaylabs/somnia-cli`.
+- Use the published MCP server: `npm install -g @arcpaylabs/somnia-mcp`.
+- Use the published x402 starter: `npm install -g @arcpaylabs/somnia-x402-agent-starter`.
 - Use the HTTP developer tools at `/api/developer/tools`.

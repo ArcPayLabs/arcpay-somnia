@@ -25,6 +25,24 @@ ArcPay Somnia focuses on:
 - treasury spend policy
 - autonomous agent operations through MCP, CLI, OpenAPI, and HTTP tools
 
+## Published Developer Packages
+
+ArcPay Somnia ships public npm packages for builders and agent developers:
+
+```bash
+npm install -g @arcpaylabs/somnia-cli
+npm install -g @arcpaylabs/somnia-mcp
+npm install -g @arcpaylabs/somnia-x402-agent-starter
+```
+
+Use them directly:
+
+```bash
+arcpay-somnia contracts
+arcpay-somnia-mcp
+arcpay-somnia-x402-agent quote research-agent
+```
+
 ## Contracts
 
 | Contract | Purpose |
@@ -74,6 +92,18 @@ npm run mcp
 npm run worker
 npm run worker:once
 npm run x402
+```
+
+Published package equivalents:
+
+```bash
+arcpay-somnia contracts
+arcpay-somnia wallet
+arcpay-somnia agent-id research-agent
+arcpay-somnia privacy-guide
+arcpay-somnia x402-guide
+arcpay-somnia-mcp
+arcpay-somnia-x402-agent quote research-agent
 ```
 
 ## Deploy
@@ -249,7 +279,10 @@ ArcPay includes a Mintlify-ready docs site:
 - `apps/frontend/public/openapi.json` - public OpenAPI-style developer reference served as `/openapi.json`
 - `apps/frontend/public/llms.txt` - agent-readable product context served as `/llms.txt`
 - `apps/frontend/src/app/api/developer/tools` - HTTP wrapper for safe MCP-style developer tools
-- `starter-kits/somnia-x402-agent` - reusable Somnia x402 client starter
+- `@arcpaylabs/somnia-cli` - published CLI for contracts, IDs, guides, smoke paths, and MCP config
+- `@arcpaylabs/somnia-mcp` - published stdio MCP server for Claude Desktop and compatible hosts
+- `@arcpaylabs/somnia-x402-agent-starter` - published reusable Somnia x402 client starter
+- `starter-kits/somnia-x402-agent` - source for the reusable Somnia x402 client starter
 - `examples/privacy-intents` and `examples/agent-reputation` - integration patterns for builders
 
 For Mintlify deployment, connect this repository and use the repo root as the
@@ -288,8 +321,9 @@ Current Somnia build:
 - deploy script added
 - Somnia testnet deployment completed
 - ArcPay-style frontend added under `apps/frontend`
-- MCP server added under `apps/mcp`
-- CLI added under `bin/arcpay-somnia.mjs`
+- MCP server added under `apps/mcp` and published as `@arcpaylabs/somnia-mcp`
+- CLI added under `apps/cli` and published as `@arcpaylabs/somnia-cli`
+- x402 starter kit published as `@arcpaylabs/somnia-x402-agent-starter`
 - x402 server added under `apps/x402-server`
 - Cards402-depth operator controls added
 - on-chain invoice book added and deployed

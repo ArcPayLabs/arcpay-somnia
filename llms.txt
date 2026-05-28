@@ -32,6 +32,12 @@ Important docs:
 
 Agent tooling:
 
+- `npm install -g @arcpaylabs/somnia-cli`
+- `npm install -g @arcpaylabs/somnia-mcp`
+- `npm install -g @arcpaylabs/somnia-x402-agent-starter`
+- `arcpay-somnia contracts`
+- `arcpay-somnia-mcp`
+- `arcpay-somnia-x402-agent quote research-agent`
 - `npm run arcpay -- mcp-config`
 - `npm run mcp`
 - `npm run arcpay -- demo-path`

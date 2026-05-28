@@ -84,6 +84,17 @@ npm run smoke:live
 
 ## CLI Helpers
 
+Published CLI:
+
+```bash
+npm install -g @arcpaylabs/somnia-cli
+arcpay-somnia privacy-commit "invoice-42-secret"
+arcpay-somnia privacy-abi
+arcpay-somnia privacy-guide
+```
+
+Repo-local CLI:
+
 ```bash
 npm run arcpay -- privacy-commit "invoice-42-secret"
 npm run arcpay -- privacy-abi
@@ -98,6 +109,13 @@ The ArcPay Somnia MCP server exposes:
 - `privacy_intent_guide`
 
 Run:
+
+```bash
+npm install -g @arcpaylabs/somnia-mcp
+arcpay-somnia-mcp
+```
+
+Or run from the repo:
 
 ```bash
 npm run mcp

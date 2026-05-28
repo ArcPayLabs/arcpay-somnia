@@ -5,7 +5,7 @@ Stellar/card-specific implementation.
 
 | Cards402 pattern | ArcPay Somnia implementation |
 | --- | --- |
-| MCP server | `apps/mcp/server.mjs` exposes deployment lookup, agent ID derivation, claim hash derivation, and demo path. |
+| MCP server | `apps/mcp/server.mjs` exposes deployment lookup, agent ID derivation, claim hash derivation, and demo path. Published as `@arcpaylabs/somnia-mcp`. |
 | `skill.md` / `llms.txt` | Root files describe how agents, operators, and reviewers should operate the app. |
 | x402 HTTP payment gate | `apps/x402-server/server.mjs` returns real `402 Payment Required` quotes, verifies Somnia order state, and unlocks agent work after fulfillment. |
 | Order state machine | `AgentOrderBook` supports pending, accepted, processing, fulfilled, settled, refunded, and failed. |
@@ -13,7 +13,7 @@ Stellar/card-specific implementation.
 | Time-window policies | `TreasuryPolicy` enforces hourly, daily, weekly, UTC-hour windows, allowlists, emergency pause, and per-order approvals. |
 | Circuit-breaker webhooks | `OperatorControls` tracks per-origin webhook failures and opens a breaker after repeated failures. |
 | Agent claim code onboarding | `OperatorControls` creates and redeems expiring claim codes by hash. |
-| CLI tool | `bin/arcpay-somnia.mjs` supports contracts, wallet, agent ID, claim hash, demo path, and MCP config commands. |
+| CLI tool | `apps/cli/arcpay-somnia.mjs` supports contracts, wallet, agent ID, claim hash, demo path, and MCP config commands. Published as `@arcpaylabs/somnia-cli`. |
 | Card-like spend product | `AgentSpendCardVault` creates SOMUSD-backed virtual cards for agent budgets. |
 | Privacy layer | `SomniaPrivacyVault` creates commitment-based SOMUSD/STT payment intents with encrypted metadata and nullifier release. |
 

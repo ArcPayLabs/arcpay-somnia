@@ -19,8 +19,8 @@ const MODULES = [
   { icon: Gauge, title: "Risk oracle", body: "Quote the live Somnia agent requester deposit and store risk callback evidence for operator review.", href: "/app/oracle" },
   { icon: KeyRound, title: "Wallet auth", body: "Challenge-sign EVM wallets into an ArcPay workspace. Email auth remains optional for team sync.", href: "/sign-in" },
   { icon: ScrollText, title: "Audit mirror", body: "Azure worker indexes contract events into Supabase-backed records for dashboard and CSV export.", href: "/app/audit" },
-  { icon: Terminal, title: "CLI", body: "Derive agent IDs, invoice IDs, claim hashes, privacy commitments, MCP config, and smoke commands.", href: "/proofs" },
-  { icon: BookOpen, title: "MCP and llms.txt", body: "Agent-facing tools and instructions let autonomous clients understand how to operate ArcPay.", href: "/proofs" },
+  { icon: Terminal, title: "Published CLI", body: "Install @arcpaylabs/somnia-cli to derive IDs, print contracts, generate MCP config, and inspect guides.", href: "/proofs" },
+  { icon: BookOpen, title: "MCP, starter kit, llms.txt", body: "Published MCP tools, x402 starter package, OpenAPI, and llms.txt help autonomous clients operate ArcPay.", href: "/proofs" },
 ];
 
 const QUICKSTART = [
