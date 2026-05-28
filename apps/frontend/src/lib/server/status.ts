@@ -121,8 +121,8 @@ async function checkWorkerRecords(): Promise<RuntimeCheck> {
     if (!latest?.created_at) return check("Worker indexing", "unknown", "No indexed records found yet");
 
     const ageMs = Date.now() - new Date(latest.created_at).getTime();
-    const state: HealthState = ageMs < 1000 * 60 * 60 * 6 ? "ok" : "degraded";
-    return check("Worker indexing", state, `Latest ${latest.type ?? "record"} is ${formatAge(ageMs)} old`, `${latest.title ?? "Untitled"} (${latest.status ?? "unknown"})`);
+    const idleNote = ageMs < 1000 * 60 * 60 * 6 ? "" : "; no new indexed events recently";
+    return check("Worker indexing", "ok", `Latest ${latest.type ?? "record"} is ${formatAge(ageMs)} old${idleNote}`, `${latest.title ?? "Untitled"} (${latest.status ?? "unknown"})`);
   } catch (error) {
     return check("Worker indexing", "down", "Worker record check failed", errorMessage(error));
   }
