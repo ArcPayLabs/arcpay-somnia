@@ -15,7 +15,8 @@ Use these resources:
 Core flows:
 
 - Register agents with service endpoints, capability tags, and STT pricing.
-- Sell agent work through HTTP 402 and escrowed Somnia orders.
+- Sell agent work through x402-style HTTP 402 and escrowed Somnia orders.
+- x402 protected resources return `X402-Version`, `X402-Payment-Required`, exact STT requirements, and unlock after retry with `?orderId=...`, `X-ArcPay-Order-Id`, or `X-Payment`.
 - Enforce operator policies before treasury execution.
 - Issue STT or SOMUSD invoices with on-chain status evidence.
 - Create SOMUSD spend cards with top-up, freeze, activate, and spend controls.

@@ -9,6 +9,8 @@ const root = path.resolve(__dirname, "../..");
 const deploymentPath = path.join(root, "deployments", "somnia-testnet.json");
 const STATUS = ["Pending", "Accepted", "Processing", "Fulfilled", "Settled", "Refunded", "Failed"];
 const ZERO = "0x0000000000000000000000000000000000000000";
+const X402_PROTOCOL_VERSION = "1";
+const ARCPAY_X402_SCHEME = "arcpay-somnia-escrow-v1";
 
 const registryAbi = [
   "function agents(bytes32) view returns (address owner,string name,string endpoint,string capabilities,uint256 priceWei,bool active,uint256 createdAt,uint256 updatedAt)",
@@ -55,8 +57,8 @@ export function createX402Server(options = {}) {
 function setCors(res) {
   res.setHeader("access-control-allow-origin", process.env.X402_ALLOWED_ORIGIN || "*");
   res.setHeader("access-control-allow-methods", "GET,POST,OPTIONS");
-  res.setHeader("access-control-allow-headers", "content-type,authorization,x-arcpay-order-id");
-  res.setHeader("access-control-expose-headers", "x-accept-payment");
+  res.setHeader("access-control-allow-headers", "content-type,authorization,x-arcpay-order-id,x-payment,payment");
+  res.setHeader("access-control-expose-headers", "x-accept-payment,x402-version,x402-payment-required,payment-required");
 }
 
 async function route(ctx) {
@@ -96,7 +98,7 @@ async function route(ctx) {
 
   if (parts[0] === "agent" && parts[1] && parts[2] === "work" && req.method === "GET") {
     const slug = parts[1];
-    const orderId = url.searchParams.get("orderId") || req.headers["x-arcpay-order-id"];
+    const orderId = url.searchParams.get("orderId") || paymentProofOrderId(req);
     if (!orderId) {
       const requirements = await paymentRequirements({ slug, req, registry, deployment });
       return sendPaymentRequired(res, requirements, { reason: "missing_order_id" });
@@ -111,7 +113,8 @@ async function route(ctx) {
     return sendJson(res, 200, {
       ok: true,
       unlocked: true,
-      x402Version: "arcpay-somnia-escrow-v1",
+      x402Version: X402_PROTOCOL_VERSION,
+      arcpayScheme: ARCPAY_X402_SCHEME,
       orderId,
       agentSlug: slug,
       result: {
@@ -166,13 +169,17 @@ async function paymentRequirements({ slug, req, registry, deployment }) {
 
   return {
     ok: true,
-    x402Version: "arcpay-somnia-escrow-v1",
+    x402Version: X402_PROTOCOL_VERSION,
+    arcpayScheme: ARCPAY_X402_SCHEME,
+    protocol: "x402",
     status: 402,
     reason: "payment_required",
     network: deployment.network,
+    caip2Network: caip2Network(deployment),
     chainId: deployment.chainId,
     currency: "STT",
     asset: "native",
+    resource: requestUri,
     agent: {
       slug,
       agentId,
@@ -184,15 +191,29 @@ async function paymentRequirements({ slug, req, registry, deployment }) {
     },
     accepts: [{
       scheme: "exact",
+      network: caip2Network(deployment),
+      chainId: deployment.chainId,
+      asset: "native",
+      currency: "STT",
+      maxAmountRequired: agent.priceWei.toString(),
       amountWei: agent.priceWei.toString(),
       amountStt: formatEther(agent.priceWei),
       payTo: deployment.contracts.AgentOrderBook,
+      recipient: deployment.contracts.AgentOrderBook,
+      description: `Pay ${agent.name || slug} for protected Somnia agent work.`,
+      resource: requestUri,
+      mimeType: "application/json",
       contract: "AgentOrderBook",
       action: "createOrder(bytes32,string)",
       calldata,
       args: { agentId, requestUri },
       verificationUrl: `${originFor(req)}/x402/verify`,
       unlockUrl: `${originFor(req)}/agent/${encodeURIComponent(slug)}/work?orderId={orderId}`,
+      paymentProof: {
+        type: "somnia-order-id",
+        header: "X-Payment",
+        acceptedFormats: ["raw orderId", "{\"orderId\":\"0x...\"}", "base64url JSON"],
+      },
     }],
     instructions: [
       "Call AgentOrderBook.createOrder(agentId, requestUri) with msg.value equal to amountWei.",
@@ -282,6 +303,9 @@ async function wait(txPromise) {
 
 function sendPaymentRequired(res, requirements, extra = {}) {
   res.setHeader("X-Accept-Payment", "arcpay-somnia-x402");
+  res.setHeader("X402-Version", X402_PROTOCOL_VERSION);
+  res.setHeader("X402-Payment-Required", encodePaymentRequirements(requirements));
+  res.setHeader("Payment-Required", encodePaymentRequirements(requirements));
   return sendJson(res, 402, { ...requirements, ...extra });
 }
 
@@ -306,6 +330,39 @@ function originFor(req) {
   const host = req.headers?.host || `127.0.0.1:${process.env.X402_SERVER_PORT || "4030"}`;
   const proto = req.headers?.["x-forwarded-proto"] || "http";
   return `${proto}://${host}`;
+}
+
+function caip2Network(deployment) {
+  return `eip155:${deployment.chainId || 50312}`;
+}
+
+function encodePaymentRequirements(requirements) {
+  return Buffer.from(JSON.stringify(requirements, bigintReplacer), "utf8").toString("base64url");
+}
+
+function paymentProofOrderId(req) {
+  const direct = req.headers["x-arcpay-order-id"];
+  if (typeof direct === "string" && direct.trim()) return direct.trim();
+
+  const proof = req.headers["x-payment"] || req.headers.payment;
+  if (typeof proof !== "string" || !proof.trim()) return null;
+  const trimmed = proof.trim();
+  if (trimmed.startsWith("0x")) return trimmed;
+
+  const parsed = parsePaymentProof(trimmed);
+  return typeof parsed?.orderId === "string" && parsed.orderId.trim() ? parsed.orderId.trim() : null;
+}
+
+function parsePaymentProof(value) {
+  try {
+    return JSON.parse(value);
+  } catch {
+    try {
+      return JSON.parse(Buffer.from(value, "base64url").toString("utf8"));
+    } catch {
+      return null;
+    }
+  }
 }
 
 function readDeployment() {

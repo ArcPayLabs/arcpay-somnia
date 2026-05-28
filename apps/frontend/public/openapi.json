@@ -139,7 +139,7 @@
       "get": {
         "tags": ["x402"],
         "summary": "Request protected agent work",
-        "description": "Returns HTTP 402 with payment requirements until a supplied order is fulfilled or settled on Somnia.",
+        "description": "Returns HTTP 402 with x402-style payment requirements until a supplied Somnia order proof is fulfilled or settled.",
         "operationId": "getProtectedAgentWork",
         "parameters": [
           {
@@ -155,6 +155,26 @@
             "name": "orderId",
             "in": "query",
             "required": false,
+            "schema": {
+              "type": "string",
+              "example": "0xabc123..."
+            }
+          },
+          {
+            "name": "X-Payment",
+            "in": "header",
+            "required": false,
+            "description": "Somnia payment proof. Accepts a raw orderId, JSON like {\"orderId\":\"0x...\"}, or base64url JSON.",
+            "schema": {
+              "type": "string",
+              "example": "{\"orderId\":\"0xabc123...\"}"
+            }
+          },
+          {
+            "name": "X-ArcPay-Order-Id",
+            "in": "header",
+            "required": false,
+            "description": "Direct ArcPay order proof header for agents that do not yet produce X-Payment payloads.",
             "schema": {
               "type": "string",
               "example": "0xabc123..."
@@ -696,9 +716,13 @@
         "properties": {
           "ok": { "type": "boolean" },
           "x402Version": { "type": "string" },
+          "arcpayScheme": { "type": "string" },
+          "protocol": { "type": "string", "example": "x402" },
           "network": { "type": "string" },
+          "caip2Network": { "type": "string", "example": "eip155:50312" },
           "chainId": { "type": "integer" },
           "currency": { "type": "string" },
+          "resource": { "type": "string" },
           "agent": { "$ref": "#/components/schemas/Agent" },
           "accepts": {
             "type": "array",
@@ -720,10 +744,22 @@
       "AcceptRequirement": {
         "type": "object",
         "properties": {
+          "scheme": { "type": "string", "example": "exact" },
+          "network": { "type": "string", "example": "eip155:50312" },
+          "chainId": { "type": "integer", "example": 50312 },
+          "asset": { "type": "string", "example": "native" },
+          "currency": { "type": "string", "example": "STT" },
+          "maxAmountRequired": { "type": "string" },
           "amountWei": { "type": "string" },
           "amountStt": { "type": "string" },
           "payTo": { "type": "string" },
+          "recipient": { "type": "string" },
+          "description": { "type": "string" },
+          "resource": { "type": "string" },
+          "mimeType": { "type": "string" },
+          "contract": { "type": "string" },
           "action": { "type": "string" },
+          "calldata": { "type": "string" },
           "args": {
             "type": "object",
             "properties": {
@@ -732,7 +768,18 @@
             }
           },
           "unlockUrl": { "type": "string" },
-          "verificationUrl": { "type": "string" }
+          "verificationUrl": { "type": "string" },
+          "paymentProof": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "example": "somnia-order-id" },
+              "header": { "type": "string", "example": "X-Payment" },
+              "acceptedFormats": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
         }
       },
       "VerifyOrderRequest": {

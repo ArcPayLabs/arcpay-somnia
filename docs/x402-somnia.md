@@ -6,6 +6,13 @@ agent work. The server reads the deployed Somnia `AgentRegistry` and
 state, and only unlocks protected work after the provider fulfills or the
 requester settles the escrowed order.
 
+The implementation follows the x402 shape: protected resource request, HTTP
+`402`, payment requirements, on-chain payment, retry with proof, and unlocked
+resource. On Somnia Testnet the settlement rail is `AgentOrderBook` escrow
+rather than an external stablecoin facilitator, so ArcPay labels the custom
+scheme as `arcpay-somnia-escrow-v1` while still returning `x402Version: "1"`
+and x402-style payment headers.
+
 ## Server
 
 ```bash
@@ -35,10 +42,10 @@ it.
 
 1. An agent is registered on Somnia with `AgentRegistry.registerAgent`.
 2. A client calls `GET /agent/:slug/work`.
-3. If no valid paid order exists, the server returns HTTP `402` with Somnia network metadata, agent ID, exact STT price, calldata, verification URL, and unlock URL.
+3. If no valid paid order exists, the server returns HTTP `402` with `X402-Version`, `X402-Payment-Required`, Somnia network metadata, agent ID, exact STT price, calldata, verification URL, and unlock URL.
 4. The payer signs `createOrder` in their wallet and escrows STT.
 5. The provider fulfills the order.
-6. The payer calls `GET /agent/:slug/work?orderId=...`.
+6. The payer retries with `?orderId=...`, `X-ArcPay-Order-Id`, or `X-Payment: {"orderId":"0x..."}`.
 7. The resource unlocks only if the on-chain order is `Fulfilled` or `Settled`.
 
 The frontend page at `/x402` exposes this flow for operators without requiring
@@ -54,6 +61,37 @@ curl: quote, pay, verify, provider-fulfill, and unlock.
 | `POST /x402/verify` | Verify an on-chain order by `orderId`, optional `agentSlug`, and optional requester. |
 | `GET /agent/:slug/work` | Protected x402 resource. Returns `402` until fulfilled/settled. |
 | `POST /agent/:slug/provider/fulfill` | Provider-side fulfillment using a configured provider key and admin secret. |
+
+## Payment Requirement Shape
+
+The protected endpoint returns:
+
+```json
+{
+  "x402Version": "1",
+  "arcpayScheme": "arcpay-somnia-escrow-v1",
+  "protocol": "x402",
+  "caip2Network": "eip155:50312",
+  "accepts": [
+    {
+      "scheme": "exact",
+      "network": "eip155:50312",
+      "currency": "STT",
+      "maxAmountRequired": "100000000000000",
+      "payTo": "0x...",
+      "action": "createOrder(bytes32,string)",
+      "paymentProof": {
+        "type": "somnia-order-id",
+        "header": "X-Payment"
+      }
+    }
+  ]
+}
+```
+
+This makes ArcPay useful for agent builders today: an agent can discover a
+priced service, pay through Somnia escrow, and retry the HTTP resource with the
+order ID as the payment proof.
 
 ## Funded Verification
 

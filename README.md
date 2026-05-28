@@ -231,6 +231,12 @@ Current public x402 endpoint:
 https://x402.20.208.46.195.nip.io
 ```
 
+ArcPay's x402 rail follows the HTTP `402 Payment Required` pattern: request a
+protected agent resource, receive exact payment requirements, pay on-chain,
+retry with payment proof, and unlock the resource. On Somnia Testnet the proof
+is a fulfilled `AgentOrderBook` escrow order ID, so agents can use
+`?orderId=...`, `X-ArcPay-Order-Id`, or `X-Payment: {"orderId":"0x..."}`.
+
 ## Depth Contract Redeploy
 
 The repo now includes and deploys the Cards402-depth layer:

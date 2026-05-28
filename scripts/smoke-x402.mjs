@@ -87,7 +87,10 @@ try {
     const res = await fetch(`${baseUrl}/agent/${slug}/work`);
     const body = await res.json();
     if (res.status !== 402) throw new Error(`expected 402, got ${res.status}`);
+    if (res.headers.get("x402-version") !== "1") throw new Error("missing x402-version header");
+    if (!res.headers.get("x402-payment-required")) throw new Error("missing encoded payment requirements header");
     if (body.accepts?.[0]?.action !== "createOrder(bytes32,string)") throw new Error("missing payment requirement");
+    if (body.accepts?.[0]?.maxAmountRequired !== body.accepts?.[0]?.amountWei) throw new Error("missing x402 exact amount field");
     return `${body.accepts[0].amountStt} STT quoted`;
   });
 
@@ -136,6 +139,15 @@ try {
     const body = await res.json();
     if (!res.ok || !body.unlocked) throw new Error("resource did not unlock");
     return body.result.evidenceUri;
+  });
+
+  await run("x402 payment proof header unlocks resource", async () => {
+    const res = await fetch(`${baseUrl}/agent/${slug}/work`, {
+      headers: { "x-payment": JSON.stringify({ orderId }) },
+    });
+    const body = await res.json();
+    if (!res.ok || !body.unlocked) throw new Error("header payment proof did not unlock");
+    return body.arcpayScheme;
   });
 
   await run("requester settles after unlock", async () => {
