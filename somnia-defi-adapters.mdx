@@ -1,0 +1,63 @@
+---
+title: "Somnia DeFi Adapters"
+description: "Somnia-native swap, liquidity, and yield adapter map for ArcPay treasury agents."
+---
+
+ArcPay Somnia treats DeFi execution as a policy-bound adapter flow, not a fake
+fill. Operators and agents can prepare route or yield intents, but an action is
+only complete after real Somnia evidence is attached.
+
+## Adapter Map
+
+| Adapter | Role | Execution Mode | Evidence Required |
+| --- | --- | --- | --- |
+| Somnia Exchange | Native swap venue | Wallet-signed route execution | Quote, wallet simulation, tx hash, before/after balance |
+| Somnex | Aggregator, liquidity, and perps venue | Agent-prepared route or strategy intent | Venue quote, position/risk summary, tx hash, risk snapshot |
+| Potion Swap | Testnet DEX candidate | Manual signer or agent handoff | Quote screenshot, pool route, tx hash |
+| Custom Somnia DEX adapter | Builder-owned router from Somnia's DEX tutorial | Contract adapter | Adapter address, quote response, fill transaction hash |
+
+## Swap Flow
+
+1. Operator or agent chooses a venue on `/swaps`.
+2. ArcPay records source asset, target asset, amount, slippage, executor, and venue.
+3. Treasury policy checks run before wallet signing or agent order creation.
+4. Execution happens through the selected venue or a custom adapter.
+5. Audit record is completed only after tx hash and route evidence are attached.
+
+## Yield / Liquidity Flow
+
+1. Operator chooses a strategy on `/yield`: Somnia Exchange LP, Somnex liquidity/perps, Potion Swap LP, or treasury hold.
+2. ArcPay records risk limit, max drawdown, asset, amount, and executor agent.
+3. Operator approval is required before any LP, perps, or strategy action.
+4. Final audit requires venue evidence, tx hash, final balance, and risk snapshot.
+
+## Developer Tools
+
+HTTP developer tool:
+
+```bash
+curl https://arcpay-somnia.vercel.app/api/developer/tools/somnia_defi_adapters
+```
+
+CLI:
+
+```bash
+npm install -g @arcpaylabs/somnia-cli
+arcpay-somnia defi-adapters
+```
+
+MCP:
+
+```text
+Tool: somnia_defi_adapters
+```
+
+## Boundary
+
+ArcPay does not claim an official private Somnia DeFi SDK where one is not
+published. The adapter layer is designed to be honest and useful:
+
+- use live Somnia venues when they expose usable testnet flows
+- use a custom router when building directly from Somnia's DEX tutorial
+- never mark execution done without transaction evidence
+- keep all route and strategy actions inside treasury policy controls

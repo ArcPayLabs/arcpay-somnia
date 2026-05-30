@@ -21,7 +21,9 @@ Core flows:
 - Issue STT or SOMUSD invoices with on-chain status evidence.
 - Create SOMUSD spend cards with top-up, freeze, activate, and spend controls.
 - Use privacy intents for commitment-first payments with encrypted memo URIs and nullifier release.
+- Prepare Somnia Exchange, Somnex, Potion Swap, and custom DEX route/yield intents with venue evidence.
 - Use the published CLI: `npm install -g @arcpaylabs/somnia-cli`.
 - Use the published MCP server: `npm install -g @arcpaylabs/somnia-mcp`.
 - Use the published x402 starter: `npm install -g @arcpaylabs/somnia-x402-agent-starter`.
 - Use the HTTP developer tools at `/api/developer/tools`.
+- Use `somnia_defi_adapters` to list supported Somnia DeFi adapter candidates and required audit evidence.

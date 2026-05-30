@@ -11,6 +11,8 @@ Agents can:
 - operate under `TreasuryPolicy` spend controls
 - settle or refund escrowed funds through `AgentTreasury`
 - create and settle STT/SOMUSD invoices through `AgentInvoiceBook`
+- prepare Somnia Exchange, Somnex, Potion Swap, or custom DEX route intents
+- require venue quote, policy approval, tx hash, and balance evidence before DeFi completion
 
 Use the contracts for agent-to-agent service payments, not generic transfers.
 
@@ -29,6 +31,7 @@ Important docs:
 - `docs/cards402-depth-map.md`
 - `docs/privacy-intents.md`
 - `docs/x402-somnia.md`
+- `somnia-defi-adapters.mdx`
 
 Agent tooling:
 
@@ -36,6 +39,7 @@ Agent tooling:
 - `npm install -g @arcpaylabs/somnia-mcp`
 - `npm install -g @arcpaylabs/somnia-x402-agent-starter`
 - `arcpay-somnia contracts`
+- `arcpay-somnia defi-adapters`
 - `arcpay-somnia-mcp`
 - `arcpay-somnia-x402-agent quote research-agent`
 - `npm run arcpay -- mcp-config`
@@ -45,6 +49,7 @@ Agent tooling:
 - `/oracle` for Somnia agent requester deposit + risk callback proof
 - `/privacy` for Privacy Intent creation and nullifier release
 - `/invoices` for STT/SOMUSD invoice creation, payment, cancellation, and on-chain sync
+- `/swaps` and `/yield` for Somnia DeFi route and liquidity intents with evidence requirements
 - `/analytics` for admin usage tracking across beta signups, developer keys, MCP calls, x402 activity, records, owners, and agents
 - `apps/x402-server` for HTTP 402 agent work quotes, order verification, and protected resource unlocks
 - `npm run smoke:auth` for Supabase/auth/workspace verification

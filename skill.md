@@ -21,6 +21,8 @@ treasury policies.
 - Create and release Privacy Intents with one-time nullifiers.
 - Create, pay, cancel, and sync STT/SOMUSD invoices through `AgentInvoiceBook`.
 - Use the x402 server for HTTP 402 payment-gated agent work.
+- Prepare Somnia Exchange, Somnex, Potion Swap, or custom DEX route/yield intents.
+- Require quote, policy, transaction, and balance evidence before completing DeFi actions.
 - Use the MCP server with `npm run mcp`.
 
 ## Constraints
@@ -42,7 +44,8 @@ treasury policies.
 7. Use `/oracle` for Somnia agent risk proof.
 8. Use `/privacy` for encrypted-metadata payment intents.
 9. Use `/invoices` for contract-backed STT/SOMUSD receivables.
-10. Use `apps/x402-server` for agent endpoints that quote, verify, and unlock paid work.
+10. Use `/swaps` and `/yield` for Somnia DeFi route and strategy evidence.
+11. Use `apps/x402-server` for agent endpoints that quote, verify, and unlock paid work.
 
 ## CLI
 
@@ -55,6 +58,7 @@ npm run arcpay -- invoice-id inv_001
 npm run arcpay -- invoice-guide
 npm run arcpay -- privacy-guide
 npm run arcpay -- x402-guide
+npm run arcpay -- defi-adapters
 npm run arcpay -- privacy-commit "invoice-secret"
 npm run arcpay -- demo-path
 npm run arcpay -- smoke

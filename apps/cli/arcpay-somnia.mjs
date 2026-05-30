@@ -27,6 +27,7 @@ Commands:
   arcpay-somnia privacy-guide          Print builder integration guide
   arcpay-somnia invoice-guide          Print invoice settlement guide
   arcpay-somnia x402-guide             Print x402 HTTP payment gate guide
+  arcpay-somnia defi-adapters          Print Somnia DEX, swap, and yield adapter map
   arcpay-somnia demo-path              Print operator demo steps
   arcpay-somnia smoke                  Print smoke-test commands
   arcpay-somnia mcp-config             Print MCP host config
@@ -109,6 +110,32 @@ try {
       "5. GET /agent/:slug/work?orderId=... unlocks only after Fulfilled or Settled.",
       "",
       "Proof command: npm run smoke:x402",
+    ].join("\n"));
+  } else if (command === "defi-adapters") {
+    console.log([
+      "ArcPay Somnia DeFi Adapters",
+      "",
+      "Somnia Exchange",
+      "- Role: native swap venue",
+      "- Evidence: route quote, wallet simulation, tx hash, before/after balance",
+      "- URL: https://somnia.exchange",
+      "",
+      "Somnex",
+      "- Role: aggregator, liquidity, and perps venue",
+      "- Evidence: venue quote, position/risk summary, tx hash",
+      "- URL: https://somnex.xyz",
+      "",
+      "Potion Swap",
+      "- Role: testnet DEX candidate",
+      "- Evidence: quote screenshot, pool route, tx hash",
+      "- URL: https://potion-swap.xyz",
+      "",
+      "Custom Somnia DEX adapter",
+      "- Role: builder-owned router from Somnia DEX tutorial",
+      "- Evidence: adapter address, quote response, fill tx",
+      "- Docs: https://docs.somnia.network/developer/how-to-guides/advanced/build-a-dex-on-somnia",
+      "",
+      "Policy: ArcPay records route/yield intent first. Completion requires real Somnia transaction evidence.",
     ].join("\n"));
   } else if (command === "demo-path") {
     console.log([

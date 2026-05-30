@@ -21,6 +21,8 @@ ArcPay Somnia focuses on:
 
 - agent discovery
 - agent-to-agent paid work
+- Somnia Exchange, Somnex, Potion Swap, and custom DEX adapter intents
+- policy-bound swap, LP, and yield evidence capture
 - onchain order lifecycle
 - treasury spend policy
 - autonomous agent operations through MCP, CLI, OpenAPI, and HTTP tools
@@ -107,6 +109,7 @@ arcpay-somnia wallet
 arcpay-somnia agent-id research-agent
 arcpay-somnia privacy-guide
 arcpay-somnia x402-guide
+arcpay-somnia defi-adapters
 arcpay-somnia-mcp
 arcpay-somnia-x402-agent quote research-agent
 ```
@@ -168,6 +171,9 @@ Machine-readable deployment metadata lives in
 Privacy Intent builder docs live in `docs/privacy-intents.md`.
 
 x402 payment-gated agent docs live in `docs/x402-somnia.md`.
+
+Somnia DeFi adapter docs live in `somnia-defi-adapters.mdx` and cover Somnia
+Exchange, Somnex, Potion Swap, and custom Somnia DEX adapter evidence flows.
 
 ## Persistence
 
@@ -300,6 +306,7 @@ ArcPay includes a Mintlify-ready docs site:
 - `@arcpaylabs/somnia-x402-agent-starter` - published reusable Somnia x402 client starter
 - `starter-kits/somnia-x402-agent` - source for the reusable Somnia x402 client starter
 - `examples/privacy-intents` and `examples/agent-reputation` - integration patterns for builders
+- `somnia-defi-adapters.mdx` - Somnia DeFi adapter map and evidence requirements
 
 For Mintlify deployment, connect this repository and use the repo root as the
 docs root so `docs.json` can reference the existing app assets and OpenAPI
@@ -325,6 +332,8 @@ demo paths resolve to Somnia infrastructure.
 | `/payments` | Wallet-signed direct STT payments for operator payouts. |
 | `/invoices` | Create, pay, cancel, and sync STT/SOMUSD invoices through `AgentInvoiceBook`. |
 | `/contractors` | Local contractor/agent workforce records. |
+| `/swaps` | Somnia Exchange, Somnex, Potion Swap, and custom DEX route intents with policy and evidence requirements. |
+| `/yield` | Somnia liquidity/yield strategy intents with drawdown, venue, and tx evidence requirements. |
 | `/audit` | Local workflow records and transaction hashes. |
 | `/analytics` | Admin usage analytics for beta signups, developer keys, MCP/tool calls, x402 activity, records, owners, and agents. |
 | `/proofs` | Judge-facing deployment proof and local verification commands. |
@@ -341,6 +350,7 @@ Current Somnia build:
 - MCP server added under `apps/mcp` and published as `@arcpaylabs/somnia-mcp`
 - CLI added under `apps/cli` and published as `@arcpaylabs/somnia-cli`
 - x402 starter kit published as `@arcpaylabs/somnia-x402-agent-starter`
+- Somnia DeFi adapter layer added for Somnia Exchange, Somnex, Potion Swap, and custom DEX routers
 - x402 server added under `apps/x402-server`
 - Cards402-depth operator controls added
 - on-chain invoice book added and deployed

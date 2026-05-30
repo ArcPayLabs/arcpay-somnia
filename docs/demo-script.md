@@ -45,19 +45,24 @@ The Somnia angle is simple: agents are not just users of the app. They are disco
    - Pay or sync it if the wallet has enough testnet balance.
    - Say: "Invoices give agent businesses a normal client-facing workflow while still keeping settlement and status evidence on Somnia."
 
-8. Show privacy intents.
+8. Show Somnia DeFi adapters.
+   - Open `Swaps`, then `Yield`.
+   - Select Somnia Exchange, Somnex, Potion Swap, or a custom DEX adapter.
+   - Say: "ArcPay does not fake a router fill. It creates policy-bound DeFi intents for Somnia venues and requires quote evidence, transaction hash, and balance snapshots before audit completion."
+
+9. Show privacy intents.
    - Open `Privacy`.
    - Create a small STT or SOMUSD shield intent, then show release/cancel/disclosure controls.
    - Say: "Somnia does not have a native privacy layer yet, so ArcPay adds a practical privacy-intent primitive: commitment, encrypted memo URI, delayed recipient release, cancellation, and nullifier evidence."
 
-9. Show cards and contractors.
+10. Show cards and contractors.
    - Open `Cards`.
    - Create or load a SOMUSD card and show freeze/activate/top-up controls.
    - Open `Contractors`.
    - Show allowlist, risk score, and payout batch intent.
    - Say: "Operators can give agents and contributors bounded budgets without exposing the whole treasury."
 
-10. Close with audit and docs.
+11. Close with audit and docs.
    - Open `Audit`, `Proofs`, then public `Docs`.
    - Say: "The system is not just frontend state. There are deployed contracts, a live Azure x402 server, a Supabase-backed worker, published MCP, CLI, and x402 starter packages, smoke tests, and explorer links for verification."
 

@@ -19,7 +19,7 @@ function readDeployment() {
 
 const server = new McpServer({
   name: "arcpay-somnia",
-  version: "0.1.1",
+  version: "0.1.3",
 });
 
 server.tool("get_deployment", "Return Somnia testnet contract addresses and network metadata.", {}, async () => ({
@@ -111,6 +111,20 @@ server.tool("x402_guide", "Return builder instructions for the ArcPay Somnia x40
     }],
   };
 });
+
+server.tool("somnia_defi_adapters", "Return Somnia DEX, swap, liquidity, and yield adapter candidates with required audit evidence.", {}, async () => ({
+  content: [{
+    type: "text",
+    text: [
+      "ArcPay Somnia DeFi Adapters",
+      "Somnia Exchange: native swap venue. Evidence: route quote, wallet simulation, tx hash, before/after balance. URL: https://somnia.exchange",
+      "Somnex: aggregator, liquidity, and perps venue. Evidence: venue quote, position/risk summary, tx hash. URL: https://somnex.xyz",
+      "Potion Swap: testnet DEX candidate. Evidence: quote screenshot, pool route, tx hash. URL: https://potion-swap.xyz",
+      "Custom Somnia DEX adapter: builder-owned router from Somnia DEX tutorial. Evidence: adapter address, quote response, fill tx. Docs: https://docs.somnia.network/developer/how-to-guides/advanced/build-a-dex-on-somnia",
+      "Policy: ArcPay records route/yield intent first. Completion requires real Somnia transaction evidence.",
+    ].join("\n"),
+  }],
+}));
 
 server.tool("demo_path", "Return the operator demo path for ArcPay Somnia.", {}, async () => ({
   content: [{

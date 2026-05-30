@@ -45,6 +45,7 @@
             "group": "Operate",
             "pages": [
               "somnia-contracts",
+              "somnia-defi-adapters",
               "x402-agent-payments",
               "privacy-intents",
               "invoices",

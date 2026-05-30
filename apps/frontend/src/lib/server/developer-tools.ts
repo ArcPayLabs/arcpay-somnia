@@ -20,6 +20,37 @@ const network = {
   currency: "STT",
 };
 
+const somniaDefiAdapters = [
+  {
+    name: "Somnia Exchange",
+    category: "swap",
+    execution: "wallet-signed route execution",
+    url: "https://somnia.exchange",
+    requiredEvidence: ["quote", "wallet simulation", "transaction hash", "before/after balance"],
+  },
+  {
+    name: "Somnex",
+    category: "aggregator-liquidity-perps",
+    execution: "agent-prepared route or strategy intent",
+    url: "https://somnex.xyz",
+    requiredEvidence: ["venue quote", "position/risk summary", "transaction hash", "risk snapshot"],
+  },
+  {
+    name: "Potion Swap",
+    category: "testnet-dex",
+    execution: "manual signer or agent handoff",
+    url: "https://potion-swap.xyz",
+    requiredEvidence: ["quote screenshot", "pool route", "transaction hash"],
+  },
+  {
+    name: "Custom Somnia DEX adapter",
+    category: "builder-router",
+    execution: "contract adapter based on Somnia DEX tutorial",
+    url: "https://docs.somnia.network/developer/how-to-guides/advanced/build-a-dex-on-somnia",
+    requiredEvidence: ["adapter address", "quote response", "fill transaction hash"],
+  },
+];
+
 export const developerTools: ToolDefinition[] = [
   {
     name: "get_deployment",
@@ -59,6 +90,11 @@ export const developerTools: ToolDefinition[] = [
   {
     name: "x402_guide",
     description: "Return integration steps for x402 paid agent endpoints.",
+    inputSchema: { type: "object", properties: {} },
+  },
+  {
+    name: "somnia_defi_adapters",
+    description: "Return Somnia swap, liquidity, and yield adapter candidates with required audit evidence.",
     inputSchema: { type: "object", properties: {} },
   },
   {
@@ -120,6 +156,16 @@ export async function runDeveloperTool(name: string, args: Record<string, unknow
         "4. Provider fulfills the order.",
         "5. GET /agent/:slug/work?orderId=... unlocks after Fulfilled or Settled.",
       ].join("\n"));
+    case "somnia_defi_adapters":
+      return json({
+        network,
+        adapters: somniaDefiAdapters,
+        policy: [
+          "No adapter may mark execution complete without a Somnia tx hash or venue response.",
+          "Every route must carry max slippage, executor, asset pair, and before/after balance evidence.",
+          "Yield and LP intents must record drawdown limits and risk notes before wallet signing.",
+        ],
+      });
     case "starter_kit":
       return json({
         files: [

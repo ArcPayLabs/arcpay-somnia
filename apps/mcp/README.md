@@ -34,6 +34,7 @@ Restart Claude Desktop after editing the config.
 - `privacy_intent_guide`
 - `invoice_guide`
 - `x402_guide`
+- `somnia_defi_adapters`
 - `demo_path`
 - `smoke_commands`
 

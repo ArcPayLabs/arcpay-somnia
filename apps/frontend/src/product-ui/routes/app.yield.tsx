@@ -8,16 +8,44 @@ import { writeRecord } from "@somnia/lib/somnia";
 
 export const Route = { options: { component: YieldRoute } };
 
+const strategies = [
+  {
+    name: "Somnia Exchange LP",
+    asset: "STT/SOMUSD",
+    mode: "liquidity provision intent",
+    risk: "impermanent loss, pool depth, fee volatility",
+  },
+  {
+    name: "Somnex liquidity / perps risk",
+    asset: "STT, SOMUSD",
+    mode: "agent-prepared allocation with venue evidence",
+    risk: "leverage, funding, liquidation, venue liquidity",
+  },
+  {
+    name: "Potion Swap LP",
+    asset: "testnet pool pair",
+    mode: "manual signer LP intent",
+    risk: "experimental pool contracts and shallow liquidity",
+  },
+  {
+    name: "Treasury hold / no-yield",
+    asset: "STT or SOMUSD",
+    mode: "capital preservation policy",
+    risk: "opportunity cost only",
+  },
+];
+
 function YieldRoute() {
-  const [form, setForm] = useState({ asset: "SOMUSD", amount: "10", target: "low-risk treasury yield", maxDrawdown: "2", agent: "yield-strategy-agent" });
-  const [message, setMessage] = useState("Somnia yield is represented as governed strategy intent until a stable vault adapter is selected.");
+  const [form, setForm] = useState({ strategy: "Somnia Exchange LP", asset: "SOMUSD", amount: "10", target: "policy-bound treasury yield", maxDrawdown: "2", agent: "yield-strategy-agent" });
+  const [message, setMessage] = useState("Somnia yield is handled as a governed strategy intent: route, risk, tx hash, and post-action balances are required before audit completion.");
 
   function saveIntent() {
-    writeRecord({ id: crypto.randomUUID(), type: "audit", title: `Yield intent ${form.amount} ${form.asset}`, amount: `${form.amount} ${form.asset}`, status: "strategy_intent_saved" });
-    setMessage("Yield intent saved. Convert it into an escrowed strategy order when an adapter is selected.");
+    writeRecord({ id: crypto.randomUUID(), type: "audit", title: `${form.strategy} yield intent ${form.amount} ${form.asset}`, amount: `${form.amount} ${form.asset}`, status: "somnia_yield_intent_saved" });
+    setMessage("Somnia strategy intent saved. Next step: collect venue evidence, pass policy, and attach execution tx before marking it live.");
   }
 
   const guardrails = [
+    { label: "Strategy", value: form.strategy },
     { label: "Asset", value: form.asset },
     { label: "Amount", value: form.amount },
     { label: "Risk limit", value: `${form.maxDrawdown}% max drawdown` },
@@ -26,9 +54,9 @@ function YieldRoute() {
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={TrendingUp} eyebrow="Yield strategy" title="Agent-managed yield intents" description="Prepare policy-approved treasury strategy requests for Somnia agents. This page records governed intent and risk boundaries until a production-grade vault adapter is selected." />
+      <PageHeader icon={TrendingUp} eyebrow="Somnia treasury strategy" title="Yield and liquidity adapters" description="Prepare policy-approved liquidity and yield requests for Somnia Exchange, Somnex, Potion Swap, or a no-yield capital-preservation path." />
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <StatCard icon={TrendingUp} label="Strategy" value="Intent" hint="No simulated APY" />
+        <StatCard icon={TrendingUp} label="Strategy" value={form.strategy} hint="Evidence required" />
         <StatCard icon={ShieldCheck} label="Policy" value="Required" hint="Spend controls first" />
         <StatCard icon={WalletCards} label="Asset" value={form.asset} hint="Treasury asset" />
         <StatCard icon={Bot} label="Agent" value="Ready" hint={form.agent} emphasis />
@@ -38,10 +66,16 @@ function YieldRoute() {
           {Object.entries(form).map(([key, value]) => (
             <label key={key} className="block">
               <span className="text-sm font-medium capitalize">{key}</span>
-              <input className="mt-1.5 h-11 w-full rounded-xl border border-border bg-background px-3" value={value} onChange={(event) => setForm({ ...form, [key]: event.target.value })} />
+              {key === "strategy" ? (
+                <select className="mt-1.5 h-11 w-full rounded-xl border border-border bg-background px-3" value={value} onChange={(event) => setForm({ ...form, [key]: event.target.value })}>
+                  {strategies.map((strategy) => <option key={strategy.name}>{strategy.name}</option>)}
+                </select>
+              ) : (
+                <input className="mt-1.5 h-11 w-full rounded-xl border border-border bg-background px-3" value={value} onChange={(event) => setForm({ ...form, [key]: event.target.value })} />
+              )}
             </label>
           ))}
-          <button className="h-12 rounded-xl bg-primary px-4 font-semibold text-primary-foreground" type="submit">Save yield intent</button>
+          <button className="h-12 rounded-xl bg-primary px-4 font-semibold text-primary-foreground" type="submit">Save Somnia strategy intent</button>
           <div className="rounded-xl border border-border bg-muted p-3 text-sm text-muted-foreground">{message}</div>
         </form>
         <div className="space-y-4">
@@ -51,10 +85,10 @@ function YieldRoute() {
             </div>
             <div className="mt-5 space-y-3">
               {[
-                "Record target asset, amount, risk boundary, and executor agent.",
-                "Evaluate the intent against workspace policy and emergency pause.",
+                "Select Somnia venue, asset, risk limit, and executor agent.",
+                "Evaluate against policy, emergency pause, and drawdown limits.",
                 "Create an escrowed strategy order only after operator approval.",
-                "Attach a Somnia vault adapter once reliable testnet liquidity is selected.",
+                "Attach quote, LP/position evidence, tx hash, and final balance snapshot.",
               ].map((step, index) => (
                 <div key={step} className="flex gap-3 rounded-2xl bg-muted/40 p-3 text-sm">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">{index + 1}</span>
@@ -62,6 +96,18 @@ function YieldRoute() {
                 </div>
               ))}
             </div>
+          </div>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            {strategies.map((strategy) => (
+              <article className="rounded-2xl border border-border bg-card p-5" key={strategy.name}>
+                <h2 className="text-lg font-semibold">{strategy.name}</h2>
+                <p className="mt-2 text-sm text-muted-foreground">{strategy.mode}</p>
+                <dl className="mt-4 space-y-2 text-sm">
+                  <div><dt className="font-medium">Assets</dt><dd className="text-muted-foreground">{strategy.asset}</dd></div>
+                  <div><dt className="font-medium">Risk checks</dt><dd className="text-muted-foreground">{strategy.risk}</dd></div>
+                </dl>
+              </article>
+            ))}
           </div>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {guardrails.map((item) => (

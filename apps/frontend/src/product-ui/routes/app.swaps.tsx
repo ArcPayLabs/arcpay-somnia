@@ -8,27 +8,59 @@ import { writeRecord } from "@somnia/lib/somnia";
 
 export const Route = { options: { component: SwapsRoute } };
 
+const venues = [
+  {
+    name: "Somnia Exchange",
+    role: "native swap venue",
+    mode: "wallet execution",
+    evidence: "route quote, wallet simulation, tx hash",
+    url: "https://somnia.exchange",
+  },
+  {
+    name: "Somnex",
+    role: "aggregator / liquidity / perps venue",
+    mode: "agent-prepared route intent",
+    evidence: "venue quote, position/risk evidence, tx hash",
+    url: "https://somnex.xyz",
+  },
+  {
+    name: "Potion Swap",
+    role: "testnet DEX candidate",
+    mode: "manual signer execution",
+    evidence: "quote screenshot, pool route, tx hash",
+    url: "https://potion-swap.xyz",
+  },
+  {
+    name: "Custom Somnia DEX adapter",
+    role: "builder-owned router from Somnia DEX tutorial",
+    mode: "contract adapter",
+    evidence: "adapter address, quote response, fill tx",
+    url: "https://docs.somnia.network/developer/how-to-guides/advanced/build-a-dex-on-somnia",
+  },
+];
+
 function SwapsRoute() {
-  const [form, setForm] = useState({ from: "STT", to: "SOMUSD", amount: "1", maxSlippage: "0.5", agent: "treasury-router" });
-  const [message, setMessage] = useState("Somnia swap routing is modeled as policy-ready intents until a stable router adapter is selected.");
+  const [form, setForm] = useState({ from: "STT", to: "SOMUSD", amount: "1", maxSlippage: "0.5", venue: "Somnia Exchange", agent: "treasury-router" });
+  const [message, setMessage] = useState("Select a Somnia venue, bind the route to policy, then attach quote and transaction evidence before marking it executed.");
 
   function saveIntent() {
-    writeRecord({ id: crypto.randomUUID(), type: "audit", title: `Swap intent ${form.amount} ${form.from} to ${form.to}`, amount: `${form.amount} ${form.from}`, status: "intent_saved" });
-    setMessage("Swap intent saved. Convert this into an escrowed agent order for execution.");
+    writeRecord({ id: crypto.randomUUID(), type: "audit", title: `${form.venue} swap intent ${form.amount} ${form.from} to ${form.to}`, amount: `${form.amount} ${form.from}`, status: "somnia_route_intent_saved" });
+    setMessage("Somnia route intent saved. Next step: collect venue quote evidence, pass policy, then execute with wallet or agent order.");
   }
 
   const reviewItems = [
     { label: "Source asset", value: form.from },
     { label: "Target asset", value: form.to },
+    { label: "Venue", value: form.venue },
     { label: "Max slippage", value: `${form.maxSlippage}%` },
     { label: "Executor", value: form.agent },
   ];
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={ArrowLeftRight} eyebrow="Treasury routing" title="Swap intents" description="Prepare policy-checked Somnia route intents that can be handed to an agent executor or future Somnia router adapter without pretending a fill already happened." />
+      <PageHeader icon={ArrowLeftRight} eyebrow="Somnia DeFi routing" title="Swap and route adapters" description="Prepare policy-checked route intents for Somnia Exchange, Somnex, Potion Swap, or a custom Somnia DEX adapter, then attach quote and tx evidence before audit." />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <StatCard icon={RouteIcon} label="Route type" value="Intent" hint="No simulated fills" />
+        <StatCard icon={RouteIcon} label="Venue" value={form.venue} hint="Somnia adapter" />
         <StatCard icon={ShieldCheck} label="Policy" value="Required" hint="Before execution" />
         <StatCard icon={Bot} label="Executor" value={form.agent} hint="Agent order ready" emphasis />
       </div>
@@ -37,10 +69,16 @@ function SwapsRoute() {
           {Object.entries(form).map(([key, value]) => (
             <label key={key} className="block">
               <span className="text-sm font-medium capitalize">{key}</span>
-              <input className="mt-1.5 h-11 w-full rounded-xl border border-border bg-background px-3" value={value} onChange={(event) => setForm({ ...form, [key]: event.target.value })} />
+              {key === "venue" ? (
+                <select className="mt-1.5 h-11 w-full rounded-xl border border-border bg-background px-3" value={value} onChange={(event) => setForm({ ...form, [key]: event.target.value })}>
+                  {venues.map((venue) => <option key={venue.name}>{venue.name}</option>)}
+                </select>
+              ) : (
+                <input className="mt-1.5 h-11 w-full rounded-xl border border-border bg-background px-3" value={value} onChange={(event) => setForm({ ...form, [key]: event.target.value })} />
+              )}
             </label>
           ))}
-          <button className="h-12 rounded-xl bg-primary px-4 font-semibold text-primary-foreground" type="submit">Save swap intent</button>
+          <button className="h-12 rounded-xl bg-primary px-4 font-semibold text-primary-foreground" type="submit">Save Somnia route intent</button>
           <div className="rounded-xl border border-border bg-muted p-3 text-sm text-muted-foreground">{message}</div>
         </form>
         <div className="space-y-4">
@@ -50,10 +88,10 @@ function SwapsRoute() {
             </div>
             <div className="mt-5 space-y-3">
               {[
-                "Create route intent with amount, assets, slippage, and executor.",
-                "Run policy checks before any wallet signature or agent handoff.",
-                "Convert approved intent into an escrowed agent order.",
-                "Attach a Somnia router adapter when a production-grade route source is selected.",
+                "Choose a Somnia venue and capture route quote evidence.",
+                "Run workspace policy, slippage, and emergency-pause checks before signing.",
+                "Create an escrowed agent order when an autonomous executor is used.",
+                "Attach fill tx hash, venue response, and final balances to the audit record.",
               ].map((step, index) => (
                 <div key={step} className="flex gap-3 rounded-2xl bg-muted/40 p-3 text-sm">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">{index + 1}</span>
@@ -61,6 +99,19 @@ function SwapsRoute() {
                 </div>
               ))}
             </div>
+          </div>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            {venues.map((venue) => (
+              <article className="rounded-2xl border border-border bg-card p-5" key={venue.name}>
+                <h2 className="text-lg font-semibold">{venue.name}</h2>
+                <p className="mt-2 text-sm text-muted-foreground">{venue.role}</p>
+                <dl className="mt-4 space-y-2 text-sm">
+                  <div><dt className="font-medium">Mode</dt><dd className="text-muted-foreground">{venue.mode}</dd></div>
+                  <div><dt className="font-medium">Evidence</dt><dd className="text-muted-foreground">{venue.evidence}</dd></div>
+                </dl>
+                <a className="mt-4 inline-flex text-sm font-semibold text-primary" href={venue.url} target="_blank" rel="noreferrer">Open venue</a>
+              </article>
+            ))}
           </div>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {reviewItems.map((item) => (

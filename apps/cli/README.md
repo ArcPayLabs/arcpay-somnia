@@ -20,6 +20,7 @@ arcpay-somnia privacy-commit "invoice-secret"
 arcpay-somnia privacy-guide
 arcpay-somnia invoice-guide
 arcpay-somnia x402-guide
+arcpay-somnia defi-adapters
 arcpay-somnia demo-path
 arcpay-somnia smoke
 arcpay-somnia mcp-config
