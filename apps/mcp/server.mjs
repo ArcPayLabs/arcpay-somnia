@@ -117,11 +117,12 @@ server.tool("somnia_defi_adapters", "Return Somnia DEX, swap, liquidity, and yie
     type: "text",
     text: [
       "ArcPay Somnia DeFi Adapters",
+      "dreamDEX CLOB: fully on-chain spot CLOB with zero maker/taker fees, USDso settlement, REST/WebSocket/CLI/CCXT access. Evidence: market quote, pool address, signed order tx hash, order/fill status. Docs: https://docs.dreamdex.io/ld25g222WKDrLlJMcR41",
       "Somnia Exchange: native swap venue. Evidence: route quote, wallet simulation, tx hash, before/after balance. URL: https://somnia.exchange",
       "Somnex: aggregator, liquidity, and perps venue. Evidence: venue quote, position/risk summary, tx hash. URL: https://somnex.xyz",
       "Potion Swap: testnet DEX candidate. Evidence: quote screenshot, pool route, tx hash. URL: https://potion-swap.xyz",
       "Custom Somnia DEX adapter: builder-owned router from Somnia DEX tutorial. Evidence: adapter address, quote response, fill tx. Docs: https://docs.somnia.network/developer/how-to-guides/advanced/build-a-dex-on-somnia",
-      "Policy: ArcPay records route/yield intent first. Completion requires real Somnia transaction evidence.",
+      "Policy: ArcPay records route/yield intent first. Completion requires real Somnia transaction evidence. dreamDEX HTTP API responses are quote/build evidence, not execution proof without a signed tx.",
     ].join("\n"),
   }],
 }));

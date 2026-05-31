@@ -115,6 +115,13 @@ try {
     console.log([
       "ArcPay Somnia DeFi Adapters",
       "",
+      "dreamDEX CLOB",
+      "- Role: fully on-chain central limit order book with zero maker/taker fees",
+      "- Execution: REST/CLI market discovery plus wallet-signed Somnia transaction",
+      "- Evidence: market quote, pool address, signed order tx hash, order/fill status, before/after balance",
+      "- Docs: https://docs.dreamdex.io/ld25g222WKDrLlJMcR41",
+      "- Testnet pools: SOMI/USDso 0x259fD6559214dd5aD3752322426eA9F9fABEFff4, WBTC/USDso 0x3605f28aA7C50e7441211e77Cb0762d49539326C, WETH/USDso 0xD180195da5459C7a0DEA188ed61216ec43682b50",
+      "",
       "Somnia Exchange",
       "- Role: native swap venue",
       "- Evidence: route quote, wallet simulation, tx hash, before/after balance",
@@ -135,7 +142,7 @@ try {
       "- Evidence: adapter address, quote response, fill tx",
       "- Docs: https://docs.somnia.network/developer/how-to-guides/advanced/build-a-dex-on-somnia",
       "",
-      "Policy: ArcPay records route/yield intent first. Completion requires real Somnia transaction evidence.",
+      "Policy: ArcPay records route/yield intent first. Completion requires real Somnia transaction evidence. dreamDEX HTTP API responses are quote/build evidence, not execution proof without a signed tx.",
     ].join("\n"));
   } else if (command === "demo-path") {
     console.log([

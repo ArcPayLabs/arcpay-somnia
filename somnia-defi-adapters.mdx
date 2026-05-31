@@ -11,6 +11,7 @@ only complete after real Somnia evidence is attached.
 
 | Adapter | Role | Execution Mode | Evidence Required |
 | --- | --- | --- | --- |
+| dreamDEX CLOB | Fully on-chain central limit order book | REST/CLI market discovery plus wallet-signed Somnia transaction | Market quote, pool address, signed order tx hash, order/fill status, before/after balance |
 | Somnia Exchange | Native swap venue | Wallet-signed route execution | Quote, wallet simulation, tx hash, before/after balance |
 | Somnex | Aggregator, liquidity, and perps venue | Agent-prepared route or strategy intent | Venue quote, position/risk summary, tx hash, risk snapshot |
 | Potion Swap | Testnet DEX candidate | Manual signer or agent handoff | Quote screenshot, pool route, tx hash |
@@ -26,7 +27,7 @@ only complete after real Somnia evidence is attached.
 
 ## Yield / Liquidity Flow
 
-1. Operator chooses a strategy on `/yield`: Somnia Exchange LP, Somnex liquidity/perps, Potion Swap LP, or treasury hold.
+1. Operator chooses a strategy on `/yield`: dreamDEX maker yield, Somnia Exchange LP, Somnex liquidity/perps, Potion Swap LP, or treasury hold.
 2. ArcPay records risk limit, max drawdown, asset, amount, and executor agent.
 3. Operator approval is required before any LP, perps, or strategy action.
 4. Final audit requires venue evidence, tx hash, final balance, and risk snapshot.
@@ -63,6 +64,7 @@ Tool: somnia_defi_adapters
 ArcPay does not claim an official private Somnia DeFi SDK where one is not
 published. The adapter layer is designed to be honest and useful:
 
+- use dreamDEX's documented REST/CLI/contract flow for CLOB market discovery and signed order transactions
 - use live Somnia venues when they expose usable testnet flows
 - use a custom router when building directly from Somnia's DEX tutorial
 - never mark execution done without transaction evidence
@@ -70,6 +72,10 @@ published. The adapter layer is designed to be honest and useful:
 
 ## Source References
 
+- dreamDEX docs: https://docs.dreamdex.io/ld25g222WKDrLlJMcR41
+- dreamDEX quick start: https://docs.dreamdex.io/ld25g222WKDrLlJMcR41/welcome/quick-start.md
+- dreamDEX contracts: https://docs.dreamdex.io/ld25g222WKDrLlJMcR41/developers/contracts.md
+- dreamDEX contract specs and testnet pools: https://docs.dreamdex.io/ld25g222WKDrLlJMcR41/trading/readme-1/contract-specifications.md
 - Somnia network information and faucet: https://docs.somnia.network/developer/network-info
 - Somnia DEX tutorial: https://docs.somnia.network/developer/tutorials/build-a-dex-on-somnia
 - Somnia MCP transaction tooling: https://somniamcp.xyz/mcp/

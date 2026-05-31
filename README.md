@@ -21,7 +21,7 @@ ArcPay Somnia focuses on:
 
 - agent discovery
 - agent-to-agent paid work
-- Somnia Exchange, Somnex, Potion Swap, and custom DEX adapter intents
+- dreamDEX CLOB, Somnia Exchange, Somnex, Potion Swap, and custom DEX adapter intents
 - policy-bound swap, LP, and yield evidence capture
 - onchain order lifecycle
 - treasury spend policy
@@ -172,8 +172,8 @@ Privacy Intent builder docs live in `docs/privacy-intents.md`.
 
 x402 payment-gated agent docs live in `docs/x402-somnia.md`.
 
-Somnia DeFi adapter docs live in `somnia-defi-adapters.mdx` and cover Somnia
-Exchange, Somnex, Potion Swap, and custom Somnia DEX adapter evidence flows.
+Somnia DeFi adapter docs live in `somnia-defi-adapters.mdx` and cover dreamDEX
+CLOB, Somnia Exchange, Somnex, Potion Swap, and custom Somnia DEX adapter evidence flows.
 
 ## Persistence
 
@@ -332,8 +332,8 @@ demo paths resolve to Somnia infrastructure.
 | `/payments` | Wallet-signed direct STT payments for operator payouts. |
 | `/invoices` | Create, pay, cancel, and sync STT/SOMUSD invoices through `AgentInvoiceBook`. |
 | `/contractors` | Local contractor/agent workforce records. |
-| `/swaps` | Somnia Exchange, Somnex, Potion Swap, and custom DEX route intents with policy and evidence requirements. |
-| `/yield` | Somnia liquidity/yield strategy intents with drawdown, venue, and tx evidence requirements. |
+| `/swaps` | dreamDEX CLOB, Somnia Exchange, Somnex, Potion Swap, and custom DEX route intents with policy and evidence requirements. |
+| `/yield` | dreamDEX maker yield plus Somnia liquidity/yield strategy intents with drawdown, venue, and tx evidence requirements. |
 | `/audit` | Local workflow records and transaction hashes. |
 | `/analytics` | Admin usage analytics for beta signups, developer keys, MCP/tool calls, x402 activity, records, owners, and agents. |
 | `/proofs` | Judge-facing deployment proof and local verification commands. |
@@ -350,7 +350,7 @@ Current Somnia build:
 - MCP server added under `apps/mcp` and published as `@arcpaylabs/somnia-mcp`
 - CLI added under `apps/cli` and published as `@arcpaylabs/somnia-cli`
 - x402 starter kit published as `@arcpaylabs/somnia-x402-agent-starter`
-- Somnia DeFi adapter layer added for Somnia Exchange, Somnex, Potion Swap, and custom DEX routers
+- Somnia DeFi adapter layer added for dreamDEX CLOB, Somnia Exchange, Somnex, Potion Swap, and custom DEX routers
 - x402 server added under `apps/x402-server`
 - Cards402-depth operator controls added
 - on-chain invoice book added and deployed

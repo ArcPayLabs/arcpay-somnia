@@ -2,6 +2,22 @@ import { NextResponse } from "next/server";
 
 const adapters = [
   {
+    name: "dreamDEX CLOB",
+    category: "onchain-clob",
+    state: "docs-live",
+    execution: "REST/CLI market discovery plus wallet-signed Somnia transaction",
+    url: "https://docs.dreamdex.io/ld25g222WKDrLlJMcR41",
+    apiDocs: "https://docs.dreamdex.io/ld25g222WKDrLlJMcR41/developers/http-api.md",
+    contractDocs: "https://docs.dreamdex.io/ld25g222WKDrLlJMcR41/developers/contracts.md",
+    tradingDocs: "https://docs.dreamdex.io/ld25g222WKDrLlJMcR41/trading/trading.md",
+    testnetPools: {
+      "SOMI/USDso": "0x259fD6559214dd5aD3752322426eA9F9fABEFff4",
+      "WBTC/USDso": "0x3605f28aA7C50e7441211e77Cb0762d49539326C",
+      "WETH/USDso": "0xD180195da5459C7a0DEA188ed61216ec43682b50",
+    },
+    evidence: ["market quote", "pool address", "signed order transaction hash", "order/fill status", "before/after balance"],
+  },
+  {
     name: "Somnia Exchange",
     category: "native-swap",
     state: "evidence-gated",
@@ -43,13 +59,13 @@ export async function GET() {
     chain: "somnia-testnet",
     chainId: 50312,
     mode: "policy-bound-defi-adapters",
-    boundary: "ArcPay records and enforces DeFi intents. Completion requires a real Somnia transaction hash or venue response.",
+    boundary: "ArcPay records and enforces DeFi intents. Completion requires a real Somnia transaction hash or venue response. dreamDEX HTTP API responses are quote/build evidence, not completion evidence without a signed tx.",
     adapters,
     developerTools: {
       http: "/api/developer/tools/somnia_defi_adapters",
       mcp: "somnia_defi_adapters",
       cli: "arcpay-somnia defi-adapters",
     },
-    nextProofTarget: "Attach a live Somnia DEX quote and tx hash to an ArcPay audit record from /swaps or /yield.",
+    nextProofTarget: "Attach a dreamDEX market quote, pool address, signed order tx hash, and fill/order status to an ArcPay audit record from /swaps or /yield.",
   });
 }

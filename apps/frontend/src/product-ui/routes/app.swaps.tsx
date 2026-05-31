@@ -10,6 +10,13 @@ export const Route = { options: { component: SwapsRoute } };
 
 const venues = [
   {
+    name: "dreamDEX CLOB",
+    role: "fully on-chain central limit order book",
+    mode: "REST/CLI quote plus wallet-signed Somnia transaction",
+    evidence: "market quote, pool address, signed order tx hash, fill/order status",
+    url: "https://docs.dreamdex.io/ld25g222WKDrLlJMcR41/welcome/quick-start",
+  },
+  {
     name: "Somnia Exchange",
     role: "native swap venue",
     mode: "wallet execution",
@@ -40,7 +47,7 @@ const venues = [
 ];
 
 function SwapsRoute() {
-  const [form, setForm] = useState({ from: "STT", to: "SOMUSD", amount: "1", maxSlippage: "0.5", venue: "Somnia Exchange", agent: "treasury-router" });
+  const [form, setForm] = useState({ from: "SOMI", to: "USDso", amount: "1", maxSlippage: "0.5", venue: "dreamDEX CLOB", agent: "treasury-router" });
   const [message, setMessage] = useState("Select a Somnia venue, bind the route to policy, then attach quote and transaction evidence before marking it executed.");
 
   function saveIntent() {
@@ -58,7 +65,7 @@ function SwapsRoute() {
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={ArrowLeftRight} eyebrow="Somnia DeFi routing" title="Swap and route adapters" description="Prepare policy-checked route intents for Somnia Exchange, Somnex, Potion Swap, or a custom Somnia DEX adapter, then attach quote and tx evidence before audit." />
+      <PageHeader icon={ArrowLeftRight} eyebrow="Somnia DeFi routing" title="Swap and route adapters" description="Prepare policy-checked route intents for dreamDEX CLOB, Somnia Exchange, Somnex, Potion Swap, or a custom Somnia DEX adapter, then attach quote and tx evidence before audit." />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <StatCard icon={RouteIcon} label="Venue" value={form.venue} hint="Somnia adapter" />
         <StatCard icon={ShieldCheck} label="Policy" value="Required" hint="Before execution" />

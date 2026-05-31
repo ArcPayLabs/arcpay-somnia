@@ -59,7 +59,7 @@
       "get": {
         "tags": ["Status"],
         "summary": "Check Somnia DeFi adapter status",
-        "description": "Returns the current Somnia Exchange, Somnex, Potion Swap, and custom DEX adapter map with the evidence required before ArcPay marks an action complete.",
+        "description": "Returns the current dreamDEX CLOB, Somnia Exchange, Somnex, Potion Swap, and custom DEX adapter map with the evidence required before ArcPay marks an action complete.",
         "operationId": "getSomniaDefiStatus",
         "responses": {
           "200": {

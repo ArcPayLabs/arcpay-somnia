@@ -22,6 +22,15 @@ const network = {
 
 const somniaDefiAdapters = [
   {
+    name: "dreamDEX CLOB",
+    category: "onchain-clob",
+    execution: "REST/CLI market discovery plus wallet-signed Somnia transaction",
+    url: "https://docs.dreamdex.io/ld25g222WKDrLlJMcR41",
+    apiDocs: "https://docs.dreamdex.io/ld25g222WKDrLlJMcR41/developers/http-api.md",
+    contractDocs: "https://docs.dreamdex.io/ld25g222WKDrLlJMcR41/developers/contracts.md",
+    requiredEvidence: ["market quote", "pool address", "signed order transaction hash", "order/fill status", "before/after balance"],
+  },
+  {
     name: "Somnia Exchange",
     category: "swap",
     execution: "wallet-signed route execution",
@@ -162,6 +171,7 @@ export async function runDeveloperTool(name: string, args: Record<string, unknow
         adapters: somniaDefiAdapters,
         policy: [
           "No adapter may mark execution complete without a Somnia tx hash or venue response.",
+          "dreamDEX integration must use documented market discovery plus wallet-signed order/vault transactions; HTTP API alone is not execution proof.",
           "Every route must carry max slippage, executor, asset pair, and before/after balance evidence.",
           "Yield and LP intents must record drawdown limits and risk notes before wallet signing.",
         ],

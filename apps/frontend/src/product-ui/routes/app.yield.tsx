@@ -10,6 +10,12 @@ export const Route = { options: { component: YieldRoute } };
 
 const strategies = [
   {
+    name: "dreamDEX maker yield",
+    asset: "USDso",
+    mode: "resting CLOB order / market-maker intent",
+    risk: "inventory risk, price drift, pool depth, order cancellation discipline",
+  },
+  {
     name: "Somnia Exchange LP",
     asset: "STT/SOMUSD",
     mode: "liquidity provision intent",
@@ -36,7 +42,7 @@ const strategies = [
 ];
 
 function YieldRoute() {
-  const [form, setForm] = useState({ strategy: "Somnia Exchange LP", asset: "SOMUSD", amount: "10", target: "policy-bound treasury yield", maxDrawdown: "2", agent: "yield-strategy-agent" });
+  const [form, setForm] = useState({ strategy: "dreamDEX maker yield", asset: "USDso", amount: "10", target: "policy-bound CLOB maker yield", maxDrawdown: "2", agent: "yield-strategy-agent" });
   const [message, setMessage] = useState("Somnia yield is handled as a governed strategy intent: route, risk, tx hash, and post-action balances are required before audit completion.");
 
   function saveIntent() {
@@ -54,7 +60,7 @@ function YieldRoute() {
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={TrendingUp} eyebrow="Somnia treasury strategy" title="Yield and liquidity adapters" description="Prepare policy-approved liquidity and yield requests for Somnia Exchange, Somnex, Potion Swap, or a no-yield capital-preservation path." />
+      <PageHeader icon={TrendingUp} eyebrow="Somnia treasury strategy" title="Yield and liquidity adapters" description="Prepare policy-approved liquidity and yield requests for dreamDEX maker orders, Somnia Exchange, Somnex, Potion Swap, or a no-yield capital-preservation path." />
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         <StatCard icon={TrendingUp} label="Strategy" value={form.strategy} hint="Evidence required" />
         <StatCard icon={ShieldCheck} label="Policy" value="Required" hint="Spend controls first" />

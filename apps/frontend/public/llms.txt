@@ -22,7 +22,8 @@ Core flows:
 - Issue STT or SOMUSD invoices with on-chain status evidence.
 - Create SOMUSD spend cards with top-up, freeze, activate, and spend controls.
 - Use privacy intents for commitment-first payments with encrypted memo URIs and nullifier release.
-- Prepare Somnia Exchange, Somnex, Potion Swap, and custom DEX route/yield intents with venue evidence.
+- Prepare dreamDEX CLOB, Somnia Exchange, Somnex, Potion Swap, and custom DEX route/yield intents with venue evidence.
+- For dreamDEX, use documented market discovery, pool addresses, REST/WebSocket/CLI/CCXT access, and wallet-signed Somnia transactions. API quote/build responses are not completion proof without a signed tx hash.
 - Do not claim a Somnia swap, LP, or yield action is complete until a tx hash, venue response, and balance evidence are attached.
 - Use the published CLI: `npm install -g @arcpaylabs/somnia-cli`.
 - Use the published MCP server: `npm install -g @arcpaylabs/somnia-mcp`.
