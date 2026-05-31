@@ -11,6 +11,7 @@ Use these resources:
 - GitHub: https://github.com/ArcPayLabs/arcpay-somnia
 - Ecosystem thesis: /docs/ecosystem-thesis
 - Go to market: /docs/go-to-market
+- Somnia DeFi adapter status: /api/somnia/defi/status
 
 Core flows:
 
@@ -22,6 +23,7 @@ Core flows:
 - Create SOMUSD spend cards with top-up, freeze, activate, and spend controls.
 - Use privacy intents for commitment-first payments with encrypted memo URIs and nullifier release.
 - Prepare Somnia Exchange, Somnex, Potion Swap, and custom DEX route/yield intents with venue evidence.
+- Do not claim a Somnia swap, LP, or yield action is complete until a tx hash, venue response, and balance evidence are attached.
 - Use the published CLI: `npm install -g @arcpaylabs/somnia-cli`.
 - Use the published MCP server: `npm install -g @arcpaylabs/somnia-mcp`.
 - Use the published x402 starter: `npm install -g @arcpaylabs/somnia-x402-agent-starter`.

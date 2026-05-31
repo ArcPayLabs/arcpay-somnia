@@ -55,6 +55,29 @@
     }
   ],
   "paths": {
+    "/api/somnia/defi/status": {
+      "get": {
+        "tags": ["Status"],
+        "summary": "Check Somnia DeFi adapter status",
+        "description": "Returns the current Somnia Exchange, Somnex, Potion Swap, and custom DEX adapter map with the evidence required before ArcPay marks an action complete.",
+        "operationId": "getSomniaDefiStatus",
+        "responses": {
+          "200": {
+            "description": "Somnia DeFi adapter status.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "ok": true,
+                  "chain": "somnia-testnet",
+                  "chainId": 50312,
+                  "mode": "policy-bound-defi-adapters"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "tags": ["x402"],
