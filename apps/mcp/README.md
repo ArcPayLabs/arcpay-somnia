@@ -1,6 +1,6 @@
 # ArcPay Somnia MCP
 
-Local MCP server for ArcPay Somnia. It exposes safe developer tools for Somnia Testnet deployments, x402 payment gates, invoice IDs, claim hashes, privacy commitments, and repeatable demo paths.
+ArcPay Somnia MCP is ArcPay for AI agents. Claude Desktop, Codex-compatible hosts, and other MCP clients can ask ArcPay for Somnia deployment data, derive agent and invoice IDs, prepare x402 paid-resource flows, generate privacy/invoice instructions, inspect Somnia DeFi adapter requirements, and return evidence checklists before claiming any work is complete.
 
 ## Install
 
@@ -46,4 +46,4 @@ Restart Claude Desktop after editing the config.
 - llms.txt: https://arcpay-somnia.vercel.app/llms.txt
 - x402: https://x402.20.208.46.195.nip.io
 
-The MCP server does not sign transactions or mutate treasury state. It only returns deterministic IDs, integration guidance, and public deployment metadata.
+The MCP server makes ArcPay usable by agents directly, not only by humans clicking a dashboard. It does not sign transactions or mutate treasury state; it returns deterministic IDs, integration guidance, handoff payloads, and public deployment metadata that an operator can verify before execution.

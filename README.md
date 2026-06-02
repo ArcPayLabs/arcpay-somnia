@@ -3,6 +3,10 @@
 ArcPay Somnia is an agent-native treasury and autonomous service payment system
 for the Somnia Agentic L1.
 
+ArcPay is not only an app. It is a control plane plus developer distribution
+layer for agent payments, treasury policies, paid APIs, and verifiable execution
+across chain ecosystems.
+
 ## Source Use
 
 This repository is source-available for evaluation, review, and contribution.
