@@ -1,6 +1,6 @@
 # ArcPay Somnia CLI
 
-ArcPay Somnia CLI is the operator kit for wiring an agent into ArcPay without using the frontend. It helps builders register deterministic agent IDs, inspect deployed Somnia contracts, prepare invoice IDs and privacy commitments, generate x402 payment instructions, review Somnia DeFi adapter evidence requirements, and print exact smoke-test commands for proving the integration works on Somnia Testnet.
+ArcPay Somnia CLI is the operator kit for wiring an agent into ArcPay without using the frontend. It helps builders register deterministic agent IDs, inspect deployed Somnia contracts, prepare invoice IDs and privacy commitments, generate x402 payment instructions, review official Somnia Agents receipt rules, inspect Somnia DeFi adapter evidence requirements, and print exact smoke-test commands for proving the integration works on Somnia Testnet.
 
 ## Install
 
@@ -20,6 +20,7 @@ arcpay-somnia privacy-commit "invoice-secret"
 arcpay-somnia privacy-guide
 arcpay-somnia invoice-guide
 arcpay-somnia x402-guide
+arcpay-somnia somnia-agents
 arcpay-somnia defi-adapters
 arcpay-somnia demo-path
 arcpay-somnia smoke
@@ -31,6 +32,7 @@ arcpay-somnia mcp-config
 - App: https://arcpay-somnia.vercel.app
 - Docs: https://arcpay-somnia.vercel.app/docs/overview
 - x402: https://x402.20.208.46.195.nip.io
+- Somnia Agents status: https://arcpay-somnia.vercel.app/api/somnia/agents/status
 - OpenAPI: https://arcpay-somnia.vercel.app/openapi.json
 
 The CLI is part of ArcPay's developer distribution layer. It does not hold private keys or sign treasury transactions; it prepares the IDs, payloads, guides, and verification steps an operator or agent team needs before sending a transaction.

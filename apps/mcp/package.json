@@ -1,6 +1,6 @@
 {
   "name": "@arcpaylabs/somnia-mcp",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "private": false,
   "description": "MCP server for ArcPay Somnia contracts, x402, privacy intents, invoices, and demo flows.",
   "type": "module",

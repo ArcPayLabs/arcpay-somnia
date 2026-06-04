@@ -127,6 +127,49 @@ server.tool("somnia_defi_adapters", "Return Somnia DEX, swap, liquidity, and yie
   }],
 }));
 
+server.tool("somnia_agents", "Return official Somnia Agents IDs, contracts, receipt policy, and ArcPay integration guidance.", {}, async () => ({
+  content: [{
+    type: "text",
+    text: JSON.stringify({
+      network: "Somnia Testnet",
+      agentsUrl: "https://agents.testnet.somnia.network",
+      docsUrl: "https://docs.somnia.network/agents",
+      contracts: {
+        platformContract: "0x037Bb9C718F3f7fe5eCBDB0b600D607b52706776",
+        agentRegistry: "0x08D1Fc808f1983d2Ea7B63a28ECD4d8C885Cd02A",
+      },
+      agents: [
+        {
+          name: "LLM Parse Website",
+          id: "12875401142070969085",
+          methods: 2,
+          cost: "0.10 STT/SOMI per validator",
+          arcpayUse: "Parse HTML websites into structured evidence before order settlement.",
+        },
+        {
+          name: "LLM Inference",
+          id: "12847293847561029384",
+          methods: 4,
+          cost: "variable",
+          arcpayUse: "Generate receipt-backed reasoning for treasury decisions and risk notes.",
+        },
+        {
+          name: "JSON API Request",
+          id: "13174292974160097713",
+          methods: 6,
+          cost: "variable",
+          arcpayUse: "Fetch public APIs and attach selector output to audit records.",
+        },
+      ],
+      receiptPolicy: [
+        "Attach Somnia Agent receipts to ArcPay orders, invoices, privacy intents, or audit records.",
+        "Do not mark completion from inference alone; require receipt plus ArcPay order state or tx hash.",
+        "Use JSON API Request for structured APIs, LLM Parse Website for HTML pages, and LLM Inference for reasoning.",
+      ],
+    }, null, 2),
+  }],
+}));
+
 server.tool("demo_path", "Return the operator demo path for ArcPay Somnia.", {}, async () => ({
   content: [{
     type: "text",

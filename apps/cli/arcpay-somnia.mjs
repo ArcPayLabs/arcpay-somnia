@@ -27,6 +27,7 @@ Commands:
   arcpay-somnia privacy-guide          Print builder integration guide
   arcpay-somnia invoice-guide          Print invoice settlement guide
   arcpay-somnia x402-guide             Print x402 HTTP payment gate guide
+  arcpay-somnia somnia-agents          Print official Somnia Agents IDs and ArcPay receipt policy
   arcpay-somnia defi-adapters          Print Somnia DEX, swap, and yield adapter map
   arcpay-somnia demo-path              Print operator demo steps
   arcpay-somnia smoke                  Print smoke-test commands
@@ -111,6 +112,44 @@ try {
       "",
       "Proof command: npm run smoke:x402",
     ].join("\n"));
+  } else if (command === "somnia-agents") {
+    console.log(JSON.stringify({
+      network: "Somnia Testnet",
+      agentsUrl: "https://agents.testnet.somnia.network",
+      docsUrl: "https://docs.somnia.network/agents",
+      contracts: {
+        platformContract: "0x037Bb9C718F3f7fe5eCBDB0b600D607b52706776",
+        agentRegistry: "0x08D1Fc808f1983d2Ea7B63a28ECD4d8C885Cd02A",
+      },
+      agents: [
+        {
+          name: "LLM Parse Website",
+          id: "12875401142070969085",
+          methods: 2,
+          cost: "0.10 STT/SOMI per validator",
+          arcpayUse: "Parse HTML websites into structured evidence before order settlement.",
+        },
+        {
+          name: "LLM Inference",
+          id: "12847293847561029384",
+          methods: 4,
+          cost: "variable",
+          arcpayUse: "Generate receipt-backed reasoning for treasury decisions and risk notes.",
+        },
+        {
+          name: "JSON API Request",
+          id: "13174292974160097713",
+          methods: 6,
+          cost: "variable",
+          arcpayUse: "Fetch public APIs and attach selector output to audit records.",
+        },
+      ],
+      receiptPolicy: [
+        "Attach Somnia Agent receipts to ArcPay orders, invoices, privacy intents, or audit records.",
+        "Do not mark completion from inference alone; require receipt plus ArcPay order state or tx hash.",
+        "Use JSON API Request for structured APIs, LLM Parse Website for HTML pages, and LLM Inference for reasoning.",
+      ],
+    }, null, 2));
   } else if (command === "defi-adapters") {
     console.log([
       "ArcPay Somnia DeFi Adapters",

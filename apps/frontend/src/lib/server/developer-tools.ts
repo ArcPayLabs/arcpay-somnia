@@ -60,6 +60,44 @@ const somniaDefiAdapters = [
   },
 ];
 
+const somniaAgents = {
+  network,
+  agentsUrl: "https://agents.testnet.somnia.network",
+  docsUrl: "https://docs.somnia.network/agents",
+  contracts: {
+    platformContract: "0x037Bb9C718F3f7fe5eCBDB0b600D607b52706776",
+    agentRegistry: "0x08D1Fc808f1983d2Ea7B63a28ECD4d8C885Cd02A",
+  },
+  agents: [
+    {
+      name: "LLM Parse Website",
+      id: "12875401142070969085",
+      methods: 2,
+      cost: "0.10 STT/SOMI per validator",
+      useInArcPay: "Parse websites into structured evidence before order settlement.",
+    },
+    {
+      name: "LLM Inference",
+      id: "12847293847561029384",
+      methods: 4,
+      cost: "variable",
+      useInArcPay: "Generate receipt-backed reasoning for treasury decisions and risk notes.",
+    },
+    {
+      name: "JSON API Request",
+      id: "13174292974160097713",
+      methods: 6,
+      cost: "variable",
+      useInArcPay: "Fetch public APIs and attach selector output to audit records.",
+    },
+  ],
+  receiptPolicy: [
+    "Attach Somnia Agent receipt details to ArcPay orders, invoices, privacy intents, or audit records.",
+    "Do not mark completion from inference alone; require receipt plus ArcPay order state or tx hash.",
+    "Use JSON API Request for structured APIs, LLM Parse Website for HTML pages, and LLM Inference for reasoning.",
+  ],
+};
+
 export const developerTools: ToolDefinition[] = [
   {
     name: "get_deployment",
@@ -104,6 +142,11 @@ export const developerTools: ToolDefinition[] = [
   {
     name: "somnia_defi_adapters",
     description: "Return Somnia swap, liquidity, and yield adapter candidates with required audit evidence.",
+    inputSchema: { type: "object", properties: {} },
+  },
+  {
+    name: "somnia_agents",
+    description: "Return official Somnia Agents IDs, contracts, receipt rules, and ArcPay integration policy.",
     inputSchema: { type: "object", properties: {} },
   },
   {
@@ -176,6 +219,8 @@ export async function runDeveloperTool(name: string, args: Record<string, unknow
           "Yield and LP intents must record drawdown limits and risk notes before wallet signing.",
         ],
       });
+    case "somnia_agents":
+      return json(somniaAgents);
     case "starter_kit":
       return json({
         files: [

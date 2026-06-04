@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bot, CheckCircle2, Copy, DatabaseZap, ExternalLink, PlugZap, Plus, Sparkles, Workflow } from "lucide-react";
+import { Bot, CheckCircle2, Copy, DatabaseZap, ExternalLink, PlugZap, Plus, ReceiptText, Sparkles, Workflow } from "lucide-react";
 import { EmptyState } from "@/components/app/EmptyState";
 import { PageHeader } from "@/components/app/PageHeader";
 import { StatCard } from "@/components/primitives/StatCard";
@@ -85,7 +85,90 @@ function AgentsRoute() {
 
       <div className="rounded-2xl border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">{status}</div>
 
-      <section className="rounded-3xl border border-border bg-card p-5 md:p-6">
+      <section className="min-w-0 overflow-hidden rounded-3xl border border-border bg-card p-5 md:p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+              <ReceiptText className="h-3.5 w-3.5" /> Official Somnia Agents
+            </div>
+            <h2 className="mt-4 text-2xl font-semibold tracking-tight">Use Somnia receipt agents inside ArcPay flows.</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+              ArcPay treats Somnia Agents as external execution/evidence providers. Operators can use JSON API Request, LLM Inference, or LLM Parse Website to gather data, attach the receipt to an ArcPay order, and only mark treasury work complete when receipts and transaction evidence are present.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <a href="https://agents.testnet.somnia.network" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2.5 text-sm font-semibold text-background">
+              Open agents <ExternalLink className="h-4 w-4" />
+            </a>
+            <button type="button" onClick={() => void copy(JSON.stringify(SOMNIA_AGENTS_PAYLOAD, null, 2), "Somnia Agents payload")} className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2.5 text-sm font-semibold">
+              <Copy className="h-4 w-4" /> Copy payload
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {SOMNIA_OFFICIAL_AGENTS.map((item) => (
+            <div key={item.id} className="min-w-0 rounded-2xl border border-border bg-background p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{item.kind}</div>
+                  <h3 className="mt-2 truncate text-lg font-semibold tracking-tight">{item.name}</h3>
+                </div>
+                <button type="button" onClick={() => void copy(item.id, `${item.name} ID`)} className="rounded-full bg-muted p-2 text-muted-foreground transition hover:text-foreground">
+                  <Copy className="h-4 w-4" />
+                </button>
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
+              <div className="mt-4 space-y-2 rounded-2xl bg-muted/40 p-3 text-xs">
+                <div className="flex min-w-0 items-center justify-between gap-3">
+                  <span className="text-muted-foreground">Agent ID</span>
+                  <span className="truncate font-mono">{item.id}</span>
+                </div>
+                <div className="flex min-w-0 items-center justify-between gap-3">
+                  <span className="text-muted-foreground">Methods</span>
+                  <span className="font-semibold">{item.methods}</span>
+                </div>
+                <div className="flex min-w-0 items-center justify-between gap-3">
+                  <span className="text-muted-foreground">Evidence</span>
+                  <span className="font-semibold">Receipt required</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-5 grid gap-3 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="rounded-2xl border border-border bg-muted/30 p-4">
+            <div className="text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">Contracts</div>
+            <div className="mt-3 space-y-2 text-sm">
+              {Object.entries(SOMNIA_AGENT_CONTRACTS).map(([label, value]) => (
+                <button key={label} type="button" onClick={() => void copy(value, label)} className="flex w-full min-w-0 items-center justify-between gap-3 rounded-xl bg-background px-3 py-2 text-left">
+                  <span className="text-muted-foreground">{label}</span>
+                  <span className="truncate font-mono">{shortAddress(value)}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-border bg-muted/30 p-4">
+            <div className="text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">ArcPay execution gate</div>
+            <div className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
+              {[
+                "Create an ArcPay order or policy intent first.",
+                "Call the Somnia Agent for data, inference, or website parsing.",
+                "Attach the Somnia receipt to the order evidence.",
+                "Complete only when receipt, order state, and tx hash agree.",
+              ].map((item, index) => (
+                <div key={item} className="flex gap-3 rounded-xl bg-background p-3">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">{index + 1}</span>
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="min-w-0 overflow-hidden rounded-3xl border border-border bg-card p-5 md:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
@@ -119,8 +202,8 @@ function AgentsRoute() {
           ))}
         </div>
 
-        <div className="mt-5 grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
-          <div className="rounded-2xl border border-border bg-background p-4">
+        <div className="mt-5 grid min-w-0 gap-4 lg:grid-cols-[0.95fr_1.05fr]">
+          <div className="min-w-0 rounded-2xl border border-border bg-background p-4">
             <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">
               <Workflow className="h-4 w-4" /> Onboarding path
             </div>
@@ -131,14 +214,14 @@ function AgentsRoute() {
                 "Use x402 payment requirements so clients can pay before work unlocks.",
                 "Let ArcPay policy, audit records, and privacy intents govern the work.",
               ].map((step, index) => (
-                <div key={step} className="flex gap-3 rounded-2xl bg-muted/40 p-3 text-sm">
+                <div key={step} className="flex min-w-0 gap-3 rounded-2xl bg-muted/40 p-3 text-sm">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">{index + 1}</span>
-                  <span className="text-muted-foreground">{step}</span>
+                  <span className="min-w-0 text-muted-foreground">{step}</span>
                 </div>
               ))}
             </div>
           </div>
-          <div className="rounded-2xl border border-border bg-background p-4">
+          <div className="min-w-0 rounded-2xl border border-border bg-background p-4">
             <div className="text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">Builder payload</div>
             <pre className="mt-4 max-h-72 overflow-auto rounded-2xl bg-foreground p-4 text-xs text-background">{JSON.stringify({
               slug: form.slug,
@@ -233,6 +316,46 @@ const AGENT_TEMPLATES = [
     description: "Agent service for encrypted memo pointers, recipient disclosure workflows, and audit-safe privacy reports.",
   },
 ] as const;
+
+const SOMNIA_AGENT_CONTRACTS = {
+  "Platform contract": "0x037Bb9C718F3f7fe5eCBDB0b600D607b52706776",
+  "Agent registry": "0x08D1Fc808f1983d2Ea7B63a28ECD4d8C885Cd02A",
+};
+
+const SOMNIA_OFFICIAL_AGENTS = [
+  {
+    name: "LLM Parse Website",
+    kind: "website-to-receipt",
+    id: "12875401142070969085",
+    methods: "2",
+    cost: "0.10 STT/SOMI per validator",
+    description: "Search a domain or scrape a URL, convert HTML, extract structured data with AI, and return an inspectable receipt.",
+  },
+  {
+    name: "LLM Inference",
+    kind: "inference",
+    id: "12847293847561029384",
+    methods: "4",
+    cost: "variable",
+    description: "String-in/string-out inference for agent reasoning steps that need an execution receipt before ArcPay settlement.",
+  },
+  {
+    name: "JSON API Request",
+    kind: "oracle-data",
+    id: "13174292974160097713",
+    methods: "6",
+    cost: "variable",
+    description: "Fetch public JSON APIs and extract selector-path values for price, market, proof, or treasury monitoring workflows.",
+  },
+] as const;
+
+const SOMNIA_AGENTS_PAYLOAD = {
+  network: "Somnia Testnet",
+  platformContract: SOMNIA_AGENT_CONTRACTS["Platform contract"],
+  agentRegistry: SOMNIA_AGENT_CONTRACTS["Agent registry"],
+  agents: SOMNIA_OFFICIAL_AGENTS,
+  arcpayRule: "Attach Somnia Agent receipts to ArcPay orders before settlement or audit completion.",
+};
 
 function templateSnippet(slug: string) {
   return [
