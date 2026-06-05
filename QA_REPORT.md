@@ -10,6 +10,33 @@ Generated: 2026-06-04
 - Viewports: desktop 1440x1000, mobile 390x844
 - Screenshot artifacts: `C:\Users\RICHEY_SON\Desktop\arcpay-qa-artifacts-rerun\somnia`
 
+## Operator Walkthrough QA
+
+- Walkthrough screenshots: `C:\Users\RICHEY_SON\Desktop\arcpay-qa-artifacts-rerun\somnia-operator-walkthrough`
+- Browser-local wallet session used: `0xd953da085934f77cea8a2fb7a32fd48e4b1c1458`
+- Seeded local audit records were used to verify dashboard, audit, and analytics UI states without pretending to have new transaction proof.
+- Non-signing interactions clicked:
+  - `/agents`: copied official Somnia Agents payload.
+  - `/x402`: quoted the live x402 endpoint and checked the protected HTTP 402 resource.
+  - `/swaps`: saved a route intent.
+  - `/yield`: saved a yield intent.
+
+Walkthrough screenshots captured:
+
+- `01-dashboard.png`
+- `02-agents-click-copy-payload.png`
+- `03-x402-after-quote.png`
+- `04-x402-after-check-402.png`
+- `05-privacy.png`
+- `06-swaps-after-intent-click.png`
+- `07-yield-after-intent-click.png`
+- `08-cards.png`
+- `09-invoices.png`
+- `10-policies.png`
+- `11-audit.png`
+- `12-analytics.png`
+- `13-status.png`
+
 ## Routes Checked
 
 - `/`
