@@ -69,7 +69,7 @@ function X402Route() {
     resultUri: "ipfs://arcpay-x402-result/research-agent",
     adminSecret: "",
   });
-  const [status, setStatus] = useState("Quote an x402 protected Somnia agent endpoint, pay through the order book, verify, fulfill, and unlock work.");
+  const [status, setStatus] = useState("Get a price, pay, then unlock the agent result.");
   const [quote, setQuote] = useState<PaymentRequirement | null>(null);
   const [verification, setVerification] = useState<Verification | null>(null);
   const [unlock, setUnlock] = useState<UnlockResult | null>(null);
@@ -223,21 +223,21 @@ function X402Route() {
     <div className="space-y-6">
       <PageHeader
         icon={RadioTower}
-        eyebrow="Agent payment protocol"
-        title="x402"
-        description="Expose paid Somnia agent work over HTTP 402: quote requirements, escrow STT on-chain, verify order status, fulfill, and unlock the protected result."
+        eyebrow="Paid agent work"
+        title="x402 payments"
+        description="Let agents or users pay for a protected service and unlock the result after payment is verified."
         actions={
           <button disabled={busy} onClick={() => void quoteEndpoint()} className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2.5 text-sm font-medium text-background disabled:opacity-50">
-            <RefreshCcw className="h-4 w-4" /> Quote endpoint
+            <RefreshCcw className="h-4 w-4" /> Get price
           </button>
         }
       />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard icon={ServerCog} label="Gateway" value="Live" hint={serverHost} />
-        <StatCard icon={LockKeyhole} label="Resource" value={quote ? "Quoted" : "Locked"} hint="HTTP 402 until paid" />
-        <StatCard icon={CheckCircle2} label="Order" value={verification?.statusName || "--"} hint="On-chain state" />
-        <StatCard icon={UnlockKeyhole} label="Unlock" value={unlock?.unlocked ? "Open" : "Closed"} hint="Fulfilled or settled" emphasis />
+        <StatCard icon={ServerCog} label="Server" value="Ready" hint={serverHost} />
+        <StatCard icon={LockKeyhole} label="Access" value={quote ? "Priced" : "Locked"} hint="Pay to unlock" />
+        <StatCard icon={CheckCircle2} label="Payment" value={verification?.statusName || "--"} hint="Order status" />
+        <StatCard icon={UnlockKeyhole} label="Result" value={unlock?.unlocked ? "Open" : "Closed"} hint="Available after payment" emphasis />
       </div>
 
       <div className="rounded-2xl border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">{status}</div>
@@ -245,7 +245,7 @@ function X402Route() {
       <section className="rounded-3xl border border-border bg-card p-5 md:p-6">
         <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-border bg-muted/30 p-4 text-sm md:flex-row md:items-center md:justify-between">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Live x402 gateway</div>
+            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Payment server</div>
             <div className="mt-1 break-all font-mono text-xs text-foreground">{cleanServerUrl(form.serverUrl)}</div>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -258,25 +258,25 @@ function X402Route() {
           </div>
         </div>
         <div className="grid gap-4 lg:grid-cols-2">
-          <Field label="x402 server URL"><input className="ap-in" value={form.serverUrl} onChange={(event) => setForm({ ...form, serverUrl: event.target.value })} /></Field>
+          <Field label="Server URL"><input className="ap-in" value={form.serverUrl} onChange={(event) => setForm({ ...form, serverUrl: event.target.value })} /></Field>
           <Field label="Agent slug"><input className="ap-in" value={form.agentSlug} onChange={(event) => setForm({ ...form, agentSlug: event.target.value })} /></Field>
           <Field label="Order ID"><input className="ap-in font-mono" value={form.orderId} onChange={(event) => setForm({ ...form, orderId: event.target.value })} /></Field>
-          <Field label="Provider result URI"><input className="ap-in" value={form.resultUri} onChange={(event) => setForm({ ...form, resultUri: event.target.value })} /></Field>
-          <Field label="Provider admin secret"><input className="ap-in" type="password" value={form.adminSecret} onChange={(event) => setForm({ ...form, adminSecret: event.target.value })} /></Field>
+          <Field label="Result URI"><input className="ap-in" value={form.resultUri} onChange={(event) => setForm({ ...form, resultUri: event.target.value })} /></Field>
+          <Field label="Admin secret"><input className="ap-in" type="password" value={form.adminSecret} onChange={(event) => setForm({ ...form, adminSecret: event.target.value })} /></Field>
           <div className="rounded-2xl bg-muted/50 p-4 text-sm text-muted-foreground">
             <div className="mb-1 font-semibold text-foreground">Protected URL</div>
             <div className="break-all font-mono text-xs">{protectedUrl}</div>
           </div>
         </div>
         <div className="mt-5 flex flex-wrap gap-2">
-          <button disabled={busy} onClick={() => void quoteEndpoint()} className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50">Quote</button>
-          <button disabled={busy} onClick={() => void checkProtected()} className="rounded-full bg-muted px-5 py-2.5 text-sm font-semibold disabled:opacity-50">Check 402</button>
+          <button disabled={busy} onClick={() => void quoteEndpoint()} className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50">Get price</button>
+          <button disabled={busy} onClick={() => void checkProtected()} className="rounded-full bg-muted px-5 py-2.5 text-sm font-semibold disabled:opacity-50">Check access</button>
           <div className="flex flex-col">
-            <button disabled={!canPay} onClick={() => void payOrder()} className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-background disabled:opacity-50"><Send className="h-4 w-4" /> Pay order</button>
+            <button disabled={!canPay} onClick={() => void payOrder()} className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-background disabled:opacity-50"><Send className="h-4 w-4" /> Pay</button>
             {payDisabledReason ? <span className="mt-1 px-2 text-[11px] font-medium text-muted-foreground">{payDisabledReason}</span> : null}
           </div>
           <button disabled={busy} onClick={() => void verifyOrder()} className="rounded-full bg-muted px-5 py-2.5 text-sm font-semibold disabled:opacity-50">Verify</button>
-          <button disabled={busy} onClick={() => void fulfillOrder()} className="rounded-full bg-muted px-5 py-2.5 text-sm font-semibold disabled:opacity-50">Provider fulfill</button>
+          <button disabled={busy} onClick={() => void fulfillOrder()} className="rounded-full bg-muted px-5 py-2.5 text-sm font-semibold disabled:opacity-50">Fulfill result</button>
           <button disabled={busy} onClick={() => void unlockResource()} className="rounded-full bg-success px-5 py-2.5 text-sm font-semibold text-success-foreground disabled:opacity-50">Unlock</button>
         </div>
       </section>
@@ -298,9 +298,9 @@ function X402Route() {
           ) : (
             <EmptyState
               icon={LockKeyhole}
-              title="No x402 quote loaded"
-              description="Quote the protected endpoint to return exact Somnia payment requirements before creating an escrowed order."
-              actionLabel="Quote endpoint"
+              title="No price loaded"
+              description="Get the price first. ArcPay will show the exact payment before creating an order."
+              actionLabel="Get price"
               onAction={() => void quoteEndpoint()}
             />
           )}
@@ -330,8 +330,8 @@ function X402Route() {
           ) : (
             <EmptyState
               icon={UnlockKeyhole}
-              title="No verification result"
-              description="Create or paste an order id, then verify it against the live x402 server before unlocking paid agent work."
+              title="No result yet"
+              description="Pay or paste an order id, then verify it before unlocking the agent result."
               actionLabel="Verify order"
               onAction={() => void verifyOrder()}
             />

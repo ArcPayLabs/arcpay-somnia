@@ -60,12 +60,12 @@ function YieldRoute() {
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={TrendingUp} eyebrow="Somnia treasury strategy" title="Yield and liquidity adapters" description="Prepare policy-approved liquidity and yield requests for dreamDEX maker orders, Somnia Exchange, Somnex, Potion Swap, or a no-yield capital-preservation path." />
+      <PageHeader icon={TrendingUp} eyebrow="Treasury" title="Plan yield" description="Choose a treasury strategy, set risk limits, and save the plan before any funds move." />
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <StatCard icon={TrendingUp} label="Strategy" value={form.strategy} hint="Evidence required" />
-        <StatCard icon={ShieldCheck} label="Policy" value="Required" hint="Spend controls first" />
+        <StatCard icon={TrendingUp} label="Strategy" value={form.strategy} hint="Planned route" />
+        <StatCard icon={ShieldCheck} label="Safety" value="On" hint="Policy first" />
         <StatCard icon={WalletCards} label="Asset" value={form.asset} hint="Treasury asset" />
-        <StatCard icon={Bot} label="Agent" value="Ready" hint={form.agent} emphasis />
+        <StatCard icon={Bot} label="Agent" value={form.agent} hint="Optional executor" emphasis />
       </div>
       <section className="grid grid-cols-1 lg:grid-cols-[0.75fr_1fr] gap-4">
         <form className="rounded-2xl border border-border bg-card p-5 space-y-4" onSubmit={(event) => { event.preventDefault(); saveIntent(); }}>
@@ -81,7 +81,7 @@ function YieldRoute() {
               )}
             </label>
           ))}
-          <button className="h-12 rounded-xl bg-primary px-4 font-semibold text-primary-foreground" type="submit">Save Somnia strategy intent</button>
+          <button className="h-12 rounded-xl bg-primary px-4 font-semibold text-primary-foreground" type="submit">Save strategy</button>
           <div className="rounded-xl border border-border bg-muted p-3 text-sm text-muted-foreground">{message}</div>
         </form>
         <div className="space-y-4">

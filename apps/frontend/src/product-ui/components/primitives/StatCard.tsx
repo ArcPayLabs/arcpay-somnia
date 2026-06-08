@@ -17,7 +17,7 @@ export function StatCard({ label, value, hint, delta, icon: Icon, tone = "light"
     ? "bg-surface-dark text-surface-dark-foreground border-white/10"
     : "bg-card text-card-foreground border-border";
   return (
-    <div className={`relative rounded-2xl border ${base} p-5 flex flex-col gap-3 ${emphasis ? "ring-1 ring-primary/30" : ""}`}>
+    <div className={`relative min-w-0 rounded-2xl border ${base} p-5 flex flex-col gap-3 ${emphasis ? "ring-1 ring-primary/30" : ""}`}>
       <div className="flex items-center justify-between">
         <span className={`text-xs font-medium uppercase tracking-wider ${isDark ? "text-white/50" : "text-muted-foreground"}`}>
           {label}
@@ -29,7 +29,7 @@ export function StatCard({ label, value, hint, delta, icon: Icon, tone = "light"
         )}
       </div>
       <div className="flex flex-wrap items-baseline gap-2">
-        <div className="text-2xl md:text-3xl font-medium tracking-tight" style={{ letterSpacing: "-0.025em" }}>
+        <div className="min-w-0 truncate text-2xl md:text-3xl font-medium tracking-tight" style={{ letterSpacing: "-0.025em" }}>
           {value}
         </div>
         {delta && (

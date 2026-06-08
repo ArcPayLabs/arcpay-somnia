@@ -74,97 +74,46 @@ function AgentsRoute() {
         icon={Bot}
         eyebrow="Agent discovery"
         title="Agents"
-        description="Publish agent capability metadata, endpoints, and STT pricing into the Somnia registry so autonomous clients can discover and hire services."
+        description="Connect your agent service, set a price, and make it available for paid work."
       />
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-        <StatCard icon={Bot} label="Registry" value="Live" hint="Somnia contract" />
+        <StatCard icon={Bot} label="Registry" value="Ready" hint="Agent directory" />
         <StatCard icon={Sparkles} label="Price" value={`${form.price} STT`} hint="Per service call" />
-        <StatCard icon={DatabaseZap} label="Capabilities" value={form.capabilities.split(",").length} hint="Discovery tags" emphasis />
+        <StatCard icon={DatabaseZap} label="Skills" value={form.capabilities.split(",").length} hint="Service tags" emphasis />
       </div>
 
       <div className="rounded-2xl border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">{status}</div>
 
       <section className="min-w-0 overflow-hidden rounded-3xl border border-border bg-card p-5 md:p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-              <ReceiptText className="h-3.5 w-3.5" /> Official Somnia Agents
+              <ReceiptText className="h-3.5 w-3.5" /> Built-in receipt agents
             </div>
-            <h2 className="mt-4 text-2xl font-semibold tracking-tight">Use Somnia receipt agents inside ArcPay flows.</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-              ArcPay treats Somnia Agents as external execution/evidence providers. Operators can use JSON API Request, LLM Inference, or LLM Parse Website to gather data, attach the receipt to an ArcPay order, and only mark treasury work complete when receipts and transaction evidence are present.
+            <h2 className="mt-4 text-2xl font-semibold tracking-tight">Use AI receipts when a task needs proof.</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+              Use website parsing, inference, or JSON API checks to attach proof before an agent order is marked complete.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <a href="https://agents.testnet.somnia.network" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2.5 text-sm font-semibold text-background">
               Open agents <ExternalLink className="h-4 w-4" />
             </a>
-            <button type="button" onClick={() => void copy(JSON.stringify(SOMNIA_AGENTS_PAYLOAD, null, 2), "Somnia Agents payload")} className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2.5 text-sm font-semibold">
-              <Copy className="h-4 w-4" /> Copy payload
+            <button type="button" onClick={() => void copy(JSON.stringify(SOMNIA_AGENTS_PAYLOAD, null, 2), "Agents payload")} className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2.5 text-sm font-semibold">
+              <Copy className="h-4 w-4" /> Copy setup
             </button>
           </div>
         </div>
-
         <div className="mt-5 grid gap-3 lg:grid-cols-3">
           {SOMNIA_OFFICIAL_AGENTS.map((item) => (
-            <div key={item.id} className="min-w-0 rounded-2xl border border-border bg-background p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{item.kind}</div>
-                  <h3 className="mt-2 truncate text-lg font-semibold tracking-tight">{item.name}</h3>
-                </div>
-                <button type="button" onClick={() => void copy(item.id, `${item.name} ID`)} className="rounded-full bg-muted p-2 text-muted-foreground transition hover:text-foreground">
-                  <Copy className="h-4 w-4" />
-                </button>
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
-              <div className="mt-4 space-y-2 rounded-2xl bg-muted/40 p-3 text-xs">
-                <div className="flex min-w-0 items-center justify-between gap-3">
-                  <span className="text-muted-foreground">Agent ID</span>
-                  <span className="truncate font-mono">{item.id}</span>
-                </div>
-                <div className="flex min-w-0 items-center justify-between gap-3">
-                  <span className="text-muted-foreground">Methods</span>
-                  <span className="font-semibold">{item.methods}</span>
-                </div>
-                <div className="flex min-w-0 items-center justify-between gap-3">
-                  <span className="text-muted-foreground">Evidence</span>
-                  <span className="font-semibold">Receipt required</span>
-                </div>
-              </div>
-            </div>
+            <button key={item.id} type="button" onClick={() => void copy(item.id, `${item.name} ID`)} className="min-w-0 rounded-2xl border border-border bg-background p-4 text-left transition hover:border-primary/60">
+              <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{item.kind}</div>
+              <h3 className="mt-2 truncate text-lg font-semibold tracking-tight">{item.name}</h3>
+              <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
+              <div className="mt-4 text-xs font-semibold text-primary">Copy agent ID</div>
+            </button>
           ))}
-        </div>
-
-        <div className="mt-5 grid gap-3 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="rounded-2xl border border-border bg-muted/30 p-4">
-            <div className="text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">Contracts</div>
-            <div className="mt-3 space-y-2 text-sm">
-              {Object.entries(SOMNIA_AGENT_CONTRACTS).map(([label, value]) => (
-                <button key={label} type="button" onClick={() => void copy(value, label)} className="flex w-full min-w-0 items-center justify-between gap-3 rounded-xl bg-background px-3 py-2 text-left">
-                  <span className="text-muted-foreground">{label}</span>
-                  <span className="truncate font-mono">{shortAddress(value)}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="rounded-2xl border border-border bg-muted/30 p-4">
-            <div className="text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">ArcPay execution gate</div>
-            <div className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-              {[
-                "Create an ArcPay order or policy intent first.",
-                "Call the Somnia Agent for data, inference, or website parsing.",
-                "Attach the Somnia receipt to the order evidence.",
-                "Complete only when receipt, order state, and tx hash agree.",
-              ].map((item, index) => (
-                <div key={item} className="flex gap-3 rounded-xl bg-background p-3">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">{index + 1}</span>
-                  <span>{item}</span>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
@@ -222,17 +171,21 @@ function AgentsRoute() {
             </div>
           </div>
           <div className="min-w-0 rounded-2xl border border-border bg-background p-4">
-            <div className="text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">Builder payload</div>
-            <pre className="mt-4 max-h-72 overflow-auto rounded-2xl bg-foreground p-4 text-xs text-background">{JSON.stringify({
-              slug: form.slug,
-              agentId,
-              endpoint: form.endpoint,
-              capabilities: form.capabilities.split(",").map((item) => item.trim()).filter(Boolean),
-              priceStt: form.price,
-              x402ProtectedUrl: protectedUrl,
-              network: "Somnia Testnet",
-              chainId: 50312,
-            }, null, 2)}</pre>
+            <div className="text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">Connection details</div>
+            <div className="mt-4 grid gap-2">
+              {[
+                ["Slug", form.slug],
+                ["Agent ID", agentId],
+                ["Endpoint", form.endpoint],
+                ["Price", `${form.price} STT`],
+                ["x402 URL", protectedUrl],
+              ].map(([label, value]) => (
+                <div key={label} className="min-w-0 rounded-2xl bg-foreground p-3 text-background">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.16em] opacity-60">{label}</div>
+                  <div className="mt-1 truncate font-mono text-xs">{value}</div>
+                </div>
+              ))}
+            </div>
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" onClick={() => void copy(agentId, "Agent ID")} className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-2 text-xs font-semibold"><Copy className="h-3.5 w-3.5" /> Copy ID</button>
               <button type="button" onClick={() => void copy(protectedUrl, "x402 URL")} className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-2 text-xs font-semibold"><Copy className="h-3.5 w-3.5" /> Copy x402 URL</button>

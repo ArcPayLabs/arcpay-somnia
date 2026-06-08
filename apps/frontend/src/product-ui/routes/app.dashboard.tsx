@@ -37,8 +37,8 @@ function DashboardRoute() {
       <PageHeader
         icon={Workflow}
         eyebrow="Overview"
-        title="Good morning, operator."
-        description="Private treasury OS for Somnia agents: x402 paid work, wallet-signed STT payments, escrowed orders, SOMUSD cards, policy controls, privacy intents, and trust exports."
+        title="Good morning."
+        description="Control agent spending, payments, invoices, cards, privacy, and audit records from one workspace."
         actions={<Link href="/payments" className="rounded-full bg-foreground px-4 py-2.5 text-sm font-medium text-background">New payment</Link>}
         back={false}
       />
@@ -47,7 +47,7 @@ function DashboardRoute() {
         <div className="flex-1 min-w-[240px]">
           <div className="text-sm font-semibold">Next best action</div>
           <div className="text-sm text-muted-foreground">
-            {wallet ? `${shortAddress(wallet)} has ${Number(balance || 0).toFixed(4)} STT. Register an agent, set policy, then create an x402 or escrow order.` : "Connect a Somnia wallet to load live balance and start the agent treasury flow."}
+            {wallet ? `${shortAddress(wallet)} has ${Number(balance || 0).toFixed(4)} STT. Start with an agent, policy, or payment.` : "Connect a wallet to load your balance and start."}
           </div>
         </div>
         <Link href={wallet ? "/app/agents" : "/wallet"} className="text-sm font-medium px-4 py-2 rounded-full bg-primary text-primary-foreground">
@@ -55,8 +55,8 @@ function DashboardRoute() {
         </Link>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard icon={Wallet} label="Operating" value={wallet ? `${Number(balance || 0).toFixed(4)} STT` : "--"} hint="Live Somnia wallet balance" />
-        <StatCard icon={Workflow} label="Agent orders" value={counts.orders} hint="Escrow and x402 order records" />
+        <StatCard icon={Wallet} label="Balance" value={wallet ? `${Number(balance || 0).toFixed(4)} STT` : "--"} hint="Connected wallet" />
+        <StatCard icon={Workflow} label="Orders" value={counts.orders} hint="Agent work and payments" />
         <StatCard icon={CreditCard} label="SOMUSD cards" value={records.filter((record) => record.title.toLowerCase().includes("card")).length} hint="Agent card events" />
         <StatCard icon={Lock} label="Privacy intents" value={counts.privacy} hint="Commitment-based intents" emphasis />
       </div>
@@ -83,8 +83,8 @@ function DashboardRoute() {
           </div>
         </section>
         <section className="rounded-2xl border border-border bg-card p-5">
-          <div className="text-xs uppercase tracking-wider text-muted-foreground">Runtime</div>
-          <h2 className="mt-1 text-lg font-medium">Somnia contract map</h2>
+          <div className="text-xs uppercase tracking-wider text-muted-foreground">Workspace</div>
+          <h2 className="mt-1 text-lg font-medium">System health</h2>
           <div className="mt-4 space-y-3">
             <StatCard icon={RouteIcon} label="Contracts" value={Object.keys(CONTRACTS).length} hint="Deployed modules" />
             <StatCard icon={ShieldAlert} label="Policy queue" value={counts.pending} hint="Pending review records" />

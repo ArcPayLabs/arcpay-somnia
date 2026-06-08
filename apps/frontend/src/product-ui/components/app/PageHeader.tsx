@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, type LucideIcon } from "lucide-react";
-import { NetworkBadge } from "@/components/primitives/NetworkBadge";
 
 export function PageHeader({
   icon: Icon,
@@ -28,7 +27,7 @@ export function PageHeader({
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
           <div className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground flex items-center gap-2">
-            {eyebrow ?? "ArcPay"} <NetworkBadge />
+            {eyebrow ?? "ArcPay"}
           </div>
           <div className="flex items-center gap-3 mt-2">
             {Icon && (

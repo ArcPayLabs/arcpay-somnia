@@ -65,11 +65,11 @@ function SwapsRoute() {
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={ArrowLeftRight} eyebrow="Somnia DeFi routing" title="Swap and route adapters" description="Prepare policy-checked route intents for dreamDEX CLOB, Somnia Exchange, Somnex, Potion Swap, or a custom Somnia DEX adapter, then attach quote and tx evidence before audit." />
+      <PageHeader icon={ArrowLeftRight} eyebrow="Swap" title="Plan a swap" description="Choose what to swap, set a safety limit, and save the route before any wallet signature." />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <StatCard icon={RouteIcon} label="Venue" value={form.venue} hint="Somnia adapter" />
-        <StatCard icon={ShieldCheck} label="Policy" value="Required" hint="Before execution" />
-        <StatCard icon={Bot} label="Executor" value={form.agent} hint="Agent order ready" emphasis />
+        <StatCard icon={RouteIcon} label="Route" value={form.venue} hint="Best venue target" />
+        <StatCard icon={ShieldCheck} label="Safety" value="On" hint="Policy checks first" />
+        <StatCard icon={Bot} label="Agent" value={form.agent} hint="Optional executor" emphasis />
       </div>
       <section className="grid grid-cols-1 lg:grid-cols-[0.75fr_1fr] gap-4">
         <form className="rounded-2xl border border-border bg-card p-5 space-y-4" onSubmit={(event) => { event.preventDefault(); saveIntent(); }}>
@@ -85,7 +85,7 @@ function SwapsRoute() {
               )}
             </label>
           ))}
-          <button className="h-12 rounded-xl bg-primary px-4 font-semibold text-primary-foreground" type="submit">Save Somnia route intent</button>
+          <button className="h-12 rounded-xl bg-primary px-4 font-semibold text-primary-foreground" type="submit">Save route</button>
           <div className="rounded-xl border border-border bg-muted p-3 text-sm text-muted-foreground">{message}</div>
         </form>
         <div className="space-y-4">
@@ -116,7 +116,6 @@ function SwapsRoute() {
                   <div><dt className="font-medium">Mode</dt><dd className="text-muted-foreground">{venue.mode}</dd></div>
                   <div><dt className="font-medium">Evidence</dt><dd className="text-muted-foreground">{venue.evidence}</dd></div>
                 </dl>
-                <a className="mt-4 inline-flex text-sm font-semibold text-primary" href={venue.url} target="_blank" rel="noreferrer">Open venue</a>
               </article>
             ))}
           </div>
