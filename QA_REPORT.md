@@ -1,14 +1,23 @@
 # ArcPay Somnia QA Report
 
-Generated: 2026-06-04
+Generated: 2026-06-09
 
 ## Automated Browser QA
 
 - Public app: https://arcpay-somnia.vercel.app
-- API checks: 10 / 10 passed
-- Browser route checks: 22 / 22 passed
+- API checks: 10 / 10 passed on the latest local smoke sweep
+- Browser route checks: 41 / 41 passed on the latest full route crawl
 - Viewports: desktop 1440x1000, mobile 390x844
-- Screenshot artifacts: `C:\Users\RICHEY_SON\Desktop\arcpay-qa-artifacts-rerun\somnia`
+- Latest screenshot artifacts: `C:\Users\RICHEY_SON\Desktop\arcpay-somnia\qa-full-ui`
+- Earlier walkthrough artifacts: `C:\Users\RICHEY_SON\Desktop\arcpay-qa-artifacts-rerun\somnia`
+
+## Latest Cross-Chain Polish Sweep
+
+- Production build passed with Next.js/Turbopack.
+- Public API and agent-readiness endpoints returned `200` or expected `207` partial-status.
+- Landing hero was adjusted to avoid cropped/oversized card rendering on desktop and mobile.
+- Desktop and mobile route screenshots were generated for every discovered page route.
+- Focused landing/topbar checks passed after the final hero and navigation polish.
 
 ## Operator Walkthrough QA
 
