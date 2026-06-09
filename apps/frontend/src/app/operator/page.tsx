@@ -8,8 +8,17 @@ import { PageHeader } from "@/components/PageHeader";
 import { RecordTable } from "@/components/RecordTable";
 import { AsyncButton } from "../../product-ui/components/primitives/AsyncButton";
 import { DEPTH_CONTRACTS_READY, agentIdFromSlug, hashText, operatorControlsContract, writeRecord } from "@somnia/lib/somnia";
+import { ProductAppShell } from "../product-render";
 
 export default function OperatorPage() {
+  return (
+    <ProductAppShell>
+      <OperatorContent />
+    </ProductAppShell>
+  );
+}
+
+function OperatorContent() {
   const [claim, setClaim] = useState({
     code: "claim-research-agent-001",
     agentSlug: "research-agent",
@@ -218,4 +227,4 @@ function isValidUrl(value: string) {
   }
 }
 
-const INPUT_CLASS = "h-12 w-full rounded-2xl border border-border bg-background px-4 text-sm font-medium outline-none transition focus:border-primary";
+const INPUT_CLASS = "ap-in";
