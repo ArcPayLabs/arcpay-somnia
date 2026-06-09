@@ -39,7 +39,7 @@ type Analytics = {
 
 function AnalyticsRoute() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
-  const [status, setStatus] = useState("Load usage analytics from Supabase.");
+  const [status, setStatus] = useState("Load usage analytics.");
   const [loading, setLoading] = useState(false);
 
   async function load() {

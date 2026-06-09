@@ -135,7 +135,7 @@ function PoliciesPage() {
       if (!userId) {
         setDirty(false);
         setSaveState("saved");
-        setSaveMessage("Policy settings saved locally. Sign in to sync them to Supabase.");
+        setSaveMessage("Policy settings saved for this browser. Sign in to sync them across devices.");
         return;
       }
 
@@ -148,11 +148,11 @@ function PoliciesPage() {
 
       setDirty(false);
       setSaveState("saved");
-      setSaveMessage("Policy settings saved to Supabase.");
+      setSaveMessage("Policy settings saved.");
     } catch (error) {
       console.error("Policy save failed.", error);
       setSaveState("error");
-      setSaveMessage("Policy settings could not sync to Supabase. Local copy is still saved.");
+      setSaveMessage("Policy settings were saved here, but could not sync across devices.");
     }
   };
 

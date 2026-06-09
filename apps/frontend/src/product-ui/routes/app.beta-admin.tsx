@@ -29,7 +29,7 @@ const STATUSES: BetaSignup["status"][] = ["new", "invited", "active", "paused", 
 function BetaAdminRoute() {
   const [rows, setRows] = useState<BetaSignup[]>([]);
   const [filter, setFilter] = useState("all");
-  const [status, setStatus] = useState("Load beta requests from Supabase.");
+  const [status, setStatus] = useState("Load beta requests.");
   const [loading, setLoading] = useState(false);
 
   async function load(nextFilter = filter) {
@@ -94,7 +94,7 @@ function BetaAdminRoute() {
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <StatCard icon={Users} label="Loaded" value={counts.total} hint="Current filter" />
         <StatCard icon={UserCheck} label="New" value={counts.new} hint="Needs review" />
-        <StatCard icon={UserCheck} label="Invited" value={counts.invited} hint="Ready to onboard" />
+        <StatCard icon={UserCheck} label="Invited" value={counts.invited} hint="Awaiting onboarding" />
         <StatCard icon={UserCheck} label="Active" value={counts.active} hint="Using beta" emphasis />
       </div>
 

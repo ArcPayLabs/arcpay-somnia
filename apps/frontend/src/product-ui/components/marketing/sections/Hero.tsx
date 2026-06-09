@@ -13,13 +13,11 @@ export function Hero() {
         <MarketingNav tone="light" absolute />
         <div className="flex-1 px-4 md:px-6 pt-20 pb-6 flex items-start">
           <div
-            className="relative w-full rounded-3xl overflow-hidden max-w-[88rem] mx-auto bg-[#070907]"
+            className="relative w-full rounded-3xl overflow-hidden max-w-[88rem] mx-auto bg-[radial-gradient(circle_at_75%_25%,rgba(255,122,34,0.28),transparent_32%),linear-gradient(135deg,#101820_0%,#4f351d_48%,#f97316_100%)]"
             style={{ height: "min(760px, calc(100vh - 96px))", minHeight: "620px" }}
           >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_20%,rgba(255,255,255,0.14),transparent_28%),radial-gradient(circle_at_78%_76%,rgba(255,122,34,0.18),transparent_30%),linear-gradient(135deg,#050706_0%,#0c130e_46%,#11160f_100%)]" />
-            <div className="absolute inset-0 opacity-[0.16] [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:48px_48px]" />
             <video
-              className="absolute inset-0 w-full h-full object-cover opacity-90"
+              className="absolute inset-0 w-full h-full object-cover opacity-70"
               autoPlay
               muted
               loop
@@ -28,8 +26,8 @@ export function Hero() {
             >
               <source src={HERO_VIDEO_URL} type="video/mp4" />
             </video>
-            <div className="absolute inset-0 bg-gradient-to-r from-black/78 via-black/42 to-black/8" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/20" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/35 to-black/10" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/10" />
             <div className="relative z-10 flex flex-col items-start justify-end h-full p-8 md:p-14">
               <div className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur border border-white/20 px-3 py-1 text-xs text-white/85 mb-6">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" /> Somnia testnet live
@@ -67,17 +65,17 @@ export function Hero() {
                 )}
               </div>
 
-              <div className="mt-12 w-full max-w-4xl">
+              {/* Marquee */}
+              <div className="hero-marquee mt-12 w-full max-w-md overflow-hidden">
                 <div className="text-xs text-white/50 mb-3 uppercase tracking-[0.18em]">Wired into</div>
-                <div className="flex flex-wrap items-center gap-2.5">
-                  {PARTNERS.map((p) => (
-                    <span
-                      key={p}
-                      className="rounded-full border border-white/15 bg-white/[0.08] px-3 py-1.5 text-xs md:text-sm font-medium text-white/85 backdrop-blur"
-                    >
-                      {p}
-                    </span>
-                  ))}
+                <div className="relative">
+                  <div className="ap-marquee flex w-max gap-10 whitespace-nowrap">
+                    {[...PARTNERS, ...PARTNERS].map((p, i) => (
+                      <span key={i} className="text-white/85 text-base font-medium">
+                        {p}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

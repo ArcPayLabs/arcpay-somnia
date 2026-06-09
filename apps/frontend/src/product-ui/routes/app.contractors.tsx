@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { Plus, Search, Send, ShieldCheck, Users } from "lucide-react";
 import { EmptyState } from "@/components/app/EmptyState";
 import { PageHeader } from "@/components/app/PageHeader";
+import { ActionDrawer } from "@/components/primitives/ActionDrawer";
 import { ReviewModal, type ReviewRow } from "@/components/primitives/ReviewModal";
 import { StatCard } from "@/components/primitives/StatCard";
 import { readLocalJson, writeLocalJson } from "@/lib/browser-cache";
@@ -52,6 +53,15 @@ function ContractorsPage() {
   function addContractor() {
     if (!form.name.trim() || !form.wallet.trim()) {
       setMessage("Name and Somnia wallet are required.");
+      return;
+    }
+    if (!/^0x[a-fA-F0-9]{40}$/.test(form.wallet.trim())) {
+      setMessage("Enter a valid Somnia EVM wallet address.");
+      return;
+    }
+    const limit = Number.parseFloat(form.monthlyLimit);
+    if (!Number.isFinite(limit) || limit < 0) {
+      setMessage("Monthly limit must be a valid number.");
       return;
     }
     const riskScore = scoreWallet(form.wallet);
@@ -113,7 +123,7 @@ function ContractorsPage() {
         description="Maintain contractor allowlists, Somnia wallet identities, risk scores, and batch payout intents before any treasury action is signed."
         actions={
           <>
-            <button onClick={() => setOpen(true)} className="rounded-full bg-muted px-4 py-2.5 text-sm font-semibold">Add contractor</button>
+            <button type="button" onClick={() => setOpen(true)} className="rounded-full bg-muted px-4 py-2.5 text-sm font-semibold">Add contractor</button>
             <button disabled={selected.length === 0} onClick={() => setReview(true)} className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2.5 text-sm font-semibold text-background disabled:opacity-40">
               <Send className="h-4 w-4" /> Pay selected
             </button>
@@ -130,20 +140,23 @@ function ContractorsPage() {
 
       <div className="rounded-2xl border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">{message}</div>
 
-      {open && (
-        <section className="rounded-3xl border border-border bg-card p-5 md:p-6">
-          <div className="grid gap-4 md:grid-cols-2">
+      <ActionDrawer
+        open={open}
+        title="Add contractor"
+        description="Add the wallet, role, and limit first. Payout batches are reviewed separately before any signer action."
+        onClose={() => setOpen(false)}
+      >
+          <div className="grid gap-4">
             <Field label="Name"><input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className="ap-in" /></Field>
             <Field label="Somnia wallet"><input value={form.wallet} onChange={(event) => setForm({ ...form, wallet: event.target.value })} className="ap-in" placeholder="0x..." /></Field>
             <Field label="Role"><input value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value })} className="ap-in" /></Field>
             <Field label="Monthly limit SOMUSD"><input value={form.monthlyLimit} onChange={(event) => setForm({ ...form, monthlyLimit: event.target.value })} className="ap-in" inputMode="decimal" /></Field>
           </div>
           <div className="mt-5 flex gap-2">
-            <button onClick={addContractor} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"><Plus className="h-4 w-4" /> Save contractor</button>
+            <button type="button" onClick={addContractor} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"><Plus className="h-4 w-4" /> Save contractor</button>
             <button onClick={() => setOpen(false)} className="rounded-full bg-muted px-5 py-2.5 text-sm font-semibold">Cancel</button>
           </div>
-        </section>
-      )}
+      </ActionDrawer>
 
       <section className="overflow-hidden rounded-3xl border border-border bg-card">
         <div className="flex flex-col gap-3 border-b border-border p-4 md:flex-row md:items-center md:justify-between">

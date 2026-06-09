@@ -1,7 +1,10 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useState } from "react";
 import { Bot, CheckCircle2, Copy, DatabaseZap, ExternalLink, PlugZap, Plus, ReceiptText, Sparkles, Workflow } from "lucide-react";
+import { ActionDrawer } from "@/components/primitives/ActionDrawer";
+import { AsyncButton } from "@/components/primitives/AsyncButton";
 import { EmptyState } from "@/components/app/EmptyState";
 import { PageHeader } from "@/components/app/PageHeader";
 import { StatCard } from "@/components/primitives/StatCard";
@@ -18,20 +21,27 @@ function AgentsRoute() {
     price: "0.01",
   });
   const [agent, setAgent] = useState<Record<string, string> | null>(null);
-  const [status, setStatus] = useState("Register an agent so other Somnia agents can discover and hire it.");
+  const [status, setStatus] = useState("Register a paid service endpoint, then attach policies, orders, cards, and audit evidence to that agent.");
   const [template, setTemplate] = useState<(typeof AGENT_TEMPLATES)[number]>(AGENT_TEMPLATES[0]);
   const [copied, setCopied] = useState("");
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const agentId = agentIdFromSlug(form.slug);
   const protectedUrl = `https://x402.20.208.46.195.nip.io/agent/${encodeURIComponent(form.slug)}/work`;
 
   async function registerAgent() {
+    const validation = validateAgentForm(form);
+    if (validation) {
+      setStatus(validation);
+      return;
+    }
     setStatus("Submitting agent registry transaction...");
     const contract = await registryContract() as any;
     const tx = await contract.registerAgent(agentId, form.name, form.endpoint, form.capabilities, toWei(form.price));
     await tx.wait();
     writeRecord({ id: crypto.randomUUID(), type: "agent", title: `Registered ${form.name}`, status: "confirmed", txHash: tx.hash });
     setStatus(`Agent registered on Somnia: ${tx.hash}`);
+    setDrawerOpen(false);
     await loadAgent();
   }
 
@@ -75,12 +85,17 @@ function AgentsRoute() {
         eyebrow="Agent discovery"
         title="Agents"
         description="Connect your agent service, set a price, and make it available for paid work."
+        actions={
+          <button type="button" onClick={() => setDrawerOpen(true)} className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2.5 text-sm font-semibold text-background hover:opacity-90">
+            <Plus className="h-4 w-4" /> Register service agent
+          </button>
+        }
       />
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-        <StatCard icon={Bot} label="Registry" value="Ready" hint="Agent directory" />
-        <StatCard icon={Sparkles} label="Price" value={`${form.price} STT`} hint="Per service call" />
-        <StatCard icon={DatabaseZap} label="Skills" value={form.capabilities.split(",").length} hint="Service tags" emphasis />
+        <StatCard icon={Bot} label="Selected agent" value={form.slug} hint="Service slug" />
+        <StatCard icon={Sparkles} label="Price" value={`${form.price} STT`} hint="Per call" />
+        <StatCard icon={DatabaseZap} label="Capabilities" value={form.capabilities.split(",").length} hint="Published service tags" emphasis />
       </div>
 
       <div className="rounded-2xl border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">{status}</div>
@@ -100,8 +115,8 @@ function AgentsRoute() {
             <a href="https://agents.testnet.somnia.network" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2.5 text-sm font-semibold text-background">
               Open agents <ExternalLink className="h-4 w-4" />
             </a>
-            <button type="button" onClick={() => void copy(JSON.stringify(SOMNIA_AGENTS_PAYLOAD, null, 2), "Agents payload")} className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2.5 text-sm font-semibold">
-              <Copy className="h-4 w-4" /> Copy setup
+            <button type="button" onClick={() => void copy(JSON.stringify(SOMNIA_AGENTS_PAYLOAD, null, 2), "Receipt agent map")} className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2.5 text-sm font-semibold">
+              <Copy className="h-4 w-4" /> Copy receipt map
             </button>
           </div>
         </div>
@@ -198,20 +213,15 @@ function AgentsRoute() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="rounded-3xl border border-border bg-card p-5 md:p-6">
-          <h2 className="text-xl font-semibold tracking-tight">Register service agent</h2>
-          <div className="mt-5 grid gap-4">
-            {Object.entries(form).map(([key, value]) => (
-              <label key={key} className="block">
-                <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{key}</span>
-                <input value={value} onChange={(event) => setForm({ ...form, [key]: event.target.value })} className="ap-in" />
-              </label>
-            ))}
-          </div>
+          <h2 className="text-xl font-semibold tracking-tight">How onboarding works</h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            A service agent is any HTTPS endpoint or external agent that can sell work through ArcPay. Register it once, then use Orders, x402, Cards, Policies, and Operator claim codes to govern how it gets paid and audited.
+          </p>
           <div className="mt-5 flex flex-wrap gap-2">
-            <button onClick={() => void registerAgent()} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">
-              <Plus className="h-4 w-4" /> Register on Somnia
+            <button type="button" onClick={() => setDrawerOpen(true)} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">
+              <Plus className="h-4 w-4" /> Register service agent
             </button>
-            <button onClick={() => void loadAgent()} className="rounded-full bg-muted px-5 py-2.5 text-sm font-semibold">Load by slug</button>
+            <AsyncButton onClick={loadAgent} onError={setStatus} className="rounded-full bg-muted px-5 py-2.5 text-sm font-semibold" loadingLabel="Loading...">Load selected slug</AsyncButton>
           </div>
         </section>
 
@@ -239,8 +249,63 @@ function AgentsRoute() {
           )}
         </section>
       </div>
+
+      <ActionDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        title="Register service agent"
+        description="Publish a service endpoint that other agents or operators can pay through ArcPay x402 and govern with policy."
+      >
+        <div className="grid gap-4">
+          <Field label="Service slug" hint="Used for the agent ID and x402 URL.">
+            <input value={form.slug} onChange={(event) => setForm({ ...form, slug: event.target.value })} className="ap-in" placeholder="research-agent" />
+          </Field>
+          <Field label="Display name" hint="Shown in the operator dashboard.">
+            <input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className="ap-in" placeholder="Treasury Research Agent" />
+          </Field>
+          <Field label="HTTPS endpoint" hint="The agent service URL clients will request.">
+            <input value={form.endpoint} onChange={(event) => setForm({ ...form, endpoint: event.target.value })} className="ap-in" placeholder="https://..." />
+          </Field>
+          <Field label="Capabilities" hint="Comma-separated tags such as search, risk, invoices.">
+            <input value={form.capabilities} onChange={(event) => setForm({ ...form, capabilities: event.target.value })} className="ap-in" placeholder="risk-scoring, invoice-review" />
+          </Field>
+          <Field label="Price per call, STT" hint="Amount requested before the result unlocks.">
+            <input value={form.price} onChange={(event) => setForm({ ...form, price: event.target.value })} className="ap-in" inputMode="decimal" placeholder="0.01" />
+          </Field>
+        </div>
+        <div className="mt-6 rounded-2xl bg-muted/50 p-4 text-sm text-muted-foreground">
+          After registration, use the x402 page to quote the protected resource, Orders to escrow work, Policies to limit spend, and Cards to delegate a SOMUSD budget to the agent wallet.
+        </div>
+        <div className="mt-6 flex flex-wrap gap-2">
+          <AsyncButton onClick={registerAgent} onError={setStatus} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground" loadingLabel="Submitting...">
+            <Plus className="h-4 w-4" /> Register on Somnia
+          </AsyncButton>
+          <button type="button" onClick={() => setDrawerOpen(false)} className="rounded-full bg-muted px-5 py-2.5 text-sm font-semibold">Cancel</button>
+        </div>
+      </ActionDrawer>
     </div>
   );
+}
+
+function Field({ children, hint, label }: { children: ReactNode; hint?: string; label: string }) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{label}</span>
+      {children}
+      {hint ? <span className="mt-1.5 block text-xs leading-relaxed text-muted-foreground">{hint}</span> : null}
+    </label>
+  );
+}
+
+function validateAgentForm(form: { slug: string; name: string; endpoint: string; capabilities: string; price: string }) {
+  if (!form.slug.trim()) return "Service slug is required.";
+  if (!/^[a-z0-9][a-z0-9-]{2,62}$/i.test(form.slug.trim())) return "Use a simple slug such as research-agent.";
+  if (!form.name.trim()) return "Display name is required.";
+  if (!/^https:\/\/.+/i.test(form.endpoint.trim())) return "Use a valid HTTPS endpoint.";
+  if (!form.capabilities.trim()) return "Add at least one capability.";
+  const price = Number.parseFloat(form.price);
+  if (!Number.isFinite(price) || price <= 0) return "Enter a valid positive STT price.";
+  return "";
 }
 
 const AGENT_TEMPLATES = [

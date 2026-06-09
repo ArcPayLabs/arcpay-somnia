@@ -5,6 +5,8 @@ import { useMemo, useState } from "react";
 import { Eye, EyeOff, KeyRound, Lock, Send, Sparkles } from "lucide-react";
 import { EmptyState } from "@/components/app/EmptyState";
 import { PageHeader } from "@/components/app/PageHeader";
+import { ActionDrawer } from "@/components/primitives/ActionDrawer";
+import { AsyncButton } from "@/components/primitives/AsyncButton";
 import { ReviewModal, type ReviewRow } from "@/components/primitives/ReviewModal";
 import { StatCard } from "@/components/primitives/StatCard";
 import { readLocalJson, writeLocalJson } from "@/lib/browser-cache";
@@ -182,9 +184,13 @@ function PrivacyPage() {
 
       <div className="rounded-2xl border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">{message}</div>
 
-      {open && (
-        <section className="rounded-3xl border border-border bg-card p-5 md:p-6">
-          <div className="grid gap-4 md:grid-cols-3">
+      <ActionDrawer
+        open={Boolean(open)}
+        title={open === "shield" ? "Shield treasury intent" : "Create disclosure record"}
+        description={open === "shield" ? "Prepare the privacy commitment first. The wallet request only opens after policy checks pass." : "Create a selective disclosure record for an auditor or workspace reviewer."}
+        onClose={() => setOpen(null)}
+      >
+          <div className="grid gap-4">
             <Field label={`Amount ${form.token}`}><input value={form.amount} onChange={(event) => setForm({ ...form, amount: event.target.value })} className="ap-in" inputMode="decimal" /></Field>
             <Field label="Token"><select value={form.token} onChange={(event) => setForm({ ...form, token: event.target.value as "STT" | "SOMUSD" })} className="ap-in"><option>STT</option><option>SOMUSD</option></select></Field>
             <Field label="Recipient / auditor"><input value={form.recipient} onChange={(event) => setForm({ ...form, recipient: event.target.value })} className="ap-in" placeholder="0x... or auditor name" /></Field>
@@ -192,12 +198,11 @@ function PrivacyPage() {
             <Field label="Release secret"><input value={form.nullifier} onChange={(event) => setForm({ ...form, nullifier: event.target.value })} className="ap-in" /></Field>
           </div>
           <div className="mt-5 flex flex-wrap gap-2">
-            {open === "shield" ? <button onClick={prepareShield} className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">Review vault tx</button> : null}
-            {open === "key" ? <button onClick={createDisclosure} className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">Create disclosure</button> : null}
-            <button onClick={() => setOpen(null)} className="rounded-full bg-muted px-5 py-2.5 text-sm font-semibold">Cancel</button>
+            {open === "shield" ? <button type="button" onClick={prepareShield} className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">Review vault tx</button> : null}
+            {open === "key" ? <button type="button" onClick={createDisclosure} className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">Create disclosure</button> : null}
+            <button type="button" onClick={() => setOpen(null)} className="rounded-full bg-muted px-5 py-2.5 text-sm font-semibold">Cancel</button>
           </div>
-        </section>
-      )}
+      </ActionDrawer>
 
       <section className="overflow-hidden rounded-3xl border border-border bg-card">
         <div className="border-b border-border p-4 text-sm font-semibold">Privacy evidence</div>
@@ -225,12 +230,12 @@ function PrivacyPage() {
               <div className="md:col-span-12 flex flex-wrap gap-2">
                 {item.status === "Submitted" && (
                   <>
-                    <button onClick={() => setReleaseTarget(item)} className="rounded-full bg-foreground px-4 py-2 text-xs font-semibold text-background">
+                    <button type="button" onClick={() => setReleaseTarget(item)} className="rounded-full bg-foreground px-4 py-2 text-xs font-semibold text-background">
                       Release with nullifier
                     </button>
-                    <button onClick={() => void cancelIntent(item)} className="rounded-full bg-muted px-4 py-2 text-xs font-semibold">
+                    <AsyncButton onClick={() => cancelIntent(item)} onError={setMessage} className="rounded-full bg-muted px-4 py-2 text-xs font-semibold" loadingLabel="Cancelling...">
                       Cancel / refund
-                    </button>
+                    </AsyncButton>
                   </>
                 )}
                 {item.releaseTxHash ? <a href={txUrl(item.releaseTxHash)} target="_blank" rel="noreferrer" className="rounded-full bg-success/15 px-4 py-2 text-xs font-semibold text-success">Release tx {shortAddress(item.releaseTxHash)}</a> : null}

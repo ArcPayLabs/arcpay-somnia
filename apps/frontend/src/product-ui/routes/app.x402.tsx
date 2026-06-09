@@ -234,7 +234,7 @@ function X402Route() {
       />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard icon={ServerCog} label="Server" value="Ready" hint={serverHost} />
+        <StatCard icon={ServerCog} label="Server" value="Reachable" hint={serverHost} />
         <StatCard icon={LockKeyhole} label="Access" value={quote ? "Priced" : "Locked"} hint="Pay to unlock" />
         <StatCard icon={CheckCircle2} label="Payment" value={verification?.statusName || "--"} hint="Order status" />
         <StatCard icon={UnlockKeyhole} label="Result" value={unlock?.unlocked ? "Open" : "Closed"} hint="Available after payment" emphasis />

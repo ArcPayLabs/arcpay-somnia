@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Award, BarChart3, CheckCircle2, MessageSquareWarning, Star, Trophy } from "lucide-react";
 import { EmptyState } from "@/components/app/EmptyState";
 import { PageHeader } from "@/components/app/PageHeader";
+import { AsyncButton } from "@/components/primitives/AsyncButton";
 import { StatCard } from "@/components/primitives/StatCard";
 import { agentIdFromSlug, reputationBookContract, shortAddress, writeRecord } from "@somnia/lib/somnia";
 
@@ -108,8 +109,12 @@ function ReputationRoute() {
             </label>
           </div>
           <div className="mt-5 flex flex-wrap gap-2">
-            <button onClick={() => void recordReview()} className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">Record review</button>
-            <button onClick={() => void loadReputation()} className="rounded-full bg-muted px-5 py-2.5 text-sm font-semibold">Load reputation</button>
+            <AsyncButton onClick={recordReview} onError={setStatus} className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground" loadingLabel="Recording...">
+              Record review
+            </AsyncButton>
+            <AsyncButton onClick={loadReputation} onError={setStatus} className="rounded-full bg-muted px-5 py-2.5 text-sm font-semibold" loadingLabel="Loading...">
+              Load reputation
+            </AsyncButton>
           </div>
         </div>
 

@@ -13,7 +13,7 @@ function AuditPage() {
   const [records, setRecords] = useState<LocalRecord[]>(() => readRecords());
   const [query, setQuery] = useState("");
   const [reveal, setReveal] = useState(false);
-  const [message, setMessage] = useState("Audit records are sourced from Somnia actions, local evidence, and the Supabase mirror.");
+  const [message, setMessage] = useState("Audit records are sourced from Somnia actions, signed intents, and workspace evidence.");
 
   const filtered = useMemo(() => {
     const text = query.trim().toLowerCase();
@@ -23,7 +23,7 @@ function AuditPage() {
 
   async function refresh() {
     setRecords(await fetchRecords());
-    setMessage("Audit records refreshed from this browser and server mirror.");
+    setMessage("Audit records refreshed.");
   }
 
   function createViewingKey() {
@@ -82,7 +82,7 @@ function AuditPage() {
       />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Audit rows" value={records.length} hint="Somnia local + server records" />
+        <StatCard label="Audit rows" value={records.length} hint="Workspace evidence" />
         <StatCard label="Filtered" value={filtered.length} hint="Current search result" />
         <StatCard label="Tx evidence" value={records.filter((item) => item.txHash).length} hint="Explorer-backed records" />
         <StatCard label="Private fields" value={reveal ? "Visible" : "Hidden"} hint="Viewing-key controlled" emphasis />
@@ -119,7 +119,7 @@ function AuditPage() {
               <EmptyState
                 icon={ScrollText}
                 title="No audit records"
-                description="Run a wallet action, register an agent, create an order, submit a privacy intent, or refresh the Supabase mirror to populate the evidence trail."
+                description="Run a wallet action, register an agent, create an order, submit a privacy intent, or refresh records to populate the evidence trail."
                 actionLabel="Refresh records"
                 onAction={() => void refresh()}
               />

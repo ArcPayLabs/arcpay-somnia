@@ -80,7 +80,7 @@ function SettingsPage() {
 
     async function loadSettings() {
       if (!supabase) {
-        setStatus("Supabase env is not configured in this frontend runtime.");
+        setStatus("Workspace settings are available in this browser. Sign in to sync across devices.");
         return;
       }
 
@@ -143,7 +143,7 @@ function SettingsPage() {
 
     const supabase = getOptionalSupabaseClient();
     if (!supabase) {
-      setStatus("Supabase env is not configured in this frontend runtime.");
+      setStatus("Workspace settings are available in this browser. Sign in to sync across devices.");
       return;
     }
 

@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Bell, Search, Wallet, ChevronDown, Building2, UserRound, Settings, LogOut, ShieldCheck, Plus } from "lucide-react";
+import { Bell, Search, Wallet, ChevronDown, Building2, UserRound, Settings, LogOut, ShieldCheck, Plus, UserPlus } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -18,7 +18,7 @@ import { ensureCurrentUserAccount } from "@/lib/account";
 const QUICK_NAV = [
   { label: "Overview", to: "/dashboard" },
   { label: "Wallet", to: "/wallet" },
-  { label: "Agents", to: "/app/agents" },
+  { label: "Agents", to: "/agents" },
   { label: "x402", to: "/x402" },
   { label: "Payments", to: "/payments" },
   { label: "Invoices", to: "/invoices" },
@@ -39,6 +39,9 @@ export function AppTopBar() {
   const [email, setEmail] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState<string>("");
   const [workspaceName, setWorkspaceName] = useState("Multi-agent agency");
+  const [workspaceOpen, setWorkspaceOpen] = useState(false);
+  const [workspaceDraft, setWorkspaceDraft] = useState("Somnia agent treasury");
+  const [workspaceMessage, setWorkspaceMessage] = useState("");
   const walletAction = useWalletConnectAction();
 
   useEffect(() => {
@@ -92,6 +95,43 @@ export function AppTopBar() {
     if (!email) router.push("/");
   }
 
+  async function createWorkspace() {
+    const nextName = workspaceDraft.trim();
+    if (!nextName) {
+      setWorkspaceMessage("Workspace name is required.");
+      return;
+    }
+    setWorkspaceName(nextName);
+    setWorkspaceMessage("Workspace created for this browser session.");
+    const supabase = getOptionalSupabaseClient();
+    if (!supabase) {
+      setWorkspaceOpen(false);
+      return;
+    }
+    const account = await ensureCurrentUserAccount(supabase);
+    if (!account) {
+      setWorkspaceOpen(false);
+      return;
+    }
+    const { data: auth } = await supabase.auth.getUser();
+    const userId = auth.user?.id;
+    if (!userId) {
+      setWorkspaceOpen(false);
+      return;
+    }
+    await supabase.from("user_workspace_settings").upsert(
+      {
+        user_id: userId,
+        workspace_name: nextName,
+        default_network: "somnia",
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" },
+    );
+    setWorkspaceMessage("Workspace saved.");
+    setWorkspaceOpen(false);
+  }
+
   return (
     <>
       <header className="h-14 border-b border-border bg-background/80 backdrop-blur sticky top-0 z-20 flex items-center px-3 gap-3">
@@ -112,9 +152,9 @@ export function AppTopBar() {
             <Link to="/settings" className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition hover:bg-muted">
               <Settings className="h-4 w-4" /> Workspace settings
             </Link>
-            <Link to="/sign-up" className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition hover:bg-muted">
+            <button type="button" onClick={() => setWorkspaceOpen(true)} className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm transition hover:bg-muted">
               <Plus className="h-4 w-4" /> Create workspace
-            </Link>
+            </button>
           </div>
         </details>
 
@@ -123,7 +163,9 @@ export function AppTopBar() {
         {/* Wallet pill */}
         <button
           type="button"
-          onClick={() => void walletAction.connectWallet()}
+          onClick={() => {
+            if (!walletAction.publicKeyBase58) void walletAction.connectWallet();
+          }}
           disabled={walletAction.connecting}
           className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted hover:bg-muted/70 text-sm font-medium transition-colors"
         >
@@ -194,6 +236,34 @@ export function AppTopBar() {
           </DropdownMenuContent>
         </DropdownMenu>
       </header>
+      {workspaceOpen && (
+        <div className="fixed inset-0 z-50">
+          <button type="button" aria-label="Close workspace dialog" className="absolute inset-0 bg-black/30" onClick={() => setWorkspaceOpen(false)} />
+          <section className="absolute right-0 top-0 h-full w-full max-w-lg border-l border-border bg-background p-5 shadow-2xl sm:rounded-l-[2rem]">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                  <UserPlus className="h-3.5 w-3.5" /> Workspace
+                </div>
+                <h2 className="mt-4 text-2xl font-semibold tracking-tight">Create a workspace</h2>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  Name the workspace for this operator account. You can link email later from Profile if you want email login too.
+                </p>
+              </div>
+              <button type="button" onClick={() => setWorkspaceOpen(false)} className="rounded-full bg-muted px-3 py-1.5 text-sm font-semibold">Close</button>
+            </div>
+            <label className="mt-6 block">
+              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Workspace name</span>
+              <input value={workspaceDraft} onChange={(event) => setWorkspaceDraft(event.target.value)} className="ap-in" placeholder="Somnia agent treasury" />
+            </label>
+            {workspaceMessage ? <div className="mt-4 rounded-2xl bg-muted px-4 py-3 text-sm text-muted-foreground">{workspaceMessage}</div> : null}
+            <div className="mt-6 flex flex-wrap gap-2">
+              <button type="button" onClick={() => void createWorkspace()} className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">Create workspace</button>
+              <button type="button" onClick={() => setWorkspaceOpen(false)} className="rounded-full bg-muted px-5 py-2.5 text-sm font-semibold">Cancel</button>
+            </div>
+          </section>
+        </div>
+      )}
     </>
   );
 }

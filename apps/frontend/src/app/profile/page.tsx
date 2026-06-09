@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Mail, UserRound, Wallet } from "lucide-react";
 import { ProductAppShell } from "../product-render";
 import { PageHeader } from "../../product-ui/components/app/PageHeader";
+import { AsyncButton } from "../../product-ui/components/primitives/AsyncButton";
 import { StatCard } from "../../product-ui/components/primitives/StatCard";
 import { useWalletConnectAction } from "../../product-ui/hooks/use-wallet-connect-action";
 import { getOptionalSupabaseClient } from "../supabase-client";
@@ -28,7 +29,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<ProfileForm>(EMPTY_PROFILE);
   const [email, setEmail] = useState("");
   const [userId, setUserId] = useState("");
-  const [status, setStatus] = useState("Connect a Somnia wallet or sign in with email to sync profile details.");
+  const [status, setStatus] = useState("Connect a Somnia wallet or sign in with email to manage profile details.");
   const walletAddress = walletAction.publicKeyBase58 ?? "";
 
   useEffect(() => {
@@ -37,7 +38,7 @@ export default function ProfilePage() {
 
     async function load() {
       if (!supabase) {
-        setStatus("Supabase env is not configured. Wallet profile remains local.");
+        setStatus("Wallet profile is available in this browser. Email sync can be connected later.");
         return;
       }
       const { data } = await supabase.auth.getUser();
@@ -80,7 +81,7 @@ export default function ProfilePage() {
   async function saveProfile() {
     const supabase = getOptionalSupabaseClient();
     if (!supabase || !userId) {
-      setStatus("Email profile sync requires Supabase sign-in. Wallet identity is already stored in this browser session.");
+      setStatus("Sign in with email before saving email profile fields. Wallet identity is already available in this browser.");
       return;
     }
     const { error } = await supabase.from("user_profiles").upsert({
@@ -112,7 +113,7 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           <StatCard icon={Wallet} label="Wallet" value={walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : "--"} hint="Somnia signer" />
           <StatCard icon={Mail} label="Email" value={email || "--"} hint="Optional login identity" />
-          <StatCard label="Sync" value={userId ? "Supabase" : "Local"} hint="Profile persistence" emphasis />
+          <StatCard label="Profile" value={userId ? "Email linked" : "Wallet only"} hint="Identity mode" emphasis />
         </div>
 
         <div className="rounded-2xl border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">{status}</div>
@@ -124,7 +125,9 @@ export default function ProfilePage() {
             <Field label="Notification email"><input className="ap-in" value={profile.notificationEmail} onChange={(event) => setProfile({ ...profile, notificationEmail: event.target.value })} /></Field>
             <Field label="Wallet label"><input className="ap-in" value={profile.walletLabel} onChange={(event) => setProfile({ ...profile, walletLabel: event.target.value })} /></Field>
           </div>
-          <button onClick={() => void saveProfile()} className="mt-5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">Save profile</button>
+          <AsyncButton onClick={saveProfile} onError={setStatus} className="mt-5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground" loadingLabel="Saving...">
+            Save profile
+          </AsyncButton>
         </section>
       </div>
     </ProductAppShell>

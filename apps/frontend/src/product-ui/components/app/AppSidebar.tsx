@@ -19,6 +19,7 @@ import {
   RadioTower,
   Trophy,
   Activity,
+  ShieldCheck,
 } from "lucide-react";
 import {
   Sidebar,
@@ -38,10 +39,10 @@ import { useNetwork, type NetworkMode } from "@/store/network";
 const ITEMS = [
   { title: "Overview", url: "/dashboard", icon: LayoutDashboard, networks: ["somnia"] },
   { title: "Wallet", url: "/wallet", icon: Wallet, networks: ["somnia"] },
-  { title: "Agents", url: "/app/agents", icon: Bot, networks: ["somnia"] },
-  { title: "Orders", url: "/app/orders", icon: Workflow, networks: ["somnia"] },
+  { title: "Agents", url: "/agents", icon: Bot, networks: ["somnia"] },
+  { title: "Orders", url: "/orders", icon: Workflow, networks: ["somnia"] },
   { title: "x402", url: "/x402", icon: RadioTower, networks: ["somnia"] },
-  { title: "Cards", url: "/app/cards", icon: CreditCard, networks: ["somnia"] },
+  { title: "Cards", url: "/cards", icon: CreditCard, networks: ["somnia"] },
   { title: "Payments", url: "/payments", icon: Send, networks: ["somnia"] },
   { title: "Invoices", url: "/invoices", icon: FileText, networks: ["somnia"] },
   { title: "Contractors", url: "/contractors", icon: Users, networks: ["somnia"] },
@@ -50,8 +51,9 @@ const ITEMS = [
   { title: "Privacy", url: "/privacy", icon: EyeOff, networks: ["somnia"] },
   { title: "Risk", url: "/risk", icon: ShieldAlert, networks: ["somnia"] },
   { title: "Reputation", url: "/reputation", icon: Trophy, networks: ["somnia"] },
-  { title: "Oracle", url: "/app/oracle", icon: Gauge, networks: ["somnia"] },
+  { title: "Oracle", url: "/oracle", icon: Gauge, networks: ["somnia"] },
   { title: "Policies", url: "/policies", icon: SlidersHorizontal, networks: ["somnia"] },
+  { title: "Operator", url: "/operator", icon: ShieldCheck, networks: ["somnia"] },
   { title: "Audit", url: "/audit", icon: ScrollText, networks: ["somnia"] },
   { title: "Status", url: "/status", icon: Activity, networks: ["somnia"] },
 ] as const;

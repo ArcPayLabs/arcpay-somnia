@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { CheckCircle2, Copy, Plus, Search, Send, WalletCards } from "lucide-react";
 import { EmptyState } from "@/components/app/EmptyState";
 import { PageHeader } from "@/components/app/PageHeader";
+import { ActionDrawer } from "@/components/primitives/ActionDrawer";
 import { ReviewModal, type ReviewRow } from "@/components/primitives/ReviewModal";
 import { StatCard } from "@/components/primitives/StatCard";
 import { readLocalJson, writeLocalJson } from "@/lib/browser-cache";
@@ -126,17 +127,21 @@ function PaymentsPage() {
       />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard icon={WalletCards} label="Total intents" value={items.length} hint="Local + Supabase record mirror" />
-        <StatCard icon={Send} label="Ready" value={ready} hint="Awaiting wallet signature" />
+        <StatCard icon={WalletCards} label="Total intents" value={items.length} hint="Workspace payment records" />
+        <StatCard icon={Send} label="To review" value={ready} hint="Awaiting operator signature" />
         <StatCard icon={CheckCircle2} label="Signed" value={signed} hint="Operator approved intents" />
-        <StatCard label="Network" value="50312" hint="Somnia Testnet only" emphasis />
+        <StatCard label="Rail" value="Somnia" hint="STT and SOMUSD" emphasis />
       </div>
 
       <div className="rounded-2xl border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">{message}</div>
 
-      {open && (
-        <section className="rounded-3xl border border-border bg-card p-5 md:p-6">
-          <div className="grid gap-4 md:grid-cols-2">
+      <ActionDrawer
+        open={open}
+        title="New payment intent"
+        description="Prepare the payment details first. ArcPay validates policy before asking the wallet to sign the intent."
+        onClose={() => setOpen(false)}
+      >
+          <div className="grid gap-4">
             <Field label="Recipient">
               <input value={form.recipient} onChange={(event) => setForm({ ...form, recipient: event.target.value })} className="ap-in" placeholder="0x..." />
             </Field>
@@ -164,8 +169,7 @@ function PaymentsPage() {
             <button onClick={stagePayment} className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">Review and sign</button>
             <button onClick={() => setOpen(false)} className="rounded-full bg-muted px-5 py-2.5 text-sm font-semibold">Cancel</button>
           </div>
-        </section>
-      )}
+      </ActionDrawer>
 
       <section className="overflow-hidden rounded-3xl border border-border bg-card">
         <div className="flex flex-col gap-3 border-b border-border p-4 md:flex-row md:items-center md:justify-between">

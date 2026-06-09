@@ -92,7 +92,7 @@ function InvoicesPage() {
     const supabase = getOptionalSupabaseClient();
     if (!supabase) {
       setItems(readLocalInvoices());
-      setMessage("Supabase is not configured; showing browser invoice records.");
+      setMessage("Showing invoice records saved for this workspace.");
       return;
     }
 
@@ -287,7 +287,7 @@ function InvoicesPage() {
         <StatCard label="Outstanding" value={`${sum(outstanding).toLocaleString()} STT/SOMUSD`} hint={`${outstanding.length} open`} icon={WalletCards} />
         <StatCard label="Paid" value={paid.length} hint={`${sum(paid).toLocaleString()} total units`} />
         <StatCard label="Cancelled" value={items.filter((item) => item.status === "cancelled").length} />
-        <StatCard label="Contract" value={onchainReady ? "Live" : "Missing"} hint={onchainReady ? shortAddress(CONTRACTS.AgentInvoiceBook) : "Deploy invoice book"} />
+        <StatCard label="Invoice book" value={onchainReady ? "Available" : "Unavailable"} hint={onchainReady ? shortAddress(CONTRACTS.AgentInvoiceBook) : "Contract address required"} />
       </div>
 
       <div className="mb-4 rounded-2xl border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">

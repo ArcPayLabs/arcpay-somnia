@@ -6,6 +6,7 @@ import type { ComponentType, ReactNode } from "react";
 import { KeyRound, RadioTower, ShieldCheck } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import { RecordTable } from "@/components/RecordTable";
+import { AsyncButton } from "../../product-ui/components/primitives/AsyncButton";
 import { DEPTH_CONTRACTS_READY, agentIdFromSlug, hashText, operatorControlsContract, writeRecord } from "@somnia/lib/somnia";
 
 export default function OperatorPage() {
@@ -16,9 +17,14 @@ export default function OperatorPage() {
     ttlSeconds: "86400",
   });
   const [webhook, setWebhook] = useState("https://agent.example/webhook");
-  const [status, setStatus] = useState("Ready to create claim codes or update webhook circuit breaker state.");
+  const [status, setStatus] = useState("Create claim codes for service-agent onboarding or update webhook circuit breakers with wallet-signed evidence.");
 
   async function createClaimCode() {
+    const error = validateClaim(claim);
+    if (error) {
+      setStatus(error);
+      return;
+    }
     if (!DEPTH_CONTRACTS_READY) {
       setStatus("OperatorControls is not available in this deployment config. Confirm the contract address before signing.");
       return;
@@ -36,6 +42,10 @@ export default function OperatorPage() {
   }
 
   async function redeemClaimCode() {
+    if (!claim.code.trim()) {
+      setStatus("Claim code is required before an agent can redeem it.");
+      return;
+    }
     if (!DEPTH_CONTRACTS_READY) {
       setStatus("OperatorControls is not available in this deployment config. Confirm the contract address before signing.");
       return;
@@ -48,6 +58,10 @@ export default function OperatorPage() {
   }
 
   async function recordWebhook(kind: "success" | "failure" | "reset" | "check") {
+    if (!isValidUrl(webhook)) {
+      setStatus("Enter a valid webhook URL before updating breaker state.");
+      return;
+    }
     if (!DEPTH_CONTRACTS_READY) {
       setStatus("Webhook circuit breakers are not available in this deployment config. Confirm OperatorControls before signing.");
       return;
@@ -108,8 +122,12 @@ export default function OperatorPage() {
               </Field>
             </div>
             <div className="mt-5 flex flex-wrap gap-3">
-              <button className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground" onClick={createClaimCode}>Create claim code</button>
-              <button className="rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold" onClick={redeemClaimCode}>Redeem as agent</button>
+              <AsyncButton className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground" onClick={createClaimCode} onError={setStatus} loadingLabel="Creating...">
+                Create claim code
+              </AsyncButton>
+              <AsyncButton className="rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold" onClick={redeemClaimCode} onError={setStatus} loadingLabel="Redeeming...">
+                Redeem as agent
+              </AsyncButton>
             </div>
           </Card>
 
@@ -118,10 +136,18 @@ export default function OperatorPage() {
               <input className={INPUT_CLASS} value={webhook} onChange={(event) => setWebhook(event.target.value)} />
             </Field>
             <div className="mt-5 flex flex-wrap gap-3">
-              <button className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground" onClick={() => recordWebhook("success")}>Record success</button>
-              <button className="rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold" onClick={() => recordWebhook("failure")}>Record failure</button>
-              <button className="rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold" onClick={() => recordWebhook("check")}>Check breaker</button>
-              <button className="rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold" onClick={() => recordWebhook("reset")}>Reset</button>
+              <AsyncButton className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground" onClick={() => recordWebhook("success")} onError={setStatus} loadingLabel="Recording...">
+                Record success
+              </AsyncButton>
+              <AsyncButton className="rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold" onClick={() => recordWebhook("failure")} onError={setStatus} loadingLabel="Recording...">
+                Record failure
+              </AsyncButton>
+              <AsyncButton className="rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold" onClick={() => recordWebhook("check")} onError={setStatus} loadingLabel="Checking...">
+                Check breaker
+              </AsyncButton>
+              <AsyncButton className="rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold" onClick={() => recordWebhook("reset")} onError={setStatus} loadingLabel="Resetting...">
+                Reset
+              </AsyncButton>
             </div>
             <div className="mt-5 rounded-2xl bg-muted/50 p-4 text-sm text-muted-foreground break-words">{status}</div>
           </Card>
@@ -171,6 +197,24 @@ function shortHost(value: string) {
     return new URL(value).host;
   } catch {
     return value || "--";
+  }
+}
+
+function validateClaim(claim: { code: string; agentSlug: string; metadataUri: string; ttlSeconds: string }) {
+  if (!claim.code.trim()) return "Claim code is required.";
+  if (!claim.agentSlug.trim()) return "Agent slug is required.";
+  if (!claim.metadataUri.trim()) return "Metadata URI is required.";
+  const ttl = Number.parseInt(claim.ttlSeconds, 10);
+  if (!Number.isFinite(ttl) || ttl <= 0) return "TTL must be a positive number of seconds.";
+  return "";
+}
+
+function isValidUrl(value: string) {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:";
+  } catch {
+    return false;
   }
 }
 

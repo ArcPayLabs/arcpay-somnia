@@ -23,7 +23,7 @@ import {
 const NAV = [
   { label: "Overview", to: "/dashboard", icon: LayoutDashboard },
   { label: "Wallet", to: "/wallet", icon: Wallet },
-  { label: "Agents", to: "/app/agents", icon: Users },
+  { label: "Agents", to: "/agents", icon: Users },
   { label: "x402", to: "/x402", icon: RadioTower },
   { label: "Payments", to: "/payments", icon: Send },
   { label: "Invoices", to: "/invoices", icon: FileText },

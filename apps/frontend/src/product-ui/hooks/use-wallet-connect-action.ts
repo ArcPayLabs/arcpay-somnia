@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { getAddress } from "ethers";
 import { SOMNIA_CHAIN_ID_HEX } from "@somnia/lib/somnia";
+import { friendlyWalletError } from "@/components/primitives/AsyncButton";
 
 type EthereumProvider = {
   request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
@@ -44,11 +45,13 @@ export function useWalletConnectAction(): WalletConnectAction {
 
   const connectWallet = useCallback(async (): Promise<WalletConnectResult> => {
     try {
+      if (connecting) throw new Error("A wallet request is already pending.");
+      if (address) return { address };
       setConnecting(true);
       setErrorMessage(null);
       const provider = getProvider();
       if (!provider) {
-        throw new Error("Install MetaMask, Rabby, or another EVM wallet to connect to Somnia.");
+        throw new Error("Install or unlock an EVM wallet to connect to Somnia.");
       }
 
       await provider.request({
@@ -90,14 +93,14 @@ export function useWalletConnectAction(): WalletConnectAction {
       setAddress(nextAddress);
       return { address: nextAddress, supabaseAuth: verifiedBody.supabaseAuth };
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Somnia wallet connection failed.";
+      const message = friendlyWalletError(error);
       setErrorMessage(message);
       console.warn("Somnia wallet connection failed.", message);
-      throw error instanceof Error ? error : new Error(message);
+      throw new Error(message);
     } finally {
       setConnecting(false);
     }
-  }, []);
+  }, [address, connecting]);
 
   return {
     connectWallet,
