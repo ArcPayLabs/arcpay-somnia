@@ -4,6 +4,8 @@ export type ServerSession = {
   address: string;
 };
 
+const DEFAULT_ADMIN_WALLETS = ["0xd953da085934f77cea8a2fb7a32fd48e4b1c1458"];
+
 export function sessionFromRequest(request: Request): ServerSession | null {
   const cookie = request.headers.get("cookie") ?? "";
   const value = cookie.match(new RegExp(`${sessionCookie}=([^;]+)`))?.[1];
@@ -11,12 +13,11 @@ export function sessionFromRequest(request: Request): ServerSession | null {
 }
 
 export function adminAddressSet() {
-  return new Set(
-    String(process.env.ARCPAY_ADMIN_WALLETS ?? process.env.NEXT_PUBLIC_ARCPAY_ADMIN_WALLETS ?? "")
+  const configured = String(process.env.ARCPAY_ADMIN_WALLETS ?? process.env.NEXT_PUBLIC_ARCPAY_ADMIN_WALLETS ?? "")
       .split(",")
       .map((address) => address.trim().toLowerCase())
-      .filter(Boolean),
-  );
+      .filter(Boolean);
+  return new Set([...DEFAULT_ADMIN_WALLETS, ...configured]);
 }
 
 export function requireSession(request: Request) {

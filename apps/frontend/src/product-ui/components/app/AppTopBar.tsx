@@ -14,7 +14,7 @@ import {
 import { getOptionalSupabaseClient } from "../../../app/supabase-client";
 import { useWalletConnectAction } from "@/hooks/use-wallet-connect-action";
 import { ensureCurrentUserAccount } from "@/lib/account";
-import { activateWorkspace, createWorkspace as createCloudWorkspace, loadWorkspaces, type WorkspaceRecord } from "@/lib/workspaces";
+import { activateWorkspace, createWorkspace as createCloudWorkspace, loadCachedWorkspaces, loadWorkspaces, type WorkspaceRecord } from "@/lib/workspaces";
 
 const QUICK_NAV = [
   { label: "Overview", to: "/dashboard" },
@@ -51,6 +51,10 @@ export function AppTopBar() {
   useEffect(() => {
     const supabase = getOptionalSupabaseClient();
     let mounted = true;
+    const cached = loadCachedWorkspaces(NETWORK, "Somnia agent treasury");
+    const cachedActive = cached.find((workspace) => workspace.isActive) ?? cached[0];
+    setWorkspaceOptions(cached);
+    setWorkspaceName(cachedActive?.name ?? "Somnia agent treasury");
 
     async function loadAccount() {
       if (!supabase) return;
@@ -59,8 +63,8 @@ export function AppTopBar() {
       if (!account) {
         setEmail(null);
         setDisplayName("");
-        setWorkspaceName("Multi-agent agency");
-        setWorkspaceOptions([]);
+        setWorkspaceName(cachedActive?.name ?? "Somnia agent treasury");
+        setWorkspaceOptions(cached);
         return;
       }
       const workspaces = await loadWorkspaces(supabase, NETWORK, account.workspaceName);
@@ -75,11 +79,11 @@ export function AppTopBar() {
     void loadAccount();
 
     const { data: listener } = supabase?.auth.onAuthStateChange((_event, session) => {
-      setEmail(session?.user.email ?? null);
+      setEmail(isWalletAuthEmail(session?.user.email) ? null : session?.user.email ?? null);
       if (!session?.user) {
         setDisplayName("");
-        setWorkspaceName("Multi-agent agency");
-        setWorkspaceOptions([]);
+        setWorkspaceName(cachedActive?.name ?? "Somnia agent treasury");
+        setWorkspaceOptions(cached);
       }
       else void loadAccount();
     }) ?? { data: { subscription: { unsubscribe: () => undefined } } };
@@ -299,4 +303,8 @@ export function AppTopBar() {
 
 function initial(value: string | null) {
   return (value?.trim()[0] ?? "A").toUpperCase();
+}
+
+function isWalletAuthEmail(value: string | null | undefined) {
+  return Boolean(value && value.endsWith("@arcpay.local"));
 }

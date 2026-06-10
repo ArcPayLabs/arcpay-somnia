@@ -1,166 +1,139 @@
 # ArcPay Somnia Demo Recording Runbook
 
-Use this as the exact recording checklist.
+Use this as the exact screen-recording checklist. Record the screen first, then generate the voiceover from `DEMO_VOICEOVER.txt` and align cuts in CapCut, HyperFrames, or another editor.
 
 ## Before Recording
 
-1. Open a clean browser profile if possible.
-2. Connect the funded Somnia wallet.
-3. Keep only the demo tabs open.
-4. Set browser zoom to 100% for app screens and 125% for JSON/status pages.
-5. Keep `DEMO_VOICEOVER.txt` ready for ElevenLabs.
-6. Record screen only first. Add voiceover after in CapCut or HyperFrames.
+1. Use a clean browser window.
+2. Keep only ArcPay, docs, npm, and explorer tabs open.
+3. Connect the funded Somnia wallet before starting if you want fewer interruptions.
+4. Set browser zoom to 100% for dashboard pages and 125% for JSON/docs pages.
+5. Keep this file and `DEMO_VIDEO_PLAN.md` open on another monitor.
+6. Do not expose secrets, admin bearer tokens, recovery codes, or private keys.
 
-## Screen Recording Path
+## Exact Values
 
-### 1. Landing And Problem
+- Workspace: `Somnia agent treasury`
+- Agent slug: `research-agent`
+- Agent endpoint: `https://x402.20.208.46.195.nip.io/agent/research-agent/work`
+- Claim code: `claim-research-agent-001`
+- Metadata URI: `ipfs://agent-onboarding-pack`
+- Webhook: `https://agent.example/webhook`
+- x402 server: `https://x402.20.208.46.195.nip.io`
+- x402 result URI: `ipfs://arcpay-x402-result/research-agent`
+- Card slug: `research-card-001`
+- Card label: `Research Agent SOMUSD Card`
+- Card limit: `5`
+- Card top-up: `5`
+- Privacy memo URI: `selective-disclosure://workspace-auditor`
+
+## Recording Path
+
+### 1. Landing
 
 Open `https://arcpay-somnia.vercel.app`.
 
-Show:
+Show the hero, the Somnia testnet badge, and navigation. Click `Open App`.
 
-- hero
-- Somnia testnet badge
-- navigation
-- Product/Solutions section if visible
+### 2. Sign In
 
-Do not spend more than 20 seconds here.
+If signed out, use wallet sign-in. Pause recording while waiting for wallet confirmation. Resume when the dashboard opens.
 
-### 2. Auth And Workspace
-
-Click `Open App`.
+### 3. Dashboard
 
 Show:
 
-- sign-in page
-- wallet connect/signature if clean
-- dashboard loaded
 - workspace name in top bar
-- workspace dropdown showing saved workspaces if available
+- wallet/balance card
+- orders/cards/privacy/system health cards
+- no visible loading/flicker
 
-If wallet prompt stalls, pause and resume after signature.
-
-### 3. Agent Layer
+### 4. Agents
 
 Open `/agents`.
 
-Show:
+Show the bring-your-own-agent section and the Somnia Agents section. Use `research-agent` and the x402 endpoint above if editing fields.
 
-- bring-your-own-agent onboarding
-- official Somnia Agents block
-- IDs for LLM Parse Website, LLM Inference, JSON API Request
-- Somnia platform contract and AgentRegistry
+### 5. Operator
 
-Optional click:
+Open `/operator`.
 
-- copy payload or open status endpoint.
+Show claim-code onboarding and webhook breaker controls. If signing live, create the claim code and save the tx hash. If not signing, show the form and say the operator can sign it.
 
-### 4. x402 Payment Rail
+### 6. x402
 
 Open `/x402`.
 
-Show:
+Set:
 
-- x402 gateway URL
-- protected resource
-- click Quote
-- click Check 402
-- payment requirements
-- order/verify/unlock area
+- Server URL: `https://x402.20.208.46.195.nip.io`
+- Agent slug: `research-agent`
+- Result URI: `ipfs://arcpay-x402-result/research-agent`
 
-If you create a real order, capture:
+Click:
 
-- order ID
-- tx hash
-- verification response
+1. `Get price`
+2. `Check access`
+3. Optional: `Pay` with wallet
+4. Optional: `Verify`
+5. Optional: `Unlock`
 
-### 5. Policy And Privacy
+Capture the quote JSON/card. If you pay, capture the order ID and tx hash.
+
+### 7. Policies
 
 Open `/policies`.
 
-Show:
+Show global spend controls and explain that agent-specific limits are represented through agent/card/order policy plans and evidence requirements.
 
-- budget/spend policy
-- pause/approval controls
-- allowlist or evidence controls
+### 8. Cards
+
+Open `/cards`.
+
+Open create card drawer and show:
+
+- Card slug: `research-card-001`
+- Label: `Research Agent SOMUSD Card`
+- Limit: `5`
+
+Open fund drawer and show top-up `5`. If signing live, capture approve/top-up tx hashes.
+
+### 9. Privacy
 
 Open `/privacy`.
 
-Show:
+Show commitment intent and selective disclosure flow. Only say "released" if a release tx or audit record is visible.
 
-- privacy commitment
-- memo URI
-- release/evidence concept
+### 10. DeFi Intent Evidence
 
-Only claim live execution if the recording shows the tx or saved audit record.
+Open `/swaps`, then `/yield`.
 
-### 6. DeFi Intent Evidence
+Show dreamDEX/Somnia Exchange/Somnex/Potion/custom DEX adapter options and the evidence rules. Do not call these executed trades without a tx hash.
 
-Open `/swaps`.
+### 11. Audit And Status
 
-Show:
+Open `/audit`, then `/status`.
 
-- dreamDEX / Somnia Exchange / Somnex / Potion / custom DEX adapter options
-- intent and evidence wording
+Show recent records, tx evidence count, RPC/contracts/x402/docs/API health.
 
-Open `/yield`.
+### 12. Developer Surfaces
 
-Show:
-
-- yield routing/evidence controls
-- policy gate
-
-Do not call these “executed trades” unless there is a transaction hash.
-
-### 7. Audit, Status, And Developer Surfaces
-
-Open `/audit`.
-
-Show:
-
-- evidence timeline
-- record categories
-
-Open `/status`.
-
-Show:
-
-- live health checks
-- Somnia Agents status
-- x402/API health
-
-Open docs/dev tabs:
+Open:
 
 - `/docs/overview`
 - `/llms.txt`
 - `/.well-known/mcp/server-card.json`
-- npm package pages
+- npm package pages for CLI, MCP, and starter kit
 
-### 8. Close
+Show that the project is usable by dashboard users, developers, and AI agents.
 
-Return to dashboard or landing.
+## Edit Notes
 
-End with:
-
-- app link
-- GitHub link
-- docs link
-- “Built for Somnia agent businesses”
-
-## Voiceover Timing
-
-Use `DEMO_VOICEOVER.txt`.
-
-If the voiceover is longer than the screen recording:
-
-- cut the “not only an app” developer paragraph shorter
-- speed audio to 1.05x
-- remove repeated examples
-
-If the screen recording is longer:
-
-- add captions instead of more voiceover
-- avoid filler narration
+- Cut all wallet waiting time.
+- Add captions for proof points.
+- Keep every screen segment under 30 seconds.
+- Use HyperFrames only for intro/outro polish.
+- End under 5 minutes.
 
 ## Submission Links
 
@@ -169,4 +142,6 @@ If the screen recording is longer:
 - Docs: `https://arcpay-somnia.vercel.app/docs/overview`
 - Status: `https://arcpay-somnia.vercel.app/status`
 - x402 discovery: `https://arcpay-somnia.vercel.app/platform/v2/x402/discovery/resources`
-
+- CLI: `https://www.npmjs.com/package/@arcpaylabs/somnia-cli`
+- MCP: `https://www.npmjs.com/package/@arcpaylabs/somnia-mcp`
+- Starter kit: `https://www.npmjs.com/package/@arcpaylabs/somnia-x402-agent-starter`

@@ -14,8 +14,10 @@ function DashboardRoute() {
   const [records, setRecords] = useState<LocalRecord[]>([]);
   const [wallet, setWallet] = useState("");
   const [balance, setBalance] = useState("");
+  const [greeting, setGreeting] = useState("Welcome back.");
 
   useEffect(() => {
+    setGreeting(resolveGreeting());
     void fetchRecords().then(setRecords);
     connectedAddress().then(async (address) => {
       setWallet(address);
@@ -37,7 +39,7 @@ function DashboardRoute() {
       <PageHeader
         icon={Workflow}
         eyebrow="Overview"
-        title="Good morning."
+        title={greeting}
         description="Control agent spending, payments, invoices, cards, privacy, and audit records from one workspace."
         actions={<Link href="/payments" className="rounded-full bg-foreground px-4 py-2.5 text-sm font-medium text-background">New payment</Link>}
         back={false}
@@ -94,4 +96,17 @@ function DashboardRoute() {
       </div>
     </div>
   );
+}
+
+function resolveGreeting() {
+  if (typeof window === "undefined") return "Welcome back.";
+  const key = "arcpay-somnia-dashboard-visit-date";
+  const today = new Date().toISOString().slice(0, 10);
+  const lastVisit = window.localStorage.getItem(key);
+  window.localStorage.setItem(key, today);
+  if (lastVisit === today) return "Welcome back.";
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning.";
+  if (hour < 17) return "Good afternoon.";
+  return "Good evening.";
 }

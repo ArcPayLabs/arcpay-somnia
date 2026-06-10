@@ -112,6 +112,123 @@ server.tool("x402_guide", "Return builder instructions for the ArcPay Somnia x40
   };
 });
 
+server.tool("agent_onboarding_payload", "Generate a bring-your-own-agent onboarding payload for ArcPay Somnia.", {
+  slug: z.string().min(1),
+  endpoint: z.string().url().optional(),
+  priceStt: z.string().optional(),
+}, async ({ slug, endpoint, priceStt = "0.001" }) => {
+  const deployment = readDeployment();
+  return {
+    content: [{
+      type: "text",
+      text: JSON.stringify({
+        protocol: "arcpay-somnia-agent-onboarding",
+        network: deployment.network,
+        chainId: deployment.chainId,
+        agentSlug: slug,
+        agentId: id(slug),
+        endpoint: endpoint ?? `https://x402.20.208.46.195.nip.io/agent/${slug}/work`,
+        priceStt,
+        contracts: {
+          registry: deployment.contracts.AgentRegistry,
+          orderBook: deployment.contracts.AgentOrderBook,
+          policy: deployment.contracts.TreasuryPolicy,
+          operatorControls: deployment.contracts.OperatorControls,
+          spendCardVault: deployment.contracts.AgentSpendCardVault,
+          reputation: deployment.contracts.AgentReputationBook,
+        },
+        nextSteps: [
+          "Register the slug/capabilities on AgentRegistry.",
+          "Create or redeem a claim code in OperatorControls if the agent is external.",
+          "Attach workspace policy and optional per-agent limits.",
+          "Quote x402, create escrowed order, verify/fulfill, then record audit evidence.",
+        ],
+      }, null, 2),
+    }],
+  };
+});
+
+server.tool("somusd_card_plan", "Generate a SOMUSD spend-card setup plan for an agent.", {
+  slug: z.string().min(1),
+  agentWallet: z.string().optional(),
+  limitSomusd: z.string().optional(),
+}, async ({ slug, agentWallet = "<agent-wallet-address>", limitSomusd = "5" }) => {
+  const deployment = readDeployment();
+  const cardSlug = `${slug}-somusd-card`;
+  return {
+    content: [{
+      type: "text",
+      text: JSON.stringify({
+        protocol: "arcpay-somnia-somusd-card",
+        network: deployment.network,
+        chainId: deployment.chainId,
+        cardSlug,
+        cardId: keccak256(toUtf8Bytes(cardSlug)),
+        agentWallet,
+        limitSomusd,
+        contracts: {
+          spendCardVault: deployment.contracts.AgentSpendCardVault,
+          somusd: deployment.somUsdToken,
+        },
+        calls: [
+          "SOMUSD.approve(AgentSpendCardVault, amountBaseUnits)",
+          "AgentSpendCardVault.createCard(cardId, agentWallet, SOMUSD, limitBaseUnits, label)",
+          "AgentSpendCardVault.topUpCard(cardId, amountBaseUnits)",
+          "AgentSpendCardVault.setCardStatus(cardId, true|false)",
+          "AgentSpendCardVault.spendCard(cardId, recipient, amountBaseUnits, memo) by assigned agent",
+        ],
+        proofRequired: ["cardId", "createCard tx hash", "approve tx hash", "topUpCard tx hash", "cards(cardId) state", "spend tx hash if used"],
+      }, null, 2),
+    }],
+  };
+});
+
+server.tool("policy_plan", "Generate global workspace and per-agent policy requirements for ArcPay execution.", {
+  slug: z.string().min(1),
+  dailyLimit: z.string().optional(),
+}, async ({ slug, dailyLimit = "10" }) => ({
+  content: [{
+    type: "text",
+    text: JSON.stringify({
+      protocol: "arcpay-somnia-policy-plan",
+      agentSlug: slug,
+      agentId: id(slug),
+      workspacePolicy: {
+        scope: "Global workspace controls",
+        enforcedAcross: ["payments", "orders", "x402", "cards", "invoices", "privacy", "swaps", "yield"],
+        checks: ["wallet required", "treasury pause", "allowed token", "allowed network", "risk floor", "per-transaction max", "daily max"],
+      },
+      agentPolicy: {
+        scope: "Per-agent controls",
+        dailyLimitSttOrSomusd: dailyLimit,
+        allowedActions: ["x402 work", "escrow order", "SOMUSD card spend"],
+        evidenceRequired: ["tx hash", "x402 verification", "ArcPay order id", "risk or receipt evidence when applicable"],
+      },
+    }, null, 2),
+  }],
+}));
+
+server.tool("evidence_template", "Return the audit evidence checklist ArcPay requires before an agent can claim completion.", {
+  slug: z.string().optional(),
+}, async ({ slug = "research-agent" }) => ({
+  content: [{
+    type: "text",
+    text: [
+      `Agent: ${slug}`,
+      "Wallet address and chain id 50312.",
+      "Agent slug, agent id, registered endpoint, and capability metadata.",
+      "Policy snapshot: global workspace policy plus per-agent limits.",
+      "x402 quote response: HTTP status, payment requirements, request URI, amount.",
+      "Order evidence: createOrder tx hash, order id, state before/after fulfill, settle/refund tx.",
+      "Card evidence: card id, approve/top-up tx, card state, spend tx if used.",
+      "Privacy evidence: commitment, encrypted memo URI, create/release tx, nullifier.",
+      "Invoice evidence: invoice id, create/pay/cancel tx, payer and token state.",
+      "Somnia Agents evidence: receipt id/output when Parse Website, JSON API Request, or LLM Inference is used.",
+      "Audit page screenshot and explorer links for every tx hash.",
+    ].join("\n"),
+  }],
+}));
+
 server.tool("somnia_defi_adapters", "Return Somnia DEX, swap, liquidity, and yield adapter candidates with required audit evidence.", {}, async () => ({
   content: [{
     type: "text",

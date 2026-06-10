@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/app/PageHeader";
 import { useNetwork } from "@/store/network";
 import { getOptionalSupabaseClient } from "../../app/supabase-client";
 import { ensureCurrentUserAccount } from "@/lib/account";
-import { createWorkspace as createCloudWorkspace, loadWorkspaces, type WorkspaceRecord } from "@/lib/workspaces";
+import { createWorkspace as createCloudWorkspace, loadCachedWorkspaces, loadWorkspaces, type WorkspaceRecord } from "@/lib/workspaces";
 import {
   DEFAULT_WORKSPACE_SETTINGS,
   saveWorkspaceSettingsSnapshot,
@@ -59,6 +59,11 @@ function SettingsPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    const cachedWorkspaces = loadCachedWorkspaces(NETWORK, "Somnia agent treasury");
+    const cachedActive = cachedWorkspaces.find((workspace) => workspace.isActive) ?? cachedWorkspaces[0];
+    setWorkspaceOptions(cachedWorkspaces);
+    if (cachedActive) setWorkspaceName(cachedActive.name);
+
     try {
       const raw = window.localStorage.getItem(WORKSPACE_SETTINGS_STORAGE_KEY);
       if (raw) {
@@ -112,7 +117,7 @@ function SettingsPage() {
       if (!mounted) return;
 
       if (error) {
-        setStatus(`Settings load failed: ${error.message}`);
+        setStatus(`Cloud settings unavailable. Local settings are active: ${error.message}`);
         return;
       }
 

@@ -67,7 +67,7 @@ export async function ensureCurrentUserAccount(supabase: SupabaseClient): Promis
   }
 
   return {
-    email: user.email ?? null,
+    email: isWalletAuthEmail(user.email) ? null : user.email ?? null,
     displayName: profile?.display_name || fallbackName,
     workspaceName: workspace?.workspace_name || workspaceName,
   };
@@ -77,6 +77,6 @@ function readMetadataString(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function isWalletAuthEmail(value: string | null | undefined) {
+export function isWalletAuthEmail(value: string | null | undefined) {
   return Boolean(value && value.endsWith("@arcpay.local"));
 }

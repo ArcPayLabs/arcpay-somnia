@@ -8,7 +8,7 @@ export type WorkspaceRecord = {
   name: string;
   network: ArcPayNetwork;
   isActive: boolean;
-  source: "cloud" | "legacy";
+  source: "cloud" | "local";
 };
 
 const DEFAULT_WORKSPACE: Record<ArcPayNetwork, string> = {
@@ -17,41 +17,70 @@ const DEFAULT_WORKSPACE: Record<ArcPayNetwork, string> = {
   arbitrum: "Arbitrum agent treasury",
 };
 
+const CACHE_PREFIX = "arcpay-workspaces";
+
+export function loadCachedWorkspaces(network: ArcPayNetwork, fallbackName = DEFAULT_WORKSPACE[network]): WorkspaceRecord[] {
+  if (typeof window === "undefined") return [localWorkspace(network, fallbackName)];
+
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(cacheKey(network)) ?? "null") as WorkspaceRecord[] | null;
+    const rows = Array.isArray(parsed)
+      ? parsed.filter((row) => row?.network === network && typeof row.name === "string" && row.name.trim())
+      : [];
+    if (rows.length) return ensureOneActive(rows);
+  } catch {
+    window.localStorage.removeItem(cacheKey(network));
+  }
+
+  return [localWorkspace(network, fallbackName)];
+}
+
+export function saveCachedWorkspaces(network: ArcPayNetwork, workspaces: WorkspaceRecord[]) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(cacheKey(network), JSON.stringify(ensureOneActive(workspaces)));
+}
+
 export async function loadWorkspaces(
   supabase: SupabaseClient,
   network: ArcPayNetwork,
   fallbackName = DEFAULT_WORKSPACE[network],
 ): Promise<WorkspaceRecord[]> {
+  const fallback = loadCachedWorkspaces(network, fallbackName);
   const userId = await getUserId(supabase);
-  if (!userId) return [];
+  if (!userId) return fallback;
 
-  const { data, error } = await supabase
-    .from("arcpay_workspaces")
-    .select("id, name, network, is_active")
-    .eq("user_id", userId)
-    .eq("network", network)
-    .order("is_active", { ascending: false })
-    .order("updated_at", { ascending: false });
+  try {
+    const { data, error } = await supabase
+      .from("arcpay_workspaces")
+      .select("id, name, network, is_active")
+      .eq("user_id", userId)
+      .eq("network", network)
+      .order("is_active", { ascending: false })
+      .order("updated_at", { ascending: false });
 
-  if (error) return loadLegacyWorkspace(supabase, network, fallbackName);
+    if (error) return fallback;
 
-  if (!data?.length) {
-    const created = await createWorkspace(supabase, network, fallbackName);
-    return created ? [created] : loadLegacyWorkspace(supabase, network, fallbackName);
+    if (!data?.length) {
+      const created = await createWorkspace(supabase, network, fallbackName);
+      return created ? [created] : fallback;
+    }
+
+    const hasActive = data.some((row) => row.is_active);
+    const rows = data.map((row, index) => ({
+      id: row.id,
+      name: row.name,
+      network: row.network,
+      isActive: row.is_active || (!hasActive && index === 0),
+      source: "cloud" as const,
+    }));
+
+    const active = rows.find((row) => row.isActive) ?? rows[0];
+    saveCachedWorkspaces(network, rows);
+    if (active) void syncWorkspaceSettings(supabase, userId, network, active.name);
+    return rows;
+  } catch {
+    return fallback;
   }
-
-  const hasActive = data.some((row) => row.is_active);
-  const rows = data.map((row, index) => ({
-    id: row.id,
-    name: row.name,
-    network: row.network,
-    isActive: row.is_active || (!hasActive && index === 0),
-    source: "cloud" as const,
-  }));
-
-  const active = rows.find((row) => row.isActive) ?? rows[0];
-  if (active) await syncLegacyWorkspace(supabase, userId, network, active.name);
-  return rows;
 }
 
 export async function createWorkspace(
@@ -59,9 +88,14 @@ export async function createWorkspace(
   network: ArcPayNetwork,
   name: string,
 ): Promise<WorkspaceRecord | null> {
-  const userId = await getUserId(supabase);
   const cleanName = name.trim();
-  if (!userId || !cleanName) return null;
+  if (!cleanName) return null;
+
+  const local = localWorkspace(network, cleanName);
+  saveCachedWorkspaces(network, [local]);
+
+  const userId = await getUserId(supabase);
+  if (!userId) return local;
 
   const now = new Date().toISOString();
   const deactivate = await supabase
@@ -71,8 +105,8 @@ export async function createWorkspace(
     .eq("network", network);
 
   if (deactivate.error) {
-    await syncLegacyWorkspace(supabase, userId, network, cleanName);
-    return { id: `legacy-${network}`, name: cleanName, network, isActive: true, source: "legacy" };
+    void syncWorkspaceSettings(supabase, userId, network, cleanName);
+    return local;
   }
 
   const { data, error } = await supabase
@@ -84,10 +118,12 @@ export async function createWorkspace(
     .select("id, name, network, is_active")
     .single();
 
-  await syncLegacyWorkspace(supabase, userId, network, cleanName);
-  if (error || !data) return { id: `legacy-${network}`, name: cleanName, network, isActive: true, source: "legacy" };
+  void syncWorkspaceSettings(supabase, userId, network, cleanName);
+  if (error || !data) return local;
 
-  return { id: data.id, name: data.name, network: data.network, isActive: true, source: "cloud" };
+  const workspace = { id: data.id, name: data.name, network: data.network, isActive: true, source: "cloud" as const };
+  saveCachedWorkspaces(network, [workspace]);
+  return workspace;
 }
 
 export async function activateWorkspace(
@@ -95,8 +131,10 @@ export async function activateWorkspace(
   network: ArcPayNetwork,
   workspace: WorkspaceRecord,
 ) {
+  saveCachedWorkspaces(network, [{ ...workspace, isActive: true }]);
+
   const userId = await getUserId(supabase);
-  if (!userId) return false;
+  if (!userId) return true;
 
   if (workspace.source === "cloud") {
     const now = new Date().toISOString();
@@ -107,36 +145,51 @@ export async function activateWorkspace(
       .eq("user_id", userId)
       .eq("network", network)
       .eq("id", workspace.id);
-    if (error) return false;
+    if (error) return true;
   }
 
-  await syncLegacyWorkspace(supabase, userId, network, workspace.name);
+  void syncWorkspaceSettings(supabase, userId, network, workspace.name);
   return true;
 }
 
-async function loadLegacyWorkspace(supabase: SupabaseClient, network: ArcPayNetwork, fallbackName: string): Promise<WorkspaceRecord[]> {
-  const userId = await getUserId(supabase);
-  if (!userId) return [];
-  const { data } = await supabase.from("user_workspace_settings").select("workspace_name").eq("user_id", userId).maybeSingle();
-  const name = data?.workspace_name || fallbackName;
-  await syncLegacyWorkspace(supabase, userId, network, name);
-  return [{ id: `legacy-${network}`, name, network, isActive: true, source: "legacy" }];
-}
-
-async function syncLegacyWorkspace(supabase: SupabaseClient, userId: string, network: ArcPayNetwork, name: string) {
-  await supabase.from("user_workspace_settings").upsert(
-    {
-      user_id: userId,
-      workspace_name: name,
-      default_network: network as never,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id" },
-  );
+async function syncWorkspaceSettings(supabase: SupabaseClient, userId: string, network: ArcPayNetwork, name: string) {
+  try {
+    await supabase.from("user_workspace_settings").upsert(
+      {
+        user_id: userId,
+        workspace_name: name,
+        default_network: network as never,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" },
+    );
+  } catch {
+    // Local workspace cache keeps the UI usable when cloud sync is temporarily unavailable.
+  }
 }
 
 async function getUserId(supabase: SupabaseClient) {
   const { data, error } = await supabase.auth.getUser();
   if (error) return null;
   return data.user?.id ?? null;
+}
+
+function localWorkspace(network: ArcPayNetwork, name: string): WorkspaceRecord {
+  return { id: `local-${network}-${slugify(name)}`, name, network, isActive: true, source: "local" };
+}
+
+function ensureOneActive(workspaces: WorkspaceRecord[]) {
+  const hasActive = workspaces.some((workspace) => workspace.isActive);
+  return workspaces.map((workspace, index) => ({
+    ...workspace,
+    isActive: workspace.isActive || (!hasActive && index === 0),
+  }));
+}
+
+function cacheKey(network: ArcPayNetwork) {
+  return `${CACHE_PREFIX}:${network}`;
+}
+
+function slugify(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "workspace";
 }

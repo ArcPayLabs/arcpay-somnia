@@ -27,6 +27,10 @@ Commands:
   arcpay-somnia privacy-guide          Print builder integration guide
   arcpay-somnia invoice-guide          Print invoice settlement guide
   arcpay-somnia x402-guide             Print x402 HTTP payment gate guide
+  arcpay-somnia onboard-agent <slug>   Print BYO-agent onboarding payload
+  arcpay-somnia card-guide <slug>      Print SOMUSD card setup plan
+  arcpay-somnia policy-guide <slug>    Print workspace + per-agent policy plan
+  arcpay-somnia evidence-template      Print audit evidence checklist
   arcpay-somnia somnia-agents          Print official Somnia Agents IDs and ArcPay receipt policy
   arcpay-somnia defi-adapters          Print Somnia DEX, swap, and yield adapter map
   arcpay-somnia demo-path              Print operator demo steps
@@ -111,6 +115,96 @@ try {
       "5. GET /agent/:slug/work?orderId=... unlocks only after Fulfilled or Settled.",
       "",
       "Proof command: npm run smoke:x402",
+    ].join("\n"));
+  } else if (command === "onboard-agent") {
+    const info = deployment();
+    const slug = args[0] || "research-agent";
+    const endpoint = args[1] || `https://x402.20.208.46.195.nip.io/agent/${slug}/work`;
+    const priceStt = args[2] || "0.001";
+    console.log(JSON.stringify({
+      protocol: "arcpay-somnia-agent-onboarding",
+      network: info.network,
+      chainId: info.chainId,
+      agentSlug: slug,
+      agentId: id(slug),
+      endpoint,
+      priceStt,
+      contracts: {
+        registry: info.contracts.AgentRegistry,
+        orderBook: info.contracts.AgentOrderBook,
+        policy: info.contracts.TreasuryPolicy,
+        operatorControls: info.contracts.OperatorControls,
+        spendCardVault: info.contracts.AgentSpendCardVault,
+        reputation: info.contracts.AgentReputationBook,
+      },
+      dashboardPath: "https://arcpay-somnia.vercel.app/app/agents",
+      nextSteps: [
+        "Register the slug/capabilities on AgentRegistry.",
+        "Create or redeem a claim code in OperatorControls if the agent is external.",
+        "Attach workspace policy and optional per-agent allowlist/limits.",
+        "Quote the x402 endpoint, create an escrowed order, verify/fulfill, then record evidence in Audit.",
+      ],
+    }, null, 2));
+  } else if (command === "card-guide") {
+    const info = deployment();
+    const slug = args[0] || "research-agent";
+    const agent = args[1] || "<agent-wallet-address>";
+    const limit = args[2] || "5";
+    const cardSlug = `${slug}-somusd-card`;
+    console.log(JSON.stringify({
+      protocol: "arcpay-somnia-somusd-card",
+      network: info.network,
+      chainId: info.chainId,
+      cardSlug,
+      cardId: keccak256(toUtf8Bytes(cardSlug)),
+      agent,
+      limitSomusd: limit,
+      contracts: {
+        spendCardVault: info.contracts.AgentSpendCardVault,
+        somusd: info.somUsdToken,
+      },
+      calls: [
+        "SOMUSD.approve(AgentSpendCardVault, amountBaseUnits)",
+        "AgentSpendCardVault.createCard(cardId, agent, SOMUSD, limitBaseUnits, label)",
+        "AgentSpendCardVault.topUpCard(cardId, amountBaseUnits)",
+        "AgentSpendCardVault.setCardStatus(cardId, true|false)",
+        "AgentSpendCardVault.spendCard(cardId, recipient, amountBaseUnits, memo) by the assigned agent",
+      ],
+      proofRequired: ["cardId", "createCard tx hash", "approve tx hash", "topUpCard tx hash", "cards(cardId) state", "spend tx hash if used"],
+    }, null, 2));
+  } else if (command === "policy-guide") {
+    const slug = args[0] || "research-agent";
+    const dailyLimit = args[1] || "10";
+    console.log(JSON.stringify({
+      protocol: "arcpay-somnia-policy-plan",
+      agentSlug: slug,
+      agentId: id(slug),
+      workspacePolicy: {
+        scope: "Global workspace controls",
+        enforcedAcross: ["payments", "orders", "x402", "cards", "invoices", "privacy", "swaps", "yield"],
+        defaultChecks: ["wallet required", "treasury pause", "allowed token", "allowed network", "risk floor", "per-transaction max", "daily max"],
+      },
+      agentPolicy: {
+        scope: "Per-agent controls",
+        dailyLimitSttOrSomusd: dailyLimit,
+        allowedActions: ["x402 work", "escrow order", "SOMUSD card spend"],
+        evidenceRequired: ["tx hash", "x402 verification", "ArcPay order id", "risk or receipt evidence when applicable"],
+      },
+    }, null, 2));
+  } else if (command === "evidence-template") {
+    console.log([
+      "ArcPay Somnia Evidence Checklist",
+      "",
+      "- Wallet address and chain id 50312.",
+      "- Agent slug, agent id, registered endpoint, and capability metadata.",
+      "- Policy snapshot: global workspace policy plus per-agent limits.",
+      "- x402 quote response: HTTP status, payment requirements, request URI, amount.",
+      "- Order evidence: createOrder tx hash, order id, state before/after fulfill, settle/refund tx.",
+      "- Card evidence: card id, approve/top-up tx, card state, spend tx if used.",
+      "- Privacy evidence: commitment, encrypted memo URI, create/release tx, nullifier.",
+      "- Invoice evidence: invoice id, create/pay/cancel tx, payer and token state.",
+      "- Somnia Agents evidence: receipt id/output when Parse Website, JSON API Request, or LLM Inference is used.",
+      "- Audit page screenshot and explorer links for every tx hash.",
     ].join("\n"));
   } else if (command === "somnia-agents") {
     console.log(JSON.stringify({

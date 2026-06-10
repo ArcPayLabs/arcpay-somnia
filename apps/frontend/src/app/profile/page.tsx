@@ -9,6 +9,7 @@ import { AsyncButton } from "../../product-ui/components/primitives/AsyncButton"
 import { StatCard } from "../../product-ui/components/primitives/StatCard";
 import { useWalletConnectAction } from "../../product-ui/hooks/use-wallet-connect-action";
 import { getOptionalSupabaseClient } from "../supabase-client";
+import { isWalletAuthEmail } from "../../product-ui/lib/account";
 
 type ProfileForm = {
   displayName: string;
@@ -45,7 +46,8 @@ export default function ProfilePage() {
       const user = data.user;
       if (!mounted) return;
       setUserId(user?.id ?? "");
-      setEmail(user?.email ?? "");
+      const publicEmail = isWalletAuthEmail(user?.email) ? "" : user?.email ?? "";
+      setEmail(publicEmail);
       if (!user) return;
 
       const { data: row, error } = await supabase
@@ -61,7 +63,7 @@ export default function ProfilePage() {
       setProfile({
         displayName: row?.display_name ?? "",
         role: row?.role ?? "Founder / finance lead",
-        notificationEmail: row?.notification_email || user.email || "",
+        notificationEmail: isWalletAuthEmail(row?.notification_email) ? "" : row?.notification_email || publicEmail,
         walletLabel: row?.wallet_label || "Somnia operations wallet",
       });
       setStatus("Profile loaded.");
@@ -88,7 +90,7 @@ export default function ProfilePage() {
       user_id: userId,
       display_name: profile.displayName,
       role: profile.role,
-      notification_email: profile.notificationEmail || email,
+      notification_email: isWalletAuthEmail(profile.notificationEmail) ? "" : profile.notificationEmail || email,
       wallet_label: profile.walletLabel,
       linked_wallet_address: walletAddress || null,
     }, { onConflict: "user_id" });
