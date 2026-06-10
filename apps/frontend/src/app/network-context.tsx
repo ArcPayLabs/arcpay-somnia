@@ -15,7 +15,7 @@ const NetworkContext = createContext<NetworkContextValue | null>(null);
 export function NetworkModeProvider({ children }: { readonly children: ReactNode }) {
   const value = useMemo<NetworkContextValue>(() => ({
     network: "somnia",
-    endpoint: process.env.NEXT_PUBLIC_SOMNIA_RPC_URL ?? "https://dream-rpc.somnia.network",
+    endpoint: process.env.NEXT_PUBLIC_SOMNIA_RPC_URL ?? "https://api.infra.testnet.somnia.network/",
     setNetwork() {
       // Somnia build is intentionally fixed to the Somnia testnet.
     },

@@ -36,6 +36,7 @@
     "test": "hardhat test",
     "check:deployer": "hardhat run scripts/check-deployer.ts --network somniaTestnet",
     "deploy:somnia": "hardhat run scripts/deploy.ts --network somniaTestnet",
+    "deploy:defi": "hardhat run scripts/deploy-defi.ts --network somniaTestnet",
     "deploy:invoice": "hardhat run scripts/deploy-invoice.ts --network somniaTestnet",
     "deploy:reputation": "hardhat run scripts/deploy-reputation.ts --network somniaTestnet"
   },

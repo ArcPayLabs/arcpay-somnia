@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ComponentProps } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff, Wallet, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ensureCurrentUserAccount } from "@/lib/account";
 import { getOptionalSupabaseClient } from "../../../app/supabase-client";
@@ -57,13 +57,14 @@ export function WalletConnectButton({ redirectTo }: { redirectTo?: string }) {
   const wallet = useWalletConnectAction();
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const label = useMemo(() => {
     if (loading || wallet.connecting) return "Verifying wallet...";
     return wallet.connected && wallet.publicKeyBase58 ? wallet.label : "Connect Somnia wallet";
   }, [loading, wallet.connected, wallet.connecting, wallet.label, wallet.publicKeyBase58]);
 
-  async function connectAndSignIn() {
+  async function connectAndSignIn(walletId?: string) {
     const supabase = getOptionalSupabaseClient();
     if (!supabase) {
       setErrorMessage("Supabase auth is not configured for this frontend runtime.");
@@ -74,7 +75,7 @@ export function WalletConnectButton({ redirectTo }: { redirectTo?: string }) {
       setLoading(true);
       setErrorMessage(null);
 
-      const result = await wallet.connectWallet();
+      const result = await wallet.connectWallet(walletId);
       if (result.supabaseAuth) {
         const { error } = await supabase.auth.verifyOtp({
           token_hash: result.supabaseAuth.tokenHash,
@@ -101,7 +102,7 @@ export function WalletConnectButton({ redirectTo }: { redirectTo?: string }) {
     <div className="space-y-2">
       <button
         type="button"
-        onClick={() => void connectAndSignIn()}
+        onClick={() => setPickerOpen(true)}
         disabled={loading}
         className="w-full h-12 bg-foreground text-background rounded-xl flex items-center justify-center gap-2 font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
       >
@@ -111,6 +112,47 @@ export function WalletConnectButton({ redirectTo }: { redirectTo?: string }) {
       {errorMessage && (
         <div className="rounded-xl border border-destructive/20 bg-destructive/10 px-3 py-2 text-xs text-destructive">
           {errorMessage}
+        </div>
+      )}
+      {pickerOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-[2rem] border border-border bg-background p-5 shadow-2xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Somnia wallet</div>
+                <h3 className="mt-1 text-2xl font-semibold">Choose a wallet</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  ArcPay will add or switch to Somnia Testnet, then ask you to sign a login challenge.
+                </p>
+              </div>
+              <button type="button" onClick={() => setPickerOpen(false)} className="rounded-full border border-border p-2 text-muted-foreground hover:text-foreground">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="mt-5 space-y-3">
+              {wallet.availableWallets.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  disabled={!option.installed || loading || wallet.connecting}
+                  onClick={() => void connectAndSignIn(option.id).then(() => setPickerOpen(false))}
+                  className="flex w-full items-center justify-between rounded-2xl border border-border bg-card p-4 text-left transition hover:border-primary/50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <span className="flex items-center gap-3">
+                    <span className="rounded-2xl bg-primary/10 p-3 text-primary"><Wallet className="h-5 w-5" /></span>
+                    <span>
+                      <span className="block text-sm font-semibold">{option.name}</span>
+                      <span className="mt-0.5 block text-xs text-muted-foreground">{option.description}</span>
+                    </span>
+                  </span>
+                  {option.installed ? <CheckCircle2 className="h-5 w-5 text-primary" /> : <span className="text-xs font-semibold text-muted-foreground">Not detected</span>}
+                </button>
+              ))}
+            </div>
+            <p className="mt-4 rounded-2xl bg-muted px-4 py-3 text-xs text-muted-foreground">
+              If Somnia Testnet is missing, approve the wallet network prompt. Chain ID: 50312. RPC: dream-rpc.somnia.network.
+            </p>
+          </div>
         </div>
       )}
     </div>

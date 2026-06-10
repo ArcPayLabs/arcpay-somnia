@@ -1,9 +1,9 @@
-import { BrowserProvider, Contract, JsonRpcProvider, formatEther, id, keccak256, parseEther, toUtf8Bytes, type Eip1193Provider } from "ethers";
+import { BrowserProvider, Contract, JsonRpcProvider, formatEther, getAddress, id, keccak256, parseEther, toUtf8Bytes, type Eip1193Provider } from "ethers";
 import deployment from "../../../../deployments/somnia-testnet.json";
 
 export const SOMNIA_CHAIN_ID = 50312;
 export const SOMNIA_CHAIN_ID_HEX = "0xc488";
-export const SOMNIA_RPC_URL = "https://dream-rpc.somnia.network";
+export const SOMNIA_RPC_URL = process.env.NEXT_PUBLIC_SOMNIA_RPC_URL ?? "https://api.infra.testnet.somnia.network/";
 export const SOMNIA_EXPLORER_URL = "https://somnia-testnet.socialscan.io";
 const deployedContracts = deployment.contracts as Record<string, string>;
 export const NATIVE_TOKEN = "0x0000000000000000000000000000000000000000";
@@ -19,6 +19,8 @@ export const CONTRACTS = {
   SomniaPrivacyVault: deployedContracts.SomniaPrivacyVault ?? NATIVE_TOKEN,
   AgentInvoiceBook: deployedContracts.AgentInvoiceBook ?? NATIVE_TOKEN,
   AgentReputationBook: deployedContracts.AgentReputationBook ?? NATIVE_TOKEN,
+  SomniaSwapRouter: deployedContracts.SomniaSwapRouter ?? NATIVE_TOKEN,
+  SomniaYieldVault: deployedContracts.SomniaYieldVault ?? NATIVE_TOKEN,
 } as const;
 
 export const DEPTH_CONTRACTS_READY =
@@ -28,6 +30,20 @@ export const SOMNIA_AGENT_PLATFORM_ADDRESS =
   (deployment as { somniaAgentPlatform?: string }).somniaAgentPlatform ?? "0x037Bb9C718F3f7fe5eCBDB0b600D607b52706776";
 export const SOMNIA_RISK_AGENT_ID =
   (deployment as { somniaRiskAgentId?: string }).somniaRiskAgentId ?? "13174292974160097713";
+const defiDeployment = (deployment as {
+  defi?: {
+    swapRouter?: string;
+    yieldVault?: string;
+    swapToken?: string;
+    swapRateTokenUnitsPerSttWei?: string;
+    yieldApyBps?: number;
+  };
+}).defi ?? {};
+export const SOMNIA_SWAP_ROUTER_ADDRESS = defiDeployment.swapRouter ?? CONTRACTS.SomniaSwapRouter;
+export const SOMNIA_YIELD_VAULT_ADDRESS = defiDeployment.yieldVault ?? CONTRACTS.SomniaYieldVault;
+export const SOMNIA_SWAP_TOKEN_ADDRESS = defiDeployment.swapToken ?? SOMUSD_TOKEN_ADDRESS;
+export const SOMNIA_SWAP_RATE = BigInt(defiDeployment.swapRateTokenUnitsPerSttWei ?? "100000000");
+export const SOMNIA_YIELD_APY_BPS = defiDeployment.yieldApyBps ?? 520;
 
 export const AGENT_REGISTRY_ABI = [
   "function registerAgent(bytes32 agentId,string name,string endpoint,string capabilities,uint256 priceWei)",
@@ -129,6 +145,24 @@ export const REPUTATION_BOOK_ABI = [
   "function reviewedBy(bytes32 orderId,address reviewer) view returns (bool)",
   "function reputationScore(bytes32 agentId) view returns (uint256)",
   "event ReputationRecorded(bytes32 indexed reviewId,bytes32 indexed agentId,bytes32 indexed orderId,address reviewer,uint8 score,bool disputed,string evidenceUri)",
+] as const;
+
+export const SOMNIA_SWAP_ROUTER_ABI = [
+  "function quoteNativeToToken(uint256 nativeIn) view returns (uint256)",
+  "function swapExactNativeForToken(uint256 minOut,address recipient,string venue) payable returns (uint256 tokenOut)",
+  "function rateTokenUnitsPerSttWei() view returns (uint256)",
+  "function token() view returns (address)",
+  "event NativeToTokenSwap(address indexed sender,address indexed recipient,uint256 nativeIn,uint256 tokenOut,string venue)",
+] as const;
+
+export const SOMNIA_YIELD_VAULT_ABI = [
+  "function depositNative(string strategy) payable",
+  "function withdrawNative(uint256 amount)",
+  "function balances(address account) view returns (uint256)",
+  "function totalDeposits() view returns (uint256)",
+  "function apyBps() view returns (uint256)",
+  "event Deposited(address indexed account,uint256 amount,string strategy)",
+  "event Withdrawn(address indexed account,uint256 amount)",
 ] as const;
 
 export const ORDER_STATUS = ["Pending", "Accepted", "Processing", "Fulfilled", "Settled", "Refunded", "Failed"] as const;
@@ -237,6 +271,12 @@ export async function connectedAddress() {
   return signer.getAddress();
 }
 
+export async function currentConnectedAddress() {
+  if (!window.ethereum) return "";
+  const accounts = await window.ethereum.request?.({ method: "eth_accounts" }) as string[] | undefined;
+  return accounts?.[0] ? getAddress(accounts[0]) : "";
+}
+
 export async function balances(address: string) {
   const provider = publicProvider();
   return fromWei(await provider.getBalance(address));
@@ -290,6 +330,16 @@ export async function invoiceBookContract() {
 export async function reputationBookContract() {
   const signer = await signerProvider();
   return new Contract(CONTRACTS.AgentReputationBook, REPUTATION_BOOK_ABI, signer);
+}
+
+export async function swapRouterContract() {
+  const signer = await signerProvider();
+  return new Contract(SOMNIA_SWAP_ROUTER_ADDRESS, SOMNIA_SWAP_ROUTER_ABI, signer);
+}
+
+export async function yieldVaultContract() {
+  const signer = await signerProvider();
+  return new Contract(SOMNIA_YIELD_VAULT_ADDRESS, SOMNIA_YIELD_VAULT_ABI, signer);
 }
 
 export type LocalRecord = {

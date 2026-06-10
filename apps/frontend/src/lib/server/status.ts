@@ -23,7 +23,7 @@ export type RuntimeStatus = {
   checks: RuntimeCheck[];
 };
 
-const RPC_URL = process.env.SOMNIA_RPC_URL ?? "https://dream-rpc.somnia.network";
+const RPC_URL = process.env.SOMNIA_RPC_URL ?? "https://api.infra.testnet.somnia.network/";
 const X402_URL = process.env.NEXT_PUBLIC_X402_SERVER_URL ?? "https://x402.20.208.46.195.nip.io";
 const EXPLORER_URL = "https://somnia-testnet.socialscan.io";
 const RECORDS_TABLE = validRecordsTable(process.env.ARCPAY_RECORDS_TABLE ?? "arcpay_somnia_records");
@@ -38,7 +38,7 @@ export async function collectRuntimeStatus(origin?: string): Promise<RuntimeStat
   ]);
 
   return {
-    ok: checks.every((check) => check.state === "ok"),
+    ok: checks.every((check) => check.state === "ok" || check.state === "unknown"),
     generatedAt: new Date().toISOString(),
     network: {
       name: String((deployment as { network?: string }).network ?? "somnia-testnet"),

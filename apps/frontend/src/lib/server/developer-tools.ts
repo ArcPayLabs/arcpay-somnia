@@ -15,12 +15,29 @@ type ToolDefinition = {
 const network = {
   name: "Somnia Testnet",
   chainId: 50312,
-  rpcUrl: "https://dream-rpc.somnia.network",
+  rpcUrl: "https://api.infra.testnet.somnia.network/",
   explorerUrl: "https://somnia-testnet.socialscan.io",
   currency: "STT",
 };
 
 const somniaDefiAdapters = [
+  {
+    name: "ArcPay Testnet Router",
+    category: "live-swap-router",
+    execution: "wallet-signed swapExactNativeForToken on Somnia Testnet",
+    url: "https://arcpay-somnia.vercel.app/swaps",
+    contract: deployment.contracts.SomniaSwapRouter,
+    token: (deployment as { defi?: { swapToken?: string } }).defi?.swapToken,
+    requiredEvidence: ["router quote", "wallet signature", "Somnia tx hash", "before/after STT and SOMUSD balances"],
+  },
+  {
+    name: "ArcPay STT Yield Vault",
+    category: "live-yield-vault",
+    execution: "wallet-signed depositNative / withdrawNative on Somnia Testnet",
+    url: "https://arcpay-somnia.vercel.app/yield",
+    contract: deployment.contracts.SomniaYieldVault,
+    requiredEvidence: ["policy check", "wallet signature", "Somnia tx hash", "vault balance refresh"],
+  },
   {
     name: "dreamDEX CLOB",
     category: "onchain-clob",
@@ -213,7 +230,8 @@ export async function runDeveloperTool(name: string, args: Record<string, unknow
         network,
         adapters: somniaDefiAdapters,
         policy: [
-          "No adapter may mark execution complete without a Somnia tx hash or venue response.",
+        "ArcPay Testnet Router and ArcPay STT Yield Vault are live wallet-signed execution routes.",
+        "External venue adapters may not mark execution complete without a Somnia tx hash or venue response.",
           "dreamDEX integration must use documented market discovery plus wallet-signed order/vault transactions; HTTP API alone is not execution proof.",
           "Every route must carry max slippage, executor, asset pair, and before/after balance evidence.",
           "Yield and LP intents must record drawdown limits and risk notes before wallet signing.",

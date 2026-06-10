@@ -1,6 +1,24 @@
 import { NextResponse } from "next/server";
+import deployment from "../../../../../../../../deployments/somnia-testnet.json";
 
 const adapters = [
+  {
+    name: "ArcPay Testnet Router",
+    category: "live-swap-router",
+    state: "live",
+    execution: "wallet-signed swapExactNativeForToken on Somnia Testnet",
+    contract: (deployment as { contracts: Record<string, string> }).contracts.SomniaSwapRouter,
+    token: (deployment as { defi?: { swapToken?: string } }).defi?.swapToken,
+    evidence: ["router quote", "wallet signature", "Somnia tx hash", "before/after STT and SOMUSD balances"],
+  },
+  {
+    name: "ArcPay STT Yield Vault",
+    category: "live-yield-vault",
+    state: "live",
+    execution: "wallet-signed depositNative / withdrawNative on Somnia Testnet",
+    contract: (deployment as { contracts: Record<string, string> }).contracts.SomniaYieldVault,
+    evidence: ["policy check", "wallet signature", "Somnia tx hash", "vault balance refresh"],
+  },
   {
     name: "dreamDEX CLOB",
     category: "onchain-clob",
@@ -58,14 +76,14 @@ export async function GET() {
     ok: true,
     chain: "somnia-testnet",
     chainId: 50312,
-    mode: "policy-bound-defi-adapters",
-    boundary: "ArcPay records and enforces DeFi intents. Completion requires a real Somnia transaction hash or venue response. dreamDEX HTTP API responses are quote/build evidence, not completion evidence without a signed tx.",
+    mode: "live-router-plus-policy-bound-adapters",
+    boundary: "ArcPay Testnet Router and ArcPay STT Yield Vault are live wallet-signed routes. External venue adapters require a real Somnia transaction hash or venue response before completion.",
     adapters,
     developerTools: {
       http: "/api/developer/tools/somnia_defi_adapters",
       mcp: "somnia_defi_adapters",
       cli: "arcpay-somnia defi-adapters",
     },
-    nextProofTarget: "Attach a dreamDEX market quote, pool address, signed order tx hash, and fill/order status to an ArcPay audit record from /swaps or /yield.",
+    nextProofTarget: "Use /swaps for a live STT->SOMUSD router tx or /yield for a live STT vault tx. External venues still require router/pool evidence before direct execution.",
   });
 }

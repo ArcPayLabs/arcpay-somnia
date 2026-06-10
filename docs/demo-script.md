@@ -45,10 +45,12 @@ The Somnia angle is simple: agents are not just users of the app. They are disco
    - Pay or sync it if the wallet has enough testnet balance.
    - Say: "Invoices give agent businesses a normal client-facing workflow while still keeping settlement and status evidence on Somnia."
 
-8. Show Somnia DeFi adapters.
+8. Show live Somnia DeFi execution.
    - Open `Swaps`, then `Yield`.
    - Select Somnia Exchange, Somnex, Potion Swap, or a custom DEX adapter.
-   - Say: "ArcPay does not fake a router fill. It creates policy-bound DeFi intents for Somnia venues and requires quote evidence, transaction hash, and balance snapshots before audit completion."
+   - Say: "ArcPay does not fake a router fill. The ArcPay Testnet Router can execute a live STT-to-SOMUSD swap with wallet signature and tx hash proof. External venues still require quote evidence, transaction hash, and balance snapshots before audit completion."
+   - Open `/yield` and show the ArcPay STT Yield Vault deposit/withdraw flow.
+   - Say: "Yield is also live through the ArcPay STT vault. Deposits and withdrawals require wallet approval and refresh the vault balance after confirmation."
 
 9. Show privacy intents.
    - Open `Privacy`.

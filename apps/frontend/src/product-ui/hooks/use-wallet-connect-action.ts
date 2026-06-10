@@ -7,6 +7,10 @@ import { friendlyWalletError } from "@/components/primitives/AsyncButton";
 
 type EthereumProvider = {
   request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+  isMetaMask?: boolean;
+  isRabby?: boolean;
+  isCoinbaseWallet?: boolean;
+  providers?: EthereumProvider[];
 };
 
 export type WalletSupabaseAuth = {
@@ -20,8 +24,17 @@ export type WalletConnectResult = {
   supabaseAuth?: WalletSupabaseAuth;
 };
 
+export type WalletProviderOption = {
+  id: string;
+  name: string;
+  description: string;
+  installed: boolean;
+  provider?: EthereumProvider;
+};
+
 type WalletConnectAction = {
-  readonly connectWallet: () => Promise<WalletConnectResult>;
+  readonly connectWallet: (walletId?: string) => Promise<WalletConnectResult>;
+  readonly availableWallets: WalletProviderOption[];
   readonly connected: boolean;
   readonly connecting: boolean;
   readonly errorMessage: string | null;
@@ -36,23 +49,29 @@ export function useWalletConnectAction(): WalletConnectAction {
   const [address, setAddress] = useState<string | null>(null);
   const [connecting, setConnecting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [availableWallets, setAvailableWallets] = useState<WalletProviderOption[]>(DEFAULT_WALLETS);
+  const [selectedWalletName, setSelectedWalletName] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const stored = window.localStorage.getItem(sessionKey);
     if (stored) setAddress(stored);
+    setSelectedWalletName(window.localStorage.getItem("arcpay-somnia-wallet-name") ?? null);
+    setAvailableWallets(detectWallets());
   }, []);
 
-  const connectWallet = useCallback(async (): Promise<WalletConnectResult> => {
+  const connectWallet = useCallback(async (walletId?: string): Promise<WalletConnectResult> => {
     try {
       if (connecting) throw new Error("A wallet request is already pending.");
       if (address) return { address };
       setConnecting(true);
       setErrorMessage(null);
-      const provider = getProvider();
+      const provider = getProvider(walletId);
       if (!provider) {
         throw new Error("Install or unlock an EVM wallet to connect to Somnia.");
       }
+      const walletName = findWalletName(walletId, provider);
+      setSelectedWalletName(walletName);
 
       await provider.request({
         method: "wallet_addEthereumChain",
@@ -90,6 +109,7 @@ export function useWalletConnectAction(): WalletConnectAction {
       if (!verified.ok || !verifiedBody.address) throw new Error(verifiedBody.error ?? "Wallet signature verification failed.");
 
       window.localStorage.setItem(sessionKey, nextAddress);
+      window.localStorage.setItem("arcpay-somnia-wallet-name", walletName);
       setAddress(nextAddress);
       return { address: nextAddress, supabaseAuth: verifiedBody.supabaseAuth };
     } catch (error) {
@@ -104,18 +124,57 @@ export function useWalletConnectAction(): WalletConnectAction {
 
   return {
     connectWallet,
+    availableWallets,
     connected: Boolean(address),
     connecting,
     errorMessage,
     label: address ? short(address) : connecting ? "Connecting..." : "Connect wallet",
     publicKeyBase58: address,
-    selectedWalletName: "Somnia EVM",
+    selectedWalletName: selectedWalletName ?? "Somnia EVM",
   };
 }
 
-function getProvider(): EthereumProvider | null {
-  if (typeof window === "undefined") return null;
-  return (window as Window & { ethereum?: EthereumProvider }).ethereum ?? null;
+const DEFAULT_WALLETS: WalletProviderOption[] = [
+  { id: "browser", name: "Browser wallet", description: "MetaMask, Rabby, or another injected EVM wallet.", installed: false },
+  { id: "metamask", name: "MetaMask", description: "Use MetaMask and switch/add Somnia Testnet.", installed: false },
+  { id: "rabby", name: "Rabby", description: "Use Rabby and switch/add Somnia Testnet.", installed: false },
+];
+
+function getInjectedProviders(): EthereumProvider[] {
+  if (typeof window === "undefined") return [];
+  const ethereum = (window as Window & { ethereum?: EthereumProvider }).ethereum;
+  if (!ethereum) return [];
+  return Array.isArray(ethereum.providers) ? ethereum.providers : [ethereum];
+}
+
+function detectWallets(): WalletProviderOption[] {
+  const providers = getInjectedProviders();
+  const metamask = providers.find((provider) => provider.isMetaMask && !provider.isRabby);
+  const rabby = providers.find((provider) => provider.isRabby);
+  const coinbase = providers.find((provider) => provider.isCoinbaseWallet);
+  const browser = providers[0];
+  const wallets: WalletProviderOption[] = [
+    { id: "browser", name: browser ? "Detected EVM wallet" : "Browser wallet", description: "Use the currently injected EVM wallet.", installed: Boolean(browser), provider: browser },
+    { id: "metamask", name: "MetaMask", description: "Switch or add Somnia Testnet inside MetaMask.", installed: Boolean(metamask), provider: metamask },
+    { id: "rabby", name: "Rabby", description: "Switch or add Somnia Testnet inside Rabby.", installed: Boolean(rabby), provider: rabby },
+  ];
+  if (coinbase) wallets.push({ id: "coinbase", name: "Coinbase Wallet", description: "Use Coinbase Wallet with Somnia Testnet.", installed: true, provider: coinbase });
+  return wallets;
+}
+
+function getProvider(walletId?: string): EthereumProvider | null {
+  const wallets = detectWallets();
+  const selected = wallets.find((wallet) => wallet.id === walletId && wallet.provider)?.provider;
+  return selected ?? wallets.find((wallet) => wallet.provider)?.provider ?? null;
+}
+
+function findWalletName(walletId: string | undefined, provider: EthereumProvider) {
+  const wallet = detectWallets().find((item) => item.id === walletId && item.provider === provider);
+  if (wallet) return wallet.name;
+  if (provider.isRabby) return "Rabby";
+  if (provider.isMetaMask) return "MetaMask";
+  if (provider.isCoinbaseWallet) return "Coinbase Wallet";
+  return "Detected EVM wallet";
 }
 
 function short(value: string) {

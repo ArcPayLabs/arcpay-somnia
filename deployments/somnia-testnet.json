@@ -13,10 +13,27 @@
     "AgentSpendCardVault": "0x0480E467bA12E33DA163FeA45a20C30133F84B93",
     "SomniaPrivacyVault": "0x6948a15dED7F6708BD4DfD8c3Ee5314bC5B53D14",
     "AgentInvoiceBook": "0x643De19f32B1d0c396Cf8B5cD677549c442Fbbf7",
-    "AgentReputationBook": "0xBB9aB7d9e2ad5205F390580119b139bce84C8096"
+    "AgentReputationBook": "0xBB9aB7d9e2ad5205F390580119b139bce84C8096",
+    "SomniaSwapRouter": "0x09D1a6A7fcB922D4E36e3b0079db535bD6695957",
+    "SomniaYieldVault": "0x45aA9Edfb582c9D471E86dd0B553b4000872C3a8"
   },
   "somniaAgentPlatform": "0x037Bb9C718F3f7fe5eCBDB0b600D607b52706776",
   "somniaRiskAgentId": "13174292974160097713",
   "somUsdToken": "0x02b8316775057e2096471473663d51ceafbe3e3b",
-  "updatedAt": "2026-05-27T15:08:18.032Z"
+  "updatedAt": "2026-06-10T21:33:39.806Z",
+  "defi": {
+    "swapRouter": "0x09D1a6A7fcB922D4E36e3b0079db535bD6695957",
+    "yieldVault": "0x45aA9Edfb582c9D471E86dd0B553b4000872C3a8",
+    "swapToken": "0xc902DC8Ca090F6959AC4A48a20E5E17D8480bb23",
+    "swapRateTokenUnitsPerSttWei": "100000000",
+    "routerSeededSomusdUnits": "500000000000",
+    "yieldApyBps": 520,
+    "venues": [
+      "dreamDEX",
+      "Somnia Exchange",
+      "Somnex",
+      "Potion Swap",
+      "ArcPay Testnet Router"
+    ]
+  }
 }

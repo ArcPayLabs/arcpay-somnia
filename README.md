@@ -26,7 +26,7 @@ ArcPay Somnia focuses on:
 - agent discovery
 - agent-to-agent paid work
 - dreamDEX CLOB, Somnia Exchange, Somnex, Potion Swap, and custom DEX adapter intents
-- policy-bound swap, LP, and yield evidence capture
+- live STT-to-SOMUSD swap execution, live STT yield vault deposits, and policy-bound external DeFi adapter evidence capture
 - onchain order lifecycle
 - treasury spend policy
 - autonomous agent operations through MCP, CLI, OpenAPI, and HTTP tools
@@ -63,6 +63,8 @@ arcpay-somnia-x402-agent quote research-agent
 | `AgentSpendCardVault.sol` | SOMUSD-backed virtual spend cards for agent budgets. |
 | `SomniaPrivacyVault.sol` | Commitment-based payment intents with encrypted memo URIs and nullifier release. |
 | `AgentReputationBook.sol` | Order-backed score, review, and dispute evidence for service agents. |
+| `SomniaSwapRouter.sol` | Live STT-to-SOMUSD swap execution with wallet signature and tx hash proof. |
+| `SomniaYieldVault.sol` | Live STT yield deposit/withdraw flow with vault-balance evidence. |
 
 ## Local Setup
 
@@ -123,7 +125,7 @@ arcpay-somnia-x402-agent quote research-agent
 Create `.env` from `.env.example`:
 
 ```bash
-SOMNIA_RPC_URL=https://dream-rpc.somnia.network
+SOMNIA_RPC_URL=https://api.infra.testnet.somnia.network/
 SOMNIA_CHAIN_ID=50312
 SOMNIA_EXPLORER_URL=https://somnia-testnet.socialscan.io
 SOMNIA_SHANNON_EXPLORER_URL=https://shannon-explorer.somnia.network
@@ -134,6 +136,7 @@ Deploy:
 
 ```bash
 npm run deploy:somnia
+npm run deploy:defi
 ```
 
 Somnia testnet details:
@@ -142,7 +145,7 @@ Somnia testnet details:
 | --- | --- |
 | Chain ID | `50312` / `0xc488` |
 | Currency | `STT` |
-| RPC | `https://dream-rpc.somnia.network` |
+| RPC | `https://api.infra.testnet.somnia.network/` |
 | Explorer | `https://somnia-testnet.socialscan.io` |
 | Shannon Explorer | `https://shannon-explorer.somnia.network` |
 
@@ -168,7 +171,15 @@ Contracts:
 | `SomniaPrivacyVault` | `0x6948a15dED7F6708BD4DfD8c3Ee5314bC5B53D14` |
 | `AgentInvoiceBook` | `0x643De19f32B1d0c396Cf8B5cD677549c442Fbbf7` |
 | `AgentReputationBook` | `0xBB9aB7d9e2ad5205F390580119b139bce84C8096` |
- 
+| `SomniaSwapRouter` | `0x09D1a6A7fcB922D4E36e3b0079db535bD6695957` |
+| `SomniaYieldVault` | `0x45aA9Edfb582c9D471E86dd0B553b4000872C3a8` |
+
+Live DeFi support token:
+
+```text
+0xc902DC8Ca090F6959AC4A48a20E5E17D8480bb23
+```
+
 Machine-readable deployment metadata lives in
 `deployments/somnia-testnet.json`.
 
@@ -222,7 +233,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
 The Azure worker reconciles Somnia events into Supabase-backed audit records:
 
 ```bash
-SOMNIA_RPC_URL=https://dream-rpc.somnia.network
+SOMNIA_RPC_URL=https://api.infra.testnet.somnia.network/
 ARCPAY_ROOT=/home/arcpay/arcpay-somnia
 SUPABASE_URL=...
 SUPABASE_SERVICE_ROLE_KEY=...
@@ -239,7 +250,7 @@ npm run worker:once
 The x402 server can run beside the worker on Azure or any Node host:
 
 ```bash
-SOMNIA_RPC_URL=https://dream-rpc.somnia.network
+SOMNIA_RPC_URL=https://api.infra.testnet.somnia.network/
 X402_SERVER_PORT=4032
 X402_PROVIDER_PRIVATE_KEY=0x...
 X402_ADMIN_SECRET=...
@@ -336,8 +347,8 @@ demo paths resolve to Somnia infrastructure.
 | `/payments` | Wallet-signed direct STT payments for operator payouts. |
 | `/invoices` | Create, pay, cancel, and sync STT/SOMUSD invoices through `AgentInvoiceBook`. |
 | `/contractors` | Local contractor/agent workforce records. |
-| `/swaps` | dreamDEX CLOB, Somnia Exchange, Somnex, Potion Swap, and custom DEX route intents with policy and evidence requirements. |
-| `/yield` | dreamDEX maker yield plus Somnia liquidity/yield strategy intents with drawdown, venue, and tx evidence requirements. |
+| `/swaps` | Live STT -> SOMUSD execution through ArcPay Testnet Router, plus dreamDEX, Somnia Exchange, Somnex, Potion Swap, and custom DEX adapter evidence paths. |
+| `/yield` | Live STT deposit/withdraw through ArcPay STT Yield Vault, plus external yield strategy adapters with drawdown, venue, and tx evidence requirements. |
 | `/audit` | Local workflow records and transaction hashes. |
 | `/analytics` | Admin usage analytics for beta signups, developer keys, MCP/tool calls, x402 activity, records, owners, and agents. |
 | `/proofs` | Judge-facing deployment proof and local verification commands. |

@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/app/PageHeader";
 import { EmptyState } from "@/components/app/EmptyState";
 import { StatCard } from "@/components/primitives/StatCard";
-import { CONTRACTS, balances, connectedAddress, fetchRecords, shortAddress, type LocalRecord } from "@somnia/lib/somnia";
+import { CONTRACTS, balances, currentConnectedAddress, fetchRecords, shortAddress, type LocalRecord } from "@somnia/lib/somnia";
 
 export const Route = { options: { component: DashboardRoute } };
 
@@ -19,7 +19,8 @@ function DashboardRoute() {
   useEffect(() => {
     setGreeting(resolveGreeting());
     void fetchRecords().then(setRecords);
-    connectedAddress().then(async (address) => {
+    currentConnectedAddress().then(async (address) => {
+      if (!address) return;
       setWallet(address);
       setBalance(await balances(address));
     }).catch(() => undefined);

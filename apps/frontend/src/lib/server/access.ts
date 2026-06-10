@@ -4,7 +4,10 @@ export type ServerSession = {
   address: string;
 };
 
-const DEFAULT_ADMIN_WALLETS = ["0xd953da085934f77cea8a2fb7a32fd48e4b1c1458"];
+const DEFAULT_ADMIN_WALLETS = [
+  "0xd953da085934f77cea8a2fb7a32fd48e4b1c1458",
+  "0xb883e76a4f6841e72caf1c28ba00f78df974f448",
+];
 
 export function sessionFromRequest(request: Request): ServerSession | null {
   const cookie = request.headers.get("cookie") ?? "";

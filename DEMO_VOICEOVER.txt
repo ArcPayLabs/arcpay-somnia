@@ -1,38 +1,49 @@
 [0:00-0:12 Landing]
-ArcPay Somnia is a control plane and developer distribution layer for agent payments, treasury policy, paid APIs, and verifiable execution on Somnia Testnet.
+ArcPay Somnia is a control plane and developer distribution layer for agent payments, treasury policies, paid APIs, and verifiable execution on Somnia Testnet.
 
-[0:12-0:25 Auth]
-The operator starts with wallet-first access. A signed wallet session opens a persistent workspace, so the same treasury context can be used across devices.
+[0:12-0:25 Wallet sign-in]
+The operator starts by choosing an EVM wallet. ArcPay asks the wallet to add or switch to Somnia Testnet, then signs one login challenge to open the workspace.
 
-[0:25-0:45 Dashboard]
-This dashboard is the operating account for an AI-agent business: agents, orders, payments, invoices, cards, privacy, risk, status, and audit all live in one console.
+[0:25-0:40 Dashboard]
+This is the operating account for an AI-agent business. Agents, orders, cards, payments, privacy, risk, status, and audit records live in one console instead of separate scripts.
 
-[0:45-1:10 Agents]
-ArcPay supports bring-your-own-agent onboarding. A builder can register an agent slug, service endpoint, capabilities, and price, then expose that agent as a paid resource.
+[0:40-1:05 Bring your own agent]
+Here I onboard a service agent. The operator sets the agent slug, endpoint, capabilities, and price. The same agent can later be called through dashboard flows, CLI, MCP, or x402.
 
-[1:10-1:35 Operator]
-Operators can issue claim codes for external agents and control webhook circuit breakers. That lets an agent join ArcPay without a manual dashboard setup, while unsafe endpoints can be paused before they waste budget.
+[pause while fields are filled]
 
-[1:35-2:20 x402]
-The x402 flow turns an agent endpoint into a paid HTTP resource. A client requests work, ArcPay returns a 402 payment requirement, the user or agent creates an on-chain order, then the result unlocks only after verification.
+[1:05-1:25 Operator onboarding]
+The operator can also issue claim codes for outside agents. A builder can redeem the code programmatically, while webhook circuit breakers protect the treasury from failing or unsafe endpoints.
 
-[2:20-2:45 Policies]
-Policy is the safety layer. ArcPay checks wallet access, spend limits, allowed tokens, allowed networks, risk floors, and approval thresholds before money-moving actions proceed.
+[pause while claim fields are shown]
 
-[2:45-3:10 SOMUSD cards]
-SOMUSD cards give agents bounded budgets. The operator creates a card, tops it up, freezes or activates it, and the assigned agent can only spend within the card policy.
+[1:25-1:55 x402 paid work]
+ArcPay exposes paid agent work over HTTP 402. A client requests the resource, receives a payment requirement, creates or verifies an on-chain order, and only unlocks the result after evidence is available.
 
-[3:10-3:35 Privacy]
-Privacy intents add a second boundary. Teams can create commitment-based payments or disclosure records, then release selective evidence later for audit or settlement.
+[pause while quote and access checks load]
 
-[3:35-3:55 DeFi adapters]
-ArcPay also maps Somnia ecosystem routes into policy-gated intent flows, including dreamDEX, Somnia Exchange, Somnex, Potion, and custom DEX adapters. A quote is not treated as completion; ArcPay requires transaction or audit evidence.
+[1:55-2:20 Policy enforcement]
+Policy sits before wallet signing. ArcPay checks network, spend limits, allowed assets, approval thresholds, risk rules, and contractor allowlists before a payment or treasury action can move forward.
 
-[3:55-4:20 Audit and status]
-The audit and status pages show why this matters. ArcPay keeps visible evidence across wallet actions, x402 orders, invoices, cards, privacy intents, agent receipts, API health, and contract status.
+[2:20-2:50 SOMUSD agent cards]
+For bounded agent budgets, ArcPay issues SOMUSD spend cards. The operator creates the card, sets the agent wallet, defines a limit, tops it up, freezes it, or reactivates it without giving unlimited treasury access.
 
-[4:20-4:45 Developer layer]
-ArcPay is not only a frontend. It publishes a CLI, MCP server, x402 starter kit, OpenAPI, llms.txt, MCP server card, and agent metadata so other Somnia builders and AI agents can integrate directly.
+[pause while card form is shown]
 
-[4:45-4:55 Close]
+[2:50-3:15 Privacy intents]
+Privacy intents create commitment-based payment or disclosure records. Teams can keep sensitive memos encrypted, then release selective evidence later for audit or settlement.
+
+[3:15-3:40 Live DeFi execution]
+ArcPay includes a live Somnia testnet swap router and STT yield vault. Swaps and yield actions open the wallet, submit real transactions, and only count as complete after tx hash proof.
+
+[3:40-4:05 Audit and status]
+The audit and status pages show the proof layer: wallet actions, x402 orders, cards, privacy intents, agent receipts, API health, contract status, and explorer links all stay reviewable.
+
+[4:05-4:30 Wallet proof]
+The wallet console shows the connected signer, Somnia Testnet, STT balance, SOMUSD balance, and direct explorer links. This is where operators verify that signed actions happened on-chain.
+
+[4:30-4:50 Developer layer]
+ArcPay is not only a frontend. It ships a CLI, MCP server, x402 starter kit, OpenAPI, llms.txt, and agent metadata, so other Somnia builders and AI agents can integrate directly.
+
+[4:50-5:00 Close]
 ArcPay turns agent payments from isolated demos into a usable treasury operating system for real agent businesses on Somnia.
