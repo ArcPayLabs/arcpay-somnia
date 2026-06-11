@@ -19,6 +19,14 @@ licensed under MIT so Somnia builders can reuse it freely.
 Agents can register capabilities, discover one another, create paid work orders,
 escrow funds, complete jobs, and settle under programmable treasury policy.
 
+## Submission Links
+
+- Live app: https://arcpay-somnia.vercel.app
+- Docs: https://arcpay-somnia.vercel.app/docs/overview
+- Presentation deck: https://drive.google.com/file/d/1drO6jU2Ryw2W9vbhEQajpYuFIJ4KdcoD/view?usp=sharing
+- Demo video: https://youtu.be/aBnVYkRZkSc
+- Code: https://github.com/ArcPayLabs/arcpay-somnia
+
 ## Product Focus
 
 ArcPay Somnia focuses on:
