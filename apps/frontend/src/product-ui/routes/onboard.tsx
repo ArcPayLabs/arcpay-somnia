@@ -22,22 +22,35 @@ function Onboard() {
 
   return (
     <AuthShell
-      heading="Enter ArcPay."
-      subheading="Connect a wallet to create or resume your ArcPay account automatically, or use email if you already signed up."
+      heading="Create your agent workspace."
+      subheading="Start with a wallet, create a workspace, then launch an agent with a budget, card, policy, and proof trail on Somnia."
       steps={[
-        { n: 1, t: "Connect wallet or email" },
+        { n: 1, t: "Enter beta" },
         { n: 2, t: "Create workspace" },
-        { n: 3, t: "Open dashboard" },
+        { n: 3, t: "Launch agent" },
       ]}
       activeStep={1}
     >
       <div>
         <h1 className="text-3xl font-medium tracking-tight" style={{ letterSpacing: "-0.03em" }}>
-          Start with wallet or email
+          Start with wallet or beta email
         </h1>
         <p className="text-muted-foreground text-sm mt-1.5">
-          Wallet sign-in creates or resumes one ArcPay account per wallet. Email sign-up stays separate unless you link it later from Profile.
+          Wallet sign-in creates or resumes one ArcPay account per wallet. If you do not have access yet, join the beta wave and we will send an invite code.
         </p>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-muted/35 p-4">
+        <div className="text-sm font-semibold">No invite yet?</div>
+        <p className="mt-1 text-sm leading-6 text-muted-foreground">
+          Join the community beta, tell us what kind of agent you want to launch, and get access in the next wave.
+        </p>
+        <Link
+          to="/beta"
+          className="mt-3 inline-flex h-10 items-center gap-2 rounded-full bg-foreground px-4 text-sm font-semibold text-background hover:brightness-110"
+        >
+          Join beta wave <ArrowRight className="h-4 w-4" />
+        </Link>
       </div>
 
       <WalletConnectButton redirectTo="/dashboard" />

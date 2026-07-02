@@ -20,6 +20,7 @@ import {
   Trophy,
   Activity,
   ShieldCheck,
+  Rocket,
 } from "lucide-react";
 import {
   Sidebar,
@@ -38,6 +39,9 @@ import { useNetwork, type NetworkMode } from "@/store/network";
 
 const ITEMS = [
   { title: "Overview", url: "/dashboard", icon: LayoutDashboard, networks: ["somnia"] },
+  { title: "Launch Agent", url: "/launch-agent", icon: Rocket, networks: ["somnia"] },
+  { title: "Quests", url: "/quests", icon: Trophy, networks: ["somnia"] },
+  { title: "Leaderboard", url: "/leaderboard", icon: Activity, networks: ["somnia"] },
   { title: "Wallet", url: "/wallet", icon: Wallet, networks: ["somnia"] },
   { title: "Agents", url: "/agents", icon: Bot, networks: ["somnia"] },
   { title: "Orders", url: "/orders", icon: Workflow, networks: ["somnia"] },

@@ -12,6 +12,9 @@ type BetaPayload = {
   role: string;
   useCase: string;
   agentUrl: string;
+  inviteCode: string;
+  referralSource: string;
+  wave: string;
 };
 
 export async function POST(request: Request) {
@@ -30,7 +33,9 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       mode: "beta_table",
-      message: "Beta request received. Join Telegram and use the app while we review operator accounts.",
+      message: payload.inviteCode
+        ? "Invite code received. Open ArcPay and create your first Somnia agent workspace."
+        : "Beta request received. Wave invites are released in batches so every new user gets support.",
       telegramUrl: process.env.NEXT_PUBLIC_TELEGRAM_URL ?? "https://t.me/TheLuckyReborned",
     });
   }
@@ -41,7 +46,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       mode: "records_fallback",
-      message: "Beta request recorded in the audit table. Apply the beta migration for the dedicated beta queue.",
+      message: "Beta request recorded. Wave invites are released in batches so every new user gets support.",
       telegramUrl: process.env.NEXT_PUBLIC_TELEGRAM_URL ?? "https://t.me/TheLuckyReborned",
     }, { status: 202 });
   }
@@ -58,6 +63,9 @@ function normalizePayload(body: Record<string, unknown>): BetaPayload {
     role: clean(body.role, 80),
     useCase: clean(body.useCase, 1500),
     agentUrl: clean(body.agentUrl, 300),
+    inviteCode: clean(body.inviteCode, 80).toUpperCase(),
+    referralSource: clean(body.referralSource, 180),
+    wave: clean(body.wave, 40) || "wave-1",
   };
 }
 
@@ -72,6 +80,9 @@ function validatePayload(payload: BetaPayload) {
 async function writeBetaSignup(payload: BetaPayload, request: Request) {
   const metadata = {
     source: "arcpay-somnia-beta",
+    wave: payload.wave,
+    inviteCode: payload.inviteCode || null,
+    referralSource: payload.referralSource || null,
     userAgent: request.headers.get("user-agent") ?? "",
     referrer: request.headers.get("referer") ?? "",
   };
@@ -113,6 +124,9 @@ async function writeFallbackRecord(payload: BetaPayload, betaError: string | und
         walletAddress: payload.walletAddress,
         useCase: payload.useCase,
         agentUrl: payload.agentUrl,
+        inviteCode: payload.inviteCode,
+        referralSource: payload.referralSource,
+        wave: payload.wave,
       }),
       tx_hash: null,
       created_at: new Date().toISOString(),
@@ -153,6 +167,9 @@ async function trackBetaSignup(payload: BetaPayload, mode: string) {
       hasTelegram: Boolean(payload.telegram),
       hasWallet: Boolean(payload.walletAddress),
       hasAgentUrl: Boolean(payload.agentUrl),
+      hasInviteCode: Boolean(payload.inviteCode),
+      referralSource: payload.referralSource || null,
+      wave: payload.wave,
     },
   });
 }

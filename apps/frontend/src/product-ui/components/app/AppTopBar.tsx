@@ -18,6 +18,9 @@ import { activateWorkspace, createWorkspace as createCloudWorkspace, loadCachedW
 
 const QUICK_NAV = [
   { label: "Overview", to: "/dashboard" },
+  { label: "Launch Agent", to: "/launch-agent" },
+  { label: "Quests", to: "/quests" },
+  { label: "Leaderboard", to: "/leaderboard" },
   { label: "Wallet", to: "/wallet" },
   { label: "Agents", to: "/agents" },
   { label: "x402", to: "/x402" },

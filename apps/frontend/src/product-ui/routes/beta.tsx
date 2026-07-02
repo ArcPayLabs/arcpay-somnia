@@ -1,7 +1,7 @@
 "use client";
 
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Bot, CheckCircle2, RadioTower, ShieldCheck, Users } from "lucide-react";
+import { ArrowRight, Bot, CheckCircle2, RadioTower, ShieldCheck, Sparkles, Trophy, Users } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { MarketingShell } from "@/components/marketing/MarketingShell";
 
@@ -9,7 +9,7 @@ export const Route = createFileRoute("/beta")({
   head: () => ({
     meta: [
       { title: "ArcPay Somnia Beta" },
-      { name: "description", content: "Join the ArcPay Somnia private beta for agent treasury, x402, privacy intents, and SOMUSD cards." },
+      { name: "description", content: "Join the ArcPay Somnia community beta to launch agents, earn points, and test agent payments." },
     ],
   }),
   component: BetaPage,
@@ -26,6 +26,9 @@ function BetaPage() {
     role: "Agent builder",
     useCase: "",
     agentUrl: "",
+    inviteCode: "",
+    referralSource: "",
+    wave: "wave-1",
   });
   const [state, setState] = useState<SubmitState>("idle");
   const [message, setMessage] = useState("");
@@ -56,40 +59,61 @@ function BetaPage() {
     <MarketingShell navTone="light">
       <div className="px-6 py-12 md:py-16">
         <div className="mx-auto grid max-w-[88rem] gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
-          <section className="relative overflow-hidden rounded-[2.25rem] border border-orange-200/70 bg-[radial-gradient(circle_at_15%_10%,rgba(255,122,24,0.24),transparent_30%),radial-gradient(circle_at_85%_20%,rgba(255,205,122,0.30),transparent_32%),linear-gradient(135deg,#fffaf2_0%,#f4efe4_52%,#fffdf8_100%)] p-8 shadow-[0_24px_80px_rgba(43,32,20,0.10)] md:p-10">
-            <div className="pointer-events-none absolute -right-20 -top-20 hidden h-72 w-72 rounded-full border-[42px] border-orange-200/35 sm:block" />
-            <div className="pointer-events-none absolute bottom-0 right-0 hidden h-44 w-44 rounded-tl-[5rem] bg-white/45 sm:block" />
+          <section className="relative overflow-hidden rounded-[2.25rem] border border-border bg-[radial-gradient(circle_at_12%_14%,rgba(34,197,94,0.12),transparent_28%),radial-gradient(circle_at_90%_18%,rgba(56,189,248,0.16),transparent_30%),linear-gradient(135deg,#ffffff_0%,#f6f8fb_52%,#eef7ff_100%)] p-8 shadow-[0_24px_80px_rgba(15,23,42,0.10)] md:p-10">
+            <div className="pointer-events-none absolute -right-24 -top-24 hidden h-80 w-80 rounded-full border-[48px] border-sky-100/80 sm:block" />
+            <div className="pointer-events-none absolute bottom-0 right-0 hidden h-44 w-44 rounded-tl-[5rem] bg-white/55 sm:block" />
             <div className="relative">
-            <div className="inline-flex rounded-full border border-orange-200 bg-white/75 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-orange-700 shadow-sm">
-              Somnia private beta
+            <div className="inline-flex rounded-full border border-border bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground shadow-sm">
+              Somnia community beta
             </div>
             <h1 className="mt-8 max-w-2xl text-5xl font-medium leading-[0.95] tracking-[-0.05em] text-foreground md:text-7xl">
-              Bring your agents into a real treasury loop.
+              Launch your first agent on Somnia.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground">
-              ArcPay is onboarding Somnia builders who want wallet-first agent accounts, x402 paid endpoints, STT escrow, SOMUSD spend cards, privacy intents, risk checks, and reputation records on testnet.
+              Create an agent workspace, set a budget, get paid for agent work, and collect proof. ArcPay makes Somnia agent finance simple enough for users and powerful enough for builders.
             </p>
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
-              <Pill icon={Bot} title="Agent onboarding" body="Register existing agents and expose capability metadata." />
-              <Pill icon={RadioTower} title="x402 paid work" body="Charge for protected agent endpoints with on-chain settlement." />
-              <Pill icon={ShieldCheck} title="Policy controls" body="Limit spend by hour, day, week, allowlist, and pause state." />
-              <Pill icon={Users} title="Beta feedback" body="Use the product, report edge cases, and shape the Somnia stack." />
+              <Pill icon={Bot} title="Create an agent" body="Pick a template, add an endpoint, and launch a paid service profile." />
+              <Pill icon={RadioTower} title="Get paid" body="Use x402-style tasks so agents and users can pay for work." />
+              <Pill icon={ShieldCheck} title="Set a budget" body="Limit what each agent can spend before transactions happen." />
+              <Pill icon={Users} title="Earn points" body="Complete missions, collect proof, and climb the beta leaderboard." />
             </div>
             <div className="mt-8 grid gap-3 rounded-3xl border border-white/70 bg-white/70 p-4 shadow-sm backdrop-blur sm:grid-cols-3">
               <Proof label="Network" value="Somnia Testnet" />
-              <Proof label="Rail" value="x402 + escrow" />
-              <Proof label="Proof" value="Live smoke tested" />
+              <Proof label="Wave" value="First 50 invites" />
+              <Proof label="Beta loop" value="Create, earn, share" />
+            </div>
+            <div className="mt-4 rounded-3xl border border-white/80 bg-white/75 p-4 shadow-sm backdrop-blur">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 text-sm font-semibold">
+                    <Trophy className="h-4 w-4 text-primary" /> Wave 1 access
+                  </div>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Join the waitlist now. We release invite codes in waves so early users get support, points, and leaderboard visibility.
+                  </p>
+                </div>
+                <div className="hidden rounded-2xl bg-foreground px-4 py-3 text-center text-background sm:block">
+                  <div className="text-2xl font-semibold">50</div>
+                  <div className="text-[10px] uppercase tracking-[0.18em] opacity-70">wave one</div>
+                </div>
+              </div>
             </div>
             </div>
           </section>
 
           <section className="rounded-[2rem] border border-border bg-card p-6 shadow-sm md:p-8">
             <div className="mb-6">
-              <div className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">Request access</div>
-              <h2 className="mt-2 text-3xl font-medium tracking-[-0.04em]">Tell us what you want to run.</h2>
+              <div className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">Join the beta</div>
+              <h2 className="mt-2 text-3xl font-medium tracking-[-0.04em]">What agent do you want to launch?</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                We prioritize agent builders, protocol teams, and operators who can run real testnet flows and give precise feedback.
+                We are onboarding community users, traders, teams, and builders who want to test agent payments on Somnia.
               </p>
+            </div>
+            <div className="mb-6 grid gap-2 rounded-3xl border border-border bg-muted/35 p-3 text-sm sm:grid-cols-3">
+              <MiniStep icon={Sparkles} label="Apply" />
+              <MiniStep icon={CheckCircle2} label="Get invite" />
+              <MiniStep icon={Trophy} label="Earn points" />
             </div>
 
             <form className="space-y-4" onSubmit={submit}>
@@ -101,22 +125,28 @@ function BetaPage() {
                 <Field label="Telegram" placeholder="@handle" value={form.telegram} onChange={(value) => setForm({ ...form, telegram: value })} />
                 <Field label="Somnia wallet" placeholder="0x..." value={form.walletAddress} onChange={(value) => setForm({ ...form, walletAddress: value })} />
               </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field label="Invite code" placeholder="Optional: ARCPAY-WAVE1-..." value={form.inviteCode} onChange={(value) => setForm({ ...form, inviteCode: value })} />
+                <Field label="Who invited you?" placeholder="@handle, community, friend..." value={form.referralSource} onChange={(value) => setForm({ ...form, referralSource: value })} />
+              </div>
               <label className="block">
                 <span className="text-sm font-medium">Builder type</span>
                 <select className="mt-2 h-12 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:border-primary" value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value })}>
+                  <option>Community user</option>
+                  <option>Trader</option>
                   <option>Agent builder</option>
                   <option>Protocol team</option>
                   <option>Treasury operator</option>
                   <option>Hackathon team</option>
-                  <option>Developer tooling</option>
                 </select>
               </label>
               <Field label="Agent or app URL" placeholder="https://..." value={form.agentUrl} onChange={(value) => setForm({ ...form, agentUrl: value })} />
+              <input type="hidden" value={form.wave} readOnly />
               <label className="block">
-                <span className="text-sm font-medium">What will you test?</span>
+                <span className="text-sm font-medium">What do you want to do in ArcPay?</span>
                 <textarea
                   className="mt-2 min-h-32 w-full resize-y rounded-xl border border-border bg-background px-3 py-3 text-sm outline-none focus:border-primary"
-                  placeholder="Example: I want to onboard a research agent, expose an x402 endpoint, set daily spend limits, receive SOMUSD card payments, and record order-backed reputation."
+                  placeholder="Example: I want to launch a research agent, set a small budget, create a paid task, issue an agent card, and earn beta points."
                   value={form.useCase}
                   onChange={(event) => setForm({ ...form, useCase: event.target.value })}
                   required
@@ -130,7 +160,7 @@ function BetaPage() {
               ) : null}
 
               <button disabled={state === "loading"} className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary font-semibold text-primary-foreground transition hover:brightness-105 disabled:opacity-60">
-                {state === "loading" ? "Submitting..." : "Request beta access"} <ArrowRight className="h-4 w-4" />
+                {state === "loading" ? "Submitting..." : "Join community beta"} <ArrowRight className="h-4 w-4" />
               </button>
             </form>
 
@@ -154,7 +184,7 @@ function BetaPage() {
 function Pill({ icon: Icon, title, body }: { icon: typeof Bot; title: string; body: string }) {
   return (
     <div className="rounded-2xl border border-white/70 bg-white/65 p-4 shadow-sm backdrop-blur">
-      <Icon className="h-5 w-5 text-orange-600" />
+      <Icon className="h-5 w-5 text-primary" />
       <div className="mt-3 text-sm font-semibold text-foreground">{title}</div>
       <div className="mt-1 text-sm leading-6 text-muted-foreground">{body}</div>
     </div>
@@ -166,6 +196,15 @@ function Proof({ label, value }: { label: string; value: string }) {
     <div>
       <div className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
       <div className="mt-1 text-sm font-semibold text-foreground">{value}</div>
+    </div>
+  );
+}
+
+function MiniStep({ icon: Icon, label }: { icon: typeof Sparkles; label: string }) {
+  return (
+    <div className="flex items-center gap-2 rounded-2xl bg-background px-3 py-2 font-medium">
+      <Icon className="h-4 w-4 text-primary" />
+      {label}
     </div>
   );
 }
