@@ -74,7 +74,7 @@ Use this when introducing the beta form.
 ```text
 For the beta, we are not opening everything at once.
 
-The public page is a waitlist. Users submit an email and, if they already have one, a Somnia wallet. We review the queue, add approved wallets to the access list, and send invite codes in waves.
+The public page is a waitlist. Users submit an email, Telegram handle, and, if they already have one, a Somnia wallet. We review the queue, add approved wallets to the access list, and send invite codes through Telegram in waves.
 
 That lets us support early users properly, prevent spam, and learn from people who actually want to create agents, complete quests, and test payments on Somnia.
 ```
@@ -88,7 +88,7 @@ Because this is still a hands-on community beta. We want early users to have sup
 If asked how users are approved:
 
 ```text
-We review beta requests from the admin queue. For selected users, we mark them as invited or active, send an invite code, and add their wallet to the approved beta flow. That gives us a controlled way to scale from the first 50 users to the next waves.
+We review beta requests from the admin queue. For selected users, we mark them as invited or active, send an invite code through Telegram from @TheLuckyReborned, and add their wallet to the approved beta flow. That gives us a controlled way to scale from the first 50 users to the next waves.
 ```
 
 ## Opening Script
@@ -142,16 +142,16 @@ This is the public beta entry point.
 
 We are opening access in waves so the product stays supported and we can learn from real users.
 
-The form is intentionally simple: email, wallet, Telegram if they want support, and invite code if they already have one.
+The form is intentionally simple: email, Telegram, wallet, and invite code if they already have one.
 
-We review the queue, add approved wallets, and send invite codes. Wave one is focused on users and teams who want to launch agents, test paid work, create proof, and give feedback.
+We review the queue, add approved wallets, and send invite codes through Telegram. Wave one is focused on users and teams who want to launch agents, test paid work, create proof, and give feedback.
 ```
 
 Show:
 
 - email field
 - Somnia wallet field
-- optional Telegram
+- Telegram field
 - optional invite code
 - "Request beta access"
 
@@ -378,9 +378,9 @@ Somnia made sense because it is focused on agentic apps and fast execution, so w
 ### How does beta access work?
 
 ```text
-Users join the waitlist with email and wallet.
+Users join the waitlist with email, Telegram, and wallet.
 
-We review the queue, approve wallets in waves, send invite codes, and then those users enter the app, create an agent workspace, complete quests, and appear on the leaderboard.
+We review the queue, approve wallets in waves, send invite codes through Telegram from @TheLuckyReborned, and then those users enter the app, create an agent workspace, complete quests, and appear on the leaderboard.
 
 The reason for waves is support and quality. We want the first community users to get help and we want beta points to come from real activity.
 ```

@@ -72,6 +72,7 @@ function normalizePayload(body: Record<string, unknown>): BetaPayload {
 
 function validatePayload(payload: BetaPayload) {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(payload.email)) return "valid_email_required";
+  if (!payload.telegram) return "telegram_required";
   if (payload.walletAddress && !/^0x[a-fA-F0-9]{40}$/.test(payload.walletAddress)) return "valid_wallet_or_blank_required";
   return "";
 }

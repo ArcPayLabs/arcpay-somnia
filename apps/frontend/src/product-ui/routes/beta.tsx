@@ -102,7 +102,7 @@ function BetaPage() {
               <div className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">Join the beta</div>
               <h2 className="mt-2 text-3xl font-medium tracking-[-0.04em]">Join the Wave 1 waitlist.</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Drop your email and Somnia wallet. We approve wallets in waves, send invite codes, and help the first testers launch agents without overwhelming the beta.
+                Drop your email, Telegram, and Somnia wallet. We approve wallets in waves, send invite codes through Telegram, and help the first testers launch agents without overwhelming the beta.
               </p>
             </div>
             <div className="mb-6 grid gap-2 rounded-3xl border border-border bg-muted/35 p-3 text-sm sm:grid-cols-3">
@@ -117,12 +117,12 @@ function BetaPage() {
                 <Field label="Somnia wallet" placeholder="0x..." value={form.walletAddress} onChange={(value) => setForm({ ...form, walletAddress: value })} />
               </div>
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label="Telegram optional" placeholder="@handle" value={form.telegram} onChange={(value) => setForm({ ...form, telegram: value })} />
+                <Field label="Telegram" placeholder="@handle" value={form.telegram} onChange={(value) => setForm({ ...form, telegram: value })} required />
                 <Field label="Invite code" placeholder="Optional: ARCPAY-WAVE1-..." value={form.inviteCode} onChange={(value) => setForm({ ...form, inviteCode: value })} />
               </div>
               <input type="hidden" value={form.wave} readOnly />
               <div className="rounded-2xl border border-border bg-muted/35 px-4 py-3 text-sm leading-6 text-muted-foreground">
-                After approval, we add your wallet to the beta access list and send your invite code. First testers get quests, leaderboard points, and direct support.
+                After approval, we add your wallet to the beta access list and send your invite code on Telegram from @TheLuckyReborned. First testers get quests, leaderboard points, and direct support.
               </div>
 
               {message ? (
