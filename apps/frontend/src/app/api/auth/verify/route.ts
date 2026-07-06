@@ -15,30 +15,46 @@ export async function POST(request: Request) {
   }
 
   const walletEmail = `wallet-${recovered.slice(2)}@arcpay.local`;
-  const admin = createSupabaseAdminClient();
-  const { data: link, error } = await admin.auth.admin.generateLink({
-    type: "magiclink",
-    email: walletEmail,
-    options: {
-      data: {
-        name: `Somnia ${recovered.slice(0, 6)}`,
-        wallet_address: recovered,
-        workspace: "Somnia agent treasury",
-      },
-    },
-  });
+  let supabaseAuth:
+    | {
+        email: string;
+        tokenHash: string;
+        type: "email";
+      }
+    | undefined;
+  let supabaseWarning: string | undefined;
 
-  if (error || !link.properties?.hashed_token) {
-    return NextResponse.json({ error: error?.message ?? "wallet_supabase_link_failed" }, { status: 500 });
+  try {
+    const admin = createSupabaseAdminClient();
+    const { data: link, error } = await admin.auth.admin.generateLink({
+      type: "magiclink",
+      email: walletEmail,
+      options: {
+        data: {
+          name: `Somnia ${recovered.slice(0, 6)}`,
+          wallet_address: recovered,
+          workspace: "Somnia agent treasury",
+        },
+      },
+    });
+
+    if (error || !link.properties?.hashed_token) {
+      supabaseWarning = error?.message ?? "wallet_supabase_link_failed";
+    } else {
+      supabaseAuth = {
+        email: walletEmail,
+        tokenHash: link.properties.hashed_token,
+        type: "email",
+      };
+    }
+  } catch (error) {
+    supabaseWarning = error instanceof Error ? error.message : "wallet_supabase_link_failed";
   }
 
   const response = NextResponse.json({
     address: recovered,
-    supabaseAuth: {
-      email: walletEmail,
-      tokenHash: link.properties.hashed_token,
-      type: "email",
-    },
+    supabaseAuth,
+    supabaseWarning,
   });
   response.cookies.set(sessionCookie, createSession(recovered), {
     httpOnly: true,

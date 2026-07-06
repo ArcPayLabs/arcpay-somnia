@@ -26,5 +26,5 @@ export const NAV_LINKS = [
   { label: "Security", to: "/security" },
   { label: "Pricing", to: "/pricing" },
   { label: "Beta", to: "/beta" },
-  { label: "Docs", to: "/docs" },
+  { label: "Docs", to: "/docs/overview" },
 ] as const;
