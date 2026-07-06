@@ -2,6 +2,7 @@ node_modules/
 .next/
 .env
 .env.local
+*.log
 dist/
 artifacts/
 cache/
@@ -9,3 +10,15 @@ coverage/
 typechain-types/
 supabase/.temp/
 .DS_Store
+
+# Local agent/video tooling and generated launch assets
+.agents/
+skills-lock.json
+arcpay-somnia-launch-video/
+demo-output/
+social/
+LAUNCH_PLAYBOOK.md
+
+# Local QA captures and scratch crawlers
+qa-*/
+apps/frontend/arcpay-*-crawl.cjs
