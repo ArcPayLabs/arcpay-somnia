@@ -8,7 +8,9 @@ import { AppTopBar } from "@/components/app/AppTopBar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useAppAccess } from "@/hooks/use-app-access";
 import { useAdminAccess } from "@/hooks/use-admin-access";
+import { useWalletConnectAction } from "@/hooks/use-wallet-connect-action";
 import { isCommunityRoute } from "@/lib/app-routes";
+import { getOptionalSupabaseClient } from "./supabase-client";
 
 type ProductRoute = {
   readonly options?: {
@@ -30,6 +32,7 @@ export function renderProductRoute(route: ProductRoute): ReactNode {
 export function ProductAppShell({ children }: { readonly children: ReactNode }) {
   const access = useAppAccess();
   const admin = useAdminAccess();
+  const wallet = useWalletConnectAction();
   const router = useRouter();
   const pathname = usePathname();
   const isFullConsoleRoute = !isCommunityRoute(pathname);
@@ -81,6 +84,17 @@ export function ProductAppShell({ children }: { readonly children: ReactNode }) 
           <div className="mt-1 max-w-md text-sm text-muted-foreground">
             This page is restricted to ArcPay admins. Community beta users can launch agents, complete quests, use wallet, x402, cards, swaps, yield, and privacy flows.
           </div>
+          <button
+            type="button"
+            disabled={wallet.connecting}
+            onClick={() => void refreshAdminSession(wallet)}
+            className="mt-5 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-background disabled:opacity-60"
+          >
+            {wallet.connecting ? "Waiting for wallet..." : "Refresh admin wallet session"}
+          </button>
+          <div className="mt-2 text-xs text-muted-foreground">
+            Use admin wallet 0xB883...f448 or 0xd953...1458.
+          </div>
         </div>
       </div>
     );
@@ -97,4 +111,17 @@ export function ProductAppShell({ children }: { readonly children: ReactNode }) 
       </div>
     </SidebarProvider>
   );
+}
+
+async function refreshAdminSession(wallet: ReturnType<typeof useWalletConnectAction>) {
+  const result = await wallet.connectWallet(undefined, { forceVerify: true });
+  const supabase = getOptionalSupabaseClient();
+  if (supabase && result.supabaseAuth) {
+    await supabase.auth.verifyOtp({
+      token_hash: result.supabaseAuth.tokenHash,
+      type: result.supabaseAuth.type,
+    });
+  }
+  window.dispatchEvent(new StorageEvent("storage", { key: "arcpay-somnia-wallet-session" }));
+  window.location.reload();
 }

@@ -33,7 +33,7 @@ export type WalletProviderOption = {
 };
 
 type WalletConnectAction = {
-  readonly connectWallet: (walletId?: string) => Promise<WalletConnectResult>;
+  readonly connectWallet: (walletId?: string, options?: { forceVerify?: boolean }) => Promise<WalletConnectResult>;
   readonly availableWallets: WalletProviderOption[];
   readonly connected: boolean;
   readonly connecting: boolean;
@@ -60,10 +60,10 @@ export function useWalletConnectAction(): WalletConnectAction {
     setAvailableWallets(detectWallets());
   }, []);
 
-  const connectWallet = useCallback(async (walletId?: string): Promise<WalletConnectResult> => {
+  const connectWallet = useCallback(async (walletId?: string, options?: { forceVerify?: boolean }): Promise<WalletConnectResult> => {
     try {
       if (connecting) throw new Error("A wallet request is already pending.");
-      if (address) return { address };
+      if (address && !options?.forceVerify) return { address };
       setConnecting(true);
       setErrorMessage(null);
       const provider = getProvider(walletId);
