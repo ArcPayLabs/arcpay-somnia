@@ -38,7 +38,7 @@ function BetaPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      const body = await response.json();
+      const body = await parseJsonResponse(response);
       if (!response.ok && response.status !== 202) throw new Error(body?.error ?? "Beta request failed.");
       setState("success");
       setMessage(body.message ?? "Beta request received.");
@@ -84,7 +84,7 @@ function BetaPage() {
                     <Trophy className="h-4 w-4 text-primary" /> Wave 1 access
                   </div>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Join the waitlist now. We release invite codes in waves so early users get support, points, and leaderboard visibility.
+                    Join the waitlist now. We approve access in waves so early users get support, points, and leaderboard visibility.
                   </p>
                 </div>
                 <div className="hidden rounded-2xl bg-foreground px-4 py-3 text-center text-background sm:block">
@@ -152,6 +152,16 @@ function BetaPage() {
       </div>
     </MarketingShell>
   );
+}
+
+async function parseJsonResponse(response: Response) {
+  const text = await response.text();
+  if (!text) return { error: response.ok ? "" : `Request failed with status ${response.status}` };
+  try {
+    return JSON.parse(text) as { message?: string; telegramUrl?: string; error?: string };
+  } catch {
+    return { error: response.ok ? "Invalid server response." : text.slice(0, 240) || `Request failed with status ${response.status}` };
+  }
 }
 
 function Pill({ icon: Icon, title, body }: { icon: typeof Bot; title: string; body: string }) {

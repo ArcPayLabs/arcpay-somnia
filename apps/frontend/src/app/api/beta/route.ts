@@ -17,38 +17,42 @@ type BetaPayload = {
 };
 
 export async function POST(request: Request) {
-  const body = await request.json().catch(() => ({}));
-  const payload = normalizePayload(body);
-  const validation = validatePayload(payload);
-  if (validation) return NextResponse.json({ ok: false, error: validation }, { status: 400 });
+  try {
+    const body = await request.json().catch(() => ({}));
+    const payload = normalizePayload(body);
+    const validation = validatePayload(payload);
+    if (validation) return NextResponse.json({ ok: false, error: validation }, { status: 400 });
 
-  if (!hasSupabase()) {
-    return NextResponse.json({ ok: false, error: "supabase_not_configured" }, { status: 503 });
+    if (!hasSupabase()) {
+      return NextResponse.json({ ok: false, error: "supabase_not_configured" }, { status: 503 });
+    }
+
+    const betaResult = await writeBetaSignup(payload, request);
+    if (betaResult.ok) {
+      void trackBetaSignup(payload, "beta_table");
+      return NextResponse.json({
+        ok: true,
+        mode: "beta_table",
+        message: "Beta request received. We approve wallets and emails in waves so every new user gets support.",
+        telegramUrl: process.env.NEXT_PUBLIC_TELEGRAM_URL ?? "https://t.me/TheLuckyReborned",
+      });
+    }
+
+    const fallback = await writeFallbackRecord(payload, betaResult.error);
+    if (fallback.ok) {
+      void trackBetaSignup(payload, "records_fallback");
+      return NextResponse.json({
+        ok: true,
+        mode: "records_fallback",
+        message: "Beta request recorded. We approve wallets and emails in waves so every new user gets support.",
+        telegramUrl: process.env.NEXT_PUBLIC_TELEGRAM_URL ?? "https://t.me/TheLuckyReborned",
+      }, { status: 202 });
+    }
+
+    return NextResponse.json({ ok: false, error: fallback.error || betaResult.error || "beta_signup_failed" }, { status: 502 });
+  } catch (error) {
+    return NextResponse.json({ ok: false, error: friendlyError(error) }, { status: 500 });
   }
-
-  const betaResult = await writeBetaSignup(payload, request);
-  if (betaResult.ok) {
-    await trackBetaSignup(payload, "beta_table");
-    return NextResponse.json({
-      ok: true,
-      mode: "beta_table",
-      message: "Beta request received. We approve wallets and emails in waves so every new user gets support.",
-      telegramUrl: process.env.NEXT_PUBLIC_TELEGRAM_URL ?? "https://t.me/TheLuckyReborned",
-    });
-  }
-
-  const fallback = await writeFallbackRecord(payload, betaResult.error);
-  if (fallback.ok) {
-    await trackBetaSignup(payload, "records_fallback");
-    return NextResponse.json({
-      ok: true,
-      mode: "records_fallback",
-      message: "Beta request recorded. We approve wallets and emails in waves so every new user gets support.",
-      telegramUrl: process.env.NEXT_PUBLIC_TELEGRAM_URL ?? "https://t.me/TheLuckyReborned",
-    }, { status: 202 });
-  }
-
-  return NextResponse.json({ ok: false, error: fallback.error || betaResult.error || "beta_signup_failed" }, { status: 502 });
 }
 
 function normalizePayload(body: Record<string, unknown>): BetaPayload {
@@ -81,7 +85,7 @@ async function writeBetaSignup(payload: BetaPayload, request: Request) {
     userAgent: request.headers.get("user-agent") ?? "",
     referrer: request.headers.get("referer") ?? "",
   };
-  const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/${BETA_TABLE}`, {
+  const response = await safeFetch(`${process.env.SUPABASE_URL}/rest/v1/${BETA_TABLE}`, {
     method: "POST",
     headers: { ...supabaseHeaders(), "Content-Type": "application/json", Prefer: "return=minimal" },
     body: JSON.stringify({
@@ -98,13 +102,15 @@ async function writeBetaSignup(payload: BetaPayload, request: Request) {
     }),
   });
 
-  if (response.ok) return { ok: true };
-  if (response.status === 409) return { ok: true };
-  return { ok: false, error: await response.text() };
+  if (!response.ok && !response.response) return response;
+
+  if (response.response?.ok) return { ok: true };
+  if (response.response?.status === 409) return { ok: true };
+  return { ok: false, error: await response.response?.text() };
 }
 
 async function writeFallbackRecord(payload: BetaPayload, betaError: string | undefined) {
-  const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/${RECORDS_TABLE}`, {
+  const response = await safeFetch(`${process.env.SUPABASE_URL}/rest/v1/${RECORDS_TABLE}`, {
     method: "POST",
     headers: { ...supabaseHeaders(), "Content-Type": "application/json", Prefer: "return=minimal" },
     body: JSON.stringify({
@@ -127,8 +133,9 @@ async function writeFallbackRecord(payload: BetaPayload, betaError: string | und
     }),
   });
 
-  if (response.ok) return { ok: true };
-  return { ok: false, error: await response.text() };
+  if (!response.ok && !response.response) return response;
+  if (response.response?.ok) return { ok: true };
+  return { ok: false, error: await response.response?.text() };
 }
 
 function hasSupabase() {
@@ -149,7 +156,8 @@ function clean(value: unknown, max: number) {
 }
 
 async function trackBetaSignup(payload: BetaPayload, mode: string) {
-  await trackUsageEvent({
+  try {
+    await trackUsageEvent({
     eventType: "beta_signup_created",
     owner: payload.walletAddress || payload.email,
     agentSlug: payload.agentUrl ? "external-agent" : null,
@@ -165,4 +173,21 @@ async function trackBetaSignup(payload: BetaPayload, mode: string) {
       wave: payload.wave,
     },
   });
+  } catch {
+    // Usage tracking must never block beta access requests.
+  }
+}
+
+async function safeFetch(input: string, init: RequestInit): Promise<{ ok: true; response: Response } | { ok: false; error: string; response?: undefined }> {
+  try {
+    return { ok: true, response: await fetch(input, init) };
+  } catch (error) {
+    return { ok: false, error: friendlyError(error) };
+  }
+}
+
+function friendlyError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  if (message.includes("ENOTFOUND") || message.includes("fetch failed")) return "beta_storage_unreachable";
+  return message.slice(0, 240) || "beta_request_failed";
 }
