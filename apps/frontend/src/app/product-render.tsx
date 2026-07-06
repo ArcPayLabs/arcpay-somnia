@@ -39,8 +39,14 @@ export function ProductAppShell({ children }: { readonly children: ReactNode }) 
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-6 text-center">
         <div>
-          <div className="text-sm font-semibold text-foreground">Redirecting to onboarding...</div>
-          <div className="mt-1 text-sm text-muted-foreground">Connect a wallet or sign in before opening ArcPay.</div>
+          <div className="text-sm font-semibold text-foreground">
+            {access.hasIdentity ? "Beta approval required." : "Redirecting to onboarding..."}
+          </div>
+          <div className="mt-1 max-w-md text-sm text-muted-foreground">
+            {access.hasIdentity
+              ? "This wallet or email is not active in the ArcPay beta list yet. Apply through /beta or ask Henry to mark your request as invited or active."
+              : "Connect an approved wallet or sign in with an approved email before opening ArcPay."}
+          </div>
         </div>
       </div>
     );

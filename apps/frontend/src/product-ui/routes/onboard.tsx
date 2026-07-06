@@ -36,14 +36,14 @@ function Onboard() {
           Start with wallet or beta email
         </h1>
         <p className="text-muted-foreground text-sm mt-1.5">
-          Wallet sign-in creates or resumes one ArcPay account per wallet. If you do not have access yet, join the beta wave and we will send an invite code.
+          Wallet sign-in creates or resumes one ArcPay account per wallet. If you do not have access yet, join the beta wave so we can approve your wallet or email.
         </p>
       </div>
 
       <div className="rounded-2xl border border-border bg-muted/35 p-4">
         <div className="text-sm font-semibold">No invite yet?</div>
         <p className="mt-1 text-sm leading-6 text-muted-foreground">
-          Join the community beta, tell us what kind of agent you want to launch, and get access in the next wave.
+          Join the community beta, tell us what kind of agent you want to launch, and get approved in the next wave.
         </p>
         <Link
           to="/beta"

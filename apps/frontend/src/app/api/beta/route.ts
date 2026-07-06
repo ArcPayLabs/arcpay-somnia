@@ -12,7 +12,6 @@ type BetaPayload = {
   role: string;
   useCase: string;
   agentUrl: string;
-  inviteCode: string;
   referralSource: string;
   wave: string;
 };
@@ -33,9 +32,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       mode: "beta_table",
-      message: payload.inviteCode
-        ? "Invite code received. Open ArcPay and create your first Somnia agent workspace."
-        : "Beta request received. Wave invites are released in batches so every new user gets support.",
+      message: "Beta request received. We approve wallets and emails in waves so every new user gets support.",
       telegramUrl: process.env.NEXT_PUBLIC_TELEGRAM_URL ?? "https://t.me/TheLuckyReborned",
     });
   }
@@ -46,7 +43,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       mode: "records_fallback",
-      message: "Beta request recorded. Wave invites are released in batches so every new user gets support.",
+      message: "Beta request recorded. We approve wallets and emails in waves so every new user gets support.",
       telegramUrl: process.env.NEXT_PUBLIC_TELEGRAM_URL ?? "https://t.me/TheLuckyReborned",
     }, { status: 202 });
   }
@@ -60,11 +57,10 @@ function normalizePayload(body: Record<string, unknown>): BetaPayload {
     name: clean(body.name, 120) || email.split("@")[0] || "ArcPay beta user",
     email,
     telegram: clean(body.telegram, 80),
-    walletAddress: clean(body.walletAddress, 80),
+    walletAddress: clean(body.walletAddress, 80).toLowerCase(),
     role: clean(body.role, 80) || "Community beta waitlist",
     useCase: clean(body.useCase, 1500) || "Wants beta access to create agents, complete quests, and test ArcPay on Somnia.",
     agentUrl: clean(body.agentUrl, 300),
-    inviteCode: clean(body.inviteCode, 80).toUpperCase(),
     referralSource: clean(body.referralSource, 180),
     wave: clean(body.wave, 40) || "wave-1",
   };
@@ -81,7 +77,6 @@ async function writeBetaSignup(payload: BetaPayload, request: Request) {
   const metadata = {
     source: "arcpay-somnia-beta",
     wave: payload.wave,
-    inviteCode: payload.inviteCode || null,
     referralSource: payload.referralSource || null,
     userAgent: request.headers.get("user-agent") ?? "",
     referrer: request.headers.get("referer") ?? "",
@@ -124,7 +119,6 @@ async function writeFallbackRecord(payload: BetaPayload, betaError: string | und
         walletAddress: payload.walletAddress,
         useCase: payload.useCase,
         agentUrl: payload.agentUrl,
-        inviteCode: payload.inviteCode,
         referralSource: payload.referralSource,
         wave: payload.wave,
       }),
@@ -167,7 +161,6 @@ async function trackBetaSignup(payload: BetaPayload, mode: string) {
       hasTelegram: Boolean(payload.telegram),
       hasWallet: Boolean(payload.walletAddress),
       hasAgentUrl: Boolean(payload.agentUrl),
-      hasInviteCode: Boolean(payload.inviteCode),
       referralSource: payload.referralSource || null,
       wave: payload.wave,
     },
