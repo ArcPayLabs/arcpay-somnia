@@ -44,6 +44,53 @@ Henry should sound like the technical founder:
 - What security and privacy boundaries are honest.
 - How builders can integrate using CLI/MCP/starter kits.
 
+## Background Story
+
+Use this if Lisa asks how ArcPay started, or as a short human intro before the demo.
+
+```text
+The idea came from a simple problem we kept seeing while building agent products:
+
+agents are becoming easier to create, but the operating layer around them is still missing.
+
+If an agent can earn, spend, call paid tools, or work for a user, somebody needs to answer practical questions:
+who controls the wallet, what is the budget, what can it pay for, how do we prove work was done, and how does a normal user understand what happened?
+
+ArcPay started as that control layer. We wanted to make agent finance feel simple for users, but still rigorous enough for builders and teams.
+
+Somnia is a strong fit because the ecosystem is focused on real-time agentic apps. ArcPay gives those agents a product layer: launch, budget, payment, proof, reputation, and community feedback.
+```
+
+Short version:
+
+```text
+We came up with ArcPay because agents need more than chat. They need wallets, budgets, payments, and proof. ArcPay is the product layer that lets normal users and teams launch and control agents on Somnia without thinking like smart contract engineers.
+```
+
+## Community Beta Access Flow
+
+Use this when introducing the beta form.
+
+```text
+For the beta, we are not opening everything at once.
+
+The public page is a waitlist. Users submit an email and, if they already have one, a Somnia wallet. We review the queue, add approved wallets to the access list, and send invite codes in waves.
+
+That lets us support early users properly, prevent spam, and learn from people who actually want to create agents, complete quests, and test payments on Somnia.
+```
+
+If asked why not fully open:
+
+```text
+Because this is still a hands-on community beta. We want early users to have support, and we want the leaderboard and quests to reflect real activity instead of empty signups or spam wallets.
+```
+
+If asked how users are approved:
+
+```text
+We review beta requests from the admin queue. For selected users, we mark them as invited or active, send an invite code, and add their wallet to the approved beta flow. That gives us a controlled way to scale from the first 50 users to the next waves.
+```
+
 ## Opening Script
 
 ### Ama - 45-60 seconds
@@ -93,15 +140,20 @@ Ama says:
 ```text
 This is the public beta entry point.
 
-We’re opening access in waves so the product stays supported and we can learn from real users. Wave one is focused on users and teams who want to launch agents, test paid work, create proof, and give feedback.
+We are opening access in waves so the product stays supported and we can learn from real users.
+
+The form is intentionally simple: email, wallet, Telegram if they want support, and invite code if they already have one.
+
+We review the queue, add approved wallets, and send invite codes. Wave one is focused on users and teams who want to launch agents, test paid work, create proof, and give feedback.
 ```
 
 Show:
 
-- invite code field
-- role dropdown
-- use case field
-- “Join community beta”
+- email field
+- Somnia wallet field
+- optional Telegram
+- optional invite code
+- "Request beta access"
 
 Do not spend more than 45 seconds here.
 
@@ -311,6 +363,28 @@ If you are building an agent, paid API, trading bot, or automation workflow on S
 
 ## Technical Q&A
 
+### How did you come up with the idea?
+
+```text
+We were building around AI agents and kept running into the same missing layer.
+
+Agents can answer questions or run tasks, but if they become useful, they need payments, budgets, permissions, receipts, and reputation.
+
+The idea for ArcPay was to make that operating layer feel like a normal product: launch an agent, give it a controlled budget, let it sell paid work, and keep proof of everything it does.
+
+Somnia made sense because it is focused on agentic apps and fast execution, so we can build the user-facing layer around that ecosystem early.
+```
+
+### How does beta access work?
+
+```text
+Users join the waitlist with email and wallet.
+
+We review the queue, approve wallets in waves, send invite codes, and then those users enter the app, create an agent workspace, complete quests, and appear on the leaderboard.
+
+The reason for waves is support and quality. We want the first community users to get help and we want beta points to come from real activity.
+```
+
 ### How is ArcPay using Somnia?
 
 ```text
@@ -503,4 +577,3 @@ The x402 server is an external runtime, so if it is slow, the fallback is to sho
 ```text
 Good question. I want to answer that precisely, so I’ll share the exact contract/API reference after the session rather than guessing live.
 ```
-

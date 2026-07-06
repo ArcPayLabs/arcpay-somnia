@@ -19,15 +19,10 @@ type SubmitState = "idle" | "loading" | "success" | "error";
 
 function BetaPage() {
   const [form, setForm] = useState({
-    name: "",
     email: "",
     telegram: "",
     walletAddress: "",
-    role: "Agent builder",
-    useCase: "",
-    agentUrl: "",
     inviteCode: "",
-    referralSource: "",
     wave: "wave-1",
   });
   const [state, setState] = useState<SubmitState>("idle");
@@ -105,9 +100,9 @@ function BetaPage() {
           <section className="rounded-[2rem] border border-border bg-card p-6 shadow-sm md:p-8">
             <div className="mb-6">
               <div className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">Join the beta</div>
-              <h2 className="mt-2 text-3xl font-medium tracking-[-0.04em]">What agent do you want to launch?</h2>
+              <h2 className="mt-2 text-3xl font-medium tracking-[-0.04em]">Join the Wave 1 waitlist.</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                We are onboarding community users, traders, teams, and builders who want to test agent payments on Somnia.
+                Drop your email and Somnia wallet. We approve wallets in waves, send invite codes, and help the first testers launch agents without overwhelming the beta.
               </p>
             </div>
             <div className="mb-6 grid gap-2 rounded-3xl border border-border bg-muted/35 p-3 text-sm sm:grid-cols-3">
@@ -118,40 +113,17 @@ function BetaPage() {
 
             <form className="space-y-4" onSubmit={submit}>
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label="Name" value={form.name} onChange={(value) => setForm({ ...form, name: value })} required />
-                <Field label="Work email" type="email" value={form.email} onChange={(value) => setForm({ ...form, email: value })} required />
-              </div>
-              <div className="grid gap-4 md:grid-cols-2">
-                <Field label="Telegram" placeholder="@handle" value={form.telegram} onChange={(value) => setForm({ ...form, telegram: value })} />
+                <Field label="Email" type="email" placeholder="you@domain.com" value={form.email} onChange={(value) => setForm({ ...form, email: value })} required />
                 <Field label="Somnia wallet" placeholder="0x..." value={form.walletAddress} onChange={(value) => setForm({ ...form, walletAddress: value })} />
               </div>
               <div className="grid gap-4 md:grid-cols-2">
+                <Field label="Telegram optional" placeholder="@handle" value={form.telegram} onChange={(value) => setForm({ ...form, telegram: value })} />
                 <Field label="Invite code" placeholder="Optional: ARCPAY-WAVE1-..." value={form.inviteCode} onChange={(value) => setForm({ ...form, inviteCode: value })} />
-                <Field label="Who invited you?" placeholder="@handle, community, friend..." value={form.referralSource} onChange={(value) => setForm({ ...form, referralSource: value })} />
               </div>
-              <label className="block">
-                <span className="text-sm font-medium">Builder type</span>
-                <select className="mt-2 h-12 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none focus:border-primary" value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value })}>
-                  <option>Community user</option>
-                  <option>Trader</option>
-                  <option>Agent builder</option>
-                  <option>Protocol team</option>
-                  <option>Treasury operator</option>
-                  <option>Hackathon team</option>
-                </select>
-              </label>
-              <Field label="Agent or app URL" placeholder="https://..." value={form.agentUrl} onChange={(value) => setForm({ ...form, agentUrl: value })} />
               <input type="hidden" value={form.wave} readOnly />
-              <label className="block">
-                <span className="text-sm font-medium">What do you want to do in ArcPay?</span>
-                <textarea
-                  className="mt-2 min-h-32 w-full resize-y rounded-xl border border-border bg-background px-3 py-3 text-sm outline-none focus:border-primary"
-                  placeholder="Example: I want to launch a research agent, set a small budget, create a paid task, issue an agent card, and earn beta points."
-                  value={form.useCase}
-                  onChange={(event) => setForm({ ...form, useCase: event.target.value })}
-                  required
-                />
-              </label>
+              <div className="rounded-2xl border border-border bg-muted/35 px-4 py-3 text-sm leading-6 text-muted-foreground">
+                After approval, we add your wallet to the beta access list and send your invite code. First testers get quests, leaderboard points, and direct support.
+              </div>
 
               {message ? (
                 <div className={`rounded-2xl px-4 py-3 text-sm ${state === "error" ? "bg-destructive/10 text-destructive" : "bg-success/10 text-success"}`}>
@@ -160,7 +132,7 @@ function BetaPage() {
               ) : null}
 
               <button disabled={state === "loading"} className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary font-semibold text-primary-foreground transition hover:brightness-105 disabled:opacity-60">
-                {state === "loading" ? "Submitting..." : "Join community beta"} <ArrowRight className="h-4 w-4" />
+                {state === "loading" ? "Submitting..." : "Request beta access"} <ArrowRight className="h-4 w-4" />
               </button>
             </form>
 

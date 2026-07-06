@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Contract, parseEther } from "ethers";
-import { ArrowLeftRight, ChevronDown, CheckCircle2, ExternalLink, Info, Loader2, Route as RouteIcon, ShieldCheck, Zap } from "lucide-react";
+import { ArrowLeftRight, ChevronDown, CheckCircle2, ExternalLink, Loader2, Route as RouteIcon, ShieldCheck, Zap } from "lucide-react";
 import { PageHeader } from "@/components/app/PageHeader";
 import { ReviewModal } from "@/components/primitives/ReviewModal";
 import { StatCard } from "@/components/primitives/StatCard";
@@ -26,13 +26,7 @@ import {
 export const Route = { options: { component: SwapsRoute } };
 
 const TOKENS = ["STT", "SOMUSD"] as const;
-const VENUES = [
-  { id: "arcpay", label: "ArcPay Testnet Router", note: "Live Somnia contract. Signs and returns a real tx hash." },
-  { id: "dreamdex", label: "dreamDEX", note: "Adapter-ready CLOB route. Requires public router/SDK endpoint before direct signing." },
-  { id: "somnia-exchange", label: "Somnia Exchange", note: "Native venue proof path. Attach route tx when venue exposes router data." },
-  { id: "somnex", label: "Somnex", note: "Aggregator/perps evidence route for treasury agents." },
-  { id: "potion", label: "Potion Swap", note: "Uniswap-style pool route when pool/router addresses are provided." },
-] as const;
+const LIVE_VENUE = "ArcPay Testnet Router";
 
 type Token = typeof TOKENS[number];
 
@@ -48,7 +42,6 @@ function SwapsRoute() {
   const [to, setTo] = useState<Token>("SOMUSD");
   const [amount, setAmount] = useState("0.01");
   const [slippage, setSlippage] = useState("0.5");
-  const [venue, setVenue] = useState<(typeof VENUES)[number]["id"]>("arcpay");
   const [quote, setQuote] = useState<QuoteState | null>(null);
   const [quoteStatus, setQuoteStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [message, setMessage] = useState("Get a live Somnia quote before signing. ArcPay testnet router is fully executable.");
@@ -57,20 +50,19 @@ function SwapsRoute() {
 
   const num = Number.parseFloat(amount) || 0;
   const slippageBps = Math.max(0, Math.round((Number.parseFloat(slippage) || 0) * 100));
-  const activeVenue = VENUES.find((item) => item.id === venue) ?? VENUES[0];
-  const executable = venue === "arcpay" && from === "STT" && to === "SOMUSD";
+  const executable = from === "STT" && to === "SOMUSD";
 
   useEffect(() => {
     setQuote(null);
     setQuoteStatus("idle");
     setTxHash("");
-    setMessage(executable ? "Get a live Somnia quote before signing." : "This venue is adapter-ready. Use ArcPay Testnet Router for a live signed swap today.");
-  }, [amount, executable, from, slippage, to, venue]);
+    setMessage(executable ? "Get a live Somnia quote before signing." : "Live swaps currently support STT -> SOMUSD through the ArcPay router.");
+  }, [amount, executable, from, slippage, to]);
 
   async function requestQuote() {
     if (!executable) {
       setQuoteStatus("error");
-      setMessage("Direct signing is available through ArcPay Testnet Router. This external venue needs router/SDK details before live execution.");
+      setMessage("Live execution is available only for STT -> SOMUSD through the ArcPay Testnet Router.");
       return;
     }
     if (num <= 0) {
@@ -101,7 +93,7 @@ function SwapsRoute() {
       const tokenOut = await (router as unknown as { quoteNativeToToken: (nativeIn: bigint) => Promise<bigint> }).quoteNativeToToken(nativeIn);
       const minOut = tokenOut - ((tokenOut * BigInt(slippageBps)) / 10000n);
       const recipient = await currentConnectedAddress().catch(() => "");
-      setQuote({ tokenOut, minOut, recipient, venue: activeVenue.label });
+      setQuote({ tokenOut, minOut, recipient, venue: LIVE_VENUE });
       setQuoteStatus("ready");
       setMessage("Live quote loaded. Review will open the wallet and sign a real Somnia transaction.");
     } catch (error) {
@@ -134,7 +126,7 @@ function SwapsRoute() {
     await tx.wait();
     writeRecord({
       id: tx.hash,
-      type: "tx",
+      type: "swap",
       title: `Swap ${amount} STT to ${fromUnits(quote.tokenOut, 6)} SOMUSD`,
       amount: `${amount} STT`,
       status: "swap_confirmed",
@@ -186,9 +178,9 @@ function SwapsRoute() {
             <div className="grid gap-3 pt-2 md:grid-cols-2">
               <label className="block">
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Venue</span>
-                <select value={venue} onChange={(event) => setVenue(event.target.value as typeof venue)} className="mt-1.5 h-11 w-full rounded-xl border border-border bg-background px-3">
-                  {VENUES.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-                </select>
+                <div className="mt-1.5 flex h-11 items-center rounded-xl border border-border bg-muted/50 px-3 text-sm font-semibold">
+                  {LIVE_VENUE}
+                </div>
               </label>
               <label className="block">
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Max slippage</span>
@@ -221,17 +213,15 @@ function SwapsRoute() {
 
         <aside className="space-y-3 lg:col-span-2">
           <div className="rounded-3xl border border-border bg-card p-5">
-            <div className="mb-3 text-xs uppercase tracking-wider text-muted-foreground">Routes</div>
-            <div className="space-y-2">
-              {VENUES.map((item) => (
-                <div key={item.id} className={`rounded-2xl border p-3 ${item.id === venue ? "border-primary bg-primary/5" : "border-border bg-muted/20"}`}>
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="font-semibold">{item.label}</div>
-                    {item.id === "arcpay" ? <CheckCircle2 className="h-4 w-4 text-primary" /> : <Info className="h-4 w-4 text-muted-foreground" />}
-                  </div>
-                  <p className="mt-1 text-xs leading-5 text-muted-foreground">{item.note}</p>
-                </div>
-              ))}
+            <div className="mb-3 text-xs uppercase tracking-wider text-muted-foreground">Live route</div>
+            <div className="rounded-2xl border border-primary bg-primary/5 p-4">
+              <div className="flex items-center justify-between gap-2">
+                <div className="font-semibold">{LIVE_VENUE}</div>
+                <CheckCircle2 className="h-4 w-4 text-primary" />
+              </div>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                This is the only swap path exposed in ArcPay today because it can quote from-chain, open the wallet, sign, confirm, and save a Somnia tx hash.
+              </p>
             </div>
           </div>
           <div className="rounded-3xl bg-surface-dark p-5 text-surface-dark-foreground">

@@ -55,13 +55,14 @@ export async function POST(request: Request) {
 }
 
 function normalizePayload(body: Record<string, unknown>): BetaPayload {
+  const email = clean(body.email, 180).toLowerCase();
   return {
-    name: clean(body.name, 120),
-    email: clean(body.email, 180).toLowerCase(),
+    name: clean(body.name, 120) || email.split("@")[0] || "ArcPay beta user",
+    email,
     telegram: clean(body.telegram, 80),
     walletAddress: clean(body.walletAddress, 80),
-    role: clean(body.role, 80),
-    useCase: clean(body.useCase, 1500),
+    role: clean(body.role, 80) || "Community beta waitlist",
+    useCase: clean(body.useCase, 1500) || "Wants beta access to create agents, complete quests, and test ArcPay on Somnia.",
     agentUrl: clean(body.agentUrl, 300),
     inviteCode: clean(body.inviteCode, 80).toUpperCase(),
     referralSource: clean(body.referralSource, 180),
@@ -71,9 +72,7 @@ function normalizePayload(body: Record<string, unknown>): BetaPayload {
 
 function validatePayload(payload: BetaPayload) {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(payload.email)) return "valid_email_required";
-  if (!payload.name) return "name_required";
-  if (!payload.role) return "role_required";
-  if (payload.useCase.length < 20) return "use_case_min_20_chars";
+  if (payload.walletAddress && !/^0x[a-fA-F0-9]{40}$/.test(payload.walletAddress)) return "valid_wallet_or_blank_required";
   return "";
 }
 

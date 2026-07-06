@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Contract, parseEther } from "ethers";
-import { Bot, CheckCircle2, Coins, ExternalLink, Loader2, ShieldCheck, TrendingUp, WalletCards, Workflow } from "lucide-react";
+import { CheckCircle2, Coins, ExternalLink, Loader2, ShieldCheck, TrendingUp, WalletCards, Workflow } from "lucide-react";
 import { PageHeader } from "@/components/app/PageHeader";
 import { ReviewModal } from "@/components/primitives/ReviewModal";
 import { StatCard } from "@/components/primitives/StatCard";
@@ -26,14 +26,9 @@ export const Route = { options: { component: YieldRoute } };
 
 const STRATEGIES = [
   { id: "arcpay-vault", name: "ArcPay STT yield vault", asset: "STT", live: true, risk: "Live testnet vault deposit/withdraw with tx hash proof." },
-  { id: "dreamdex-maker", name: "dreamDEX maker yield", asset: "SOMUSD", live: false, risk: "CLOB maker inventory, price drift, cancellation discipline." },
-  { id: "somnia-exchange-lp", name: "Somnia Exchange LP", asset: "STT/SOMUSD", live: false, risk: "Pool depth, impermanent loss, router evidence." },
-  { id: "somnex", name: "Somnex liquidity strategy", asset: "STT", live: false, risk: "Venue liquidity and position risk evidence." },
-  { id: "potion", name: "Potion Swap LP", asset: "testnet pair", live: false, risk: "Experimental pool/router addresses required." },
 ] as const;
 
 function YieldRoute() {
-  const [strategy, setStrategy] = useState<(typeof STRATEGIES)[number]["id"]>("arcpay-vault");
   const [amount, setAmount] = useState("0.01");
   const [mode, setMode] = useState<"deposit" | "withdraw">("deposit");
   const [reviewOpen, setReviewOpen] = useState(false);
@@ -44,7 +39,7 @@ function YieldRoute() {
   const [totalDeposits, setTotalDeposits] = useState<bigint>(0n);
   const [apyBps, setApyBps] = useState(BigInt(SOMNIA_YIELD_APY_BPS));
 
-  const active = STRATEGIES.find((item) => item.id === strategy) ?? STRATEGIES[0];
+  const active = STRATEGIES[0];
   const num = Number.parseFloat(amount) || 0;
   const projectedDay = num * (Number(apyBps) / 10000) / 365;
 
@@ -70,11 +65,6 @@ function YieldRoute() {
   }, []);
 
   async function signYieldAction() {
-    if (!active.live) {
-      const text = `${active.name} needs public router/pool details before direct live signing. Use ArcPay STT yield vault for executable proof now.`;
-      setMessage(text);
-      throw new Error(text);
-    }
     if (num <= 0) {
       setMessage("Enter an amount greater than zero.");
       throw new Error("Enter an amount greater than zero.");
@@ -105,7 +95,7 @@ function YieldRoute() {
       await tx.wait();
       writeRecord({
         id: tx.hash,
-        type: "tx",
+        type: "yield",
         title: `${mode === "deposit" ? "Yield deposit" : "Yield withdrawal"} ${amount} STT`,
         amount: `${amount} STT`,
         status: mode === "deposit" ? "yield_deposit_confirmed" : "yield_withdraw_confirmed",
@@ -133,7 +123,7 @@ function YieldRoute() {
         icon={TrendingUp}
         eyebrow="Treasury execution"
         title="Yield"
-        description="Deposit or withdraw STT through a live ArcPay Somnia yield vault, while keeping external venue strategies as evidence-gated adapters."
+        description="Deposit or withdraw STT through the live ArcPay Somnia yield vault and capture explorer-verifiable tx proof."
         actions={
           <a href={addressUrl(SOMNIA_YIELD_VAULT_ADDRESS)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold">
             Vault <ExternalLink className="h-4 w-4" />
@@ -164,9 +154,9 @@ function YieldRoute() {
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <label className="block">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Strategy</span>
-              <select value={strategy} onChange={(event) => setStrategy(event.target.value as typeof strategy)} className="mt-1.5 h-12 w-full rounded-xl border border-border bg-background px-3">
-                {STRATEGIES.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-              </select>
+              <div className="mt-1.5 flex h-12 items-center rounded-xl border border-border bg-muted/50 px-3 text-sm font-semibold">
+                {active.name}
+              </div>
             </label>
             <label className="block">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Amount</span>
@@ -182,7 +172,7 @@ function YieldRoute() {
             ))}
           </div>
 
-          <div className={`mt-5 rounded-2xl border px-4 py-3 text-sm ${message.toLowerCase().includes("needs public") ? "border-warning/30 bg-warning/10 text-warning-foreground" : "border-border bg-muted/40 text-muted-foreground"}`}>
+          <div className="mt-5 rounded-2xl border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-2">
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
               {message}
@@ -202,16 +192,18 @@ function YieldRoute() {
         <aside className="space-y-3 lg:col-span-2">
           <div className="rounded-3xl border border-border bg-card p-5">
             <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
-              <Workflow className="h-4 w-4" /> Strategy adapters
+              <Workflow className="h-4 w-4" /> Live strategy
             </div>
             <div className="mt-4 space-y-2">
               {STRATEGIES.map((item) => (
-                <article key={item.id} className={`rounded-2xl border p-4 ${item.id === strategy ? "border-primary bg-primary/5" : "border-border bg-muted/20"}`}>
+                <article key={item.id} className="rounded-2xl border border-primary bg-primary/5 p-4">
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="font-semibold">{item.name}</h3>
-                    {item.live ? <CheckCircle2 className="h-4 w-4 text-primary" /> : <Bot className="h-4 w-4 text-muted-foreground" />}
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
                   </div>
-                  <p className="mt-1 text-xs leading-5 text-muted-foreground">{item.risk}</p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    {item.risk} External yield venues are not shown here until they support a direct wallet-signed testnet route with verifiable tx evidence.
+                  </p>
                 </article>
               ))}
             </div>
@@ -236,10 +228,10 @@ function YieldRoute() {
         description={active.name}
         rows={rows}
         warnings={[
-          active.live ? "Your wallet will sign a real Somnia Testnet vault transaction." : "This external strategy is adapter-ready but not directly executable until router/pool details are provided.",
+          "Your wallet will sign a real Somnia Testnet vault transaction.",
           "ArcPay only marks yield complete when a tx hash and refreshed vault state exist.",
         ]}
-        confirmLabel={active.live ? `Sign ${mode}` : "Adapter only"}
+        confirmLabel={`Sign ${mode}`}
         onConfirm={signYieldAction}
       />
     </div>

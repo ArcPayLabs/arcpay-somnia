@@ -38,44 +38,18 @@ const somniaDefiAdapters = [
     contract: deployment.contracts.SomniaYieldVault,
     requiredEvidence: ["policy check", "wallet signature", "Somnia tx hash", "vault balance refresh"],
   },
-  {
-    name: "dreamDEX CLOB",
-    category: "onchain-clob",
-    execution: "REST/CLI market discovery plus wallet-signed Somnia transaction",
-    url: "https://docs.dreamdex.io/ld25g222WKDrLlJMcR41",
-    apiDocs: "https://docs.dreamdex.io/ld25g222WKDrLlJMcR41/developers/http-api.md",
-    contractDocs: "https://docs.dreamdex.io/ld25g222WKDrLlJMcR41/developers/contracts.md",
-    requiredEvidence: ["market quote", "pool address", "signed order transaction hash", "order/fill status", "before/after balance"],
-  },
-  {
-    name: "Somnia Exchange",
-    category: "swap",
-    execution: "wallet-signed route execution",
-    url: "https://somnia.exchange",
-    requiredEvidence: ["quote", "wallet simulation", "transaction hash", "before/after balance"],
-  },
-  {
-    name: "Somnex",
-    category: "aggregator-liquidity-perps",
-    execution: "agent-prepared route or strategy intent",
-    url: "https://somnex.xyz",
-    requiredEvidence: ["venue quote", "position/risk summary", "transaction hash", "risk snapshot"],
-  },
-  {
-    name: "Potion Swap",
-    category: "testnet-dex",
-    execution: "manual signer or agent handoff",
-    url: "https://potion-swap.xyz",
-    requiredEvidence: ["quote screenshot", "pool route", "transaction hash"],
-  },
-  {
-    name: "Custom Somnia DEX adapter",
-    category: "builder-router",
-    execution: "contract adapter based on Somnia DEX tutorial",
-    url: "https://docs.somnia.network/developer/how-to-guides/advanced/build-a-dex-on-somnia",
-    requiredEvidence: ["adapter address", "quote response", "fill transaction hash"],
-  },
 ];
+
+const removedExternalDefiVenues = [
+  "dreamDEX",
+  "Somnia Exchange",
+  "Somnex",
+  "Potion Swap",
+].map((name) => ({
+  name,
+  state: "not-exposed-in-product",
+  reason: "ArcPay only exposes routes that can quote, open the wallet, sign, confirm, and save a Somnia Testnet tx hash today.",
+}));
 
 const somniaAgents = {
   network,
@@ -158,7 +132,7 @@ export const developerTools: ToolDefinition[] = [
   },
   {
     name: "somnia_defi_adapters",
-    description: "Return Somnia swap, liquidity, and yield adapter candidates with required audit evidence.",
+    description: "Return live Somnia swap and yield routes that ArcPay can execute with wallet-signed tx proof today.",
     inputSchema: { type: "object", properties: {} },
   },
   {
@@ -229,12 +203,12 @@ export async function runDeveloperTool(name: string, args: Record<string, unknow
       return json({
         network,
         adapters: somniaDefiAdapters,
+        removedExternalVenues: removedExternalDefiVenues,
         policy: [
-        "ArcPay Testnet Router and ArcPay STT Yield Vault are live wallet-signed execution routes.",
-        "External venue adapters may not mark execution complete without a Somnia tx hash or venue response.",
-          "dreamDEX integration must use documented market discovery plus wallet-signed order/vault transactions; HTTP API alone is not execution proof.",
+          "ArcPay Testnet Router and ArcPay STT Yield Vault are the only live wallet-signed DeFi routes exposed in the product.",
+          "External venue names are not selectable in the UI until they provide a direct testnet route with tx proof.",
           "Every route must carry max slippage, executor, asset pair, and before/after balance evidence.",
-          "Yield and LP intents must record drawdown limits and risk notes before wallet signing.",
+          "Yield completion requires a vault transaction hash and refreshed vault balance.",
         ],
       });
     case "somnia_agents":
