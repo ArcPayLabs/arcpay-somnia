@@ -1,21 +1,48 @@
 "use client";
 
 import Link from "next/link";
-import { Bot, CreditCard, EyeOff, RadioTower, Rocket, Trophy, WalletCards } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Bot, CheckCircle2, CreditCard, EyeOff, RadioTower, RefreshCw, Rocket, Trophy, WalletCards } from "lucide-react";
 import { PageHeader } from "@/components/app/PageHeader";
+import { fetchRecords, shortAddress, type LocalRecord } from "@somnia/lib/somnia";
 
 export const Route = { options: { component: QuestsRoute } };
 
-const QUESTS = [
-  { title: "Enter Somnia beta", body: "Connect your wallet and create an ArcPay workspace.", points: 50, href: "/wallet", icon: Rocket },
-  { title: "Launch your first agent", body: "Pick a template, add an endpoint, and publish your agent profile.", points: 250, href: "/launch-agent", icon: Bot },
-  { title: "Get paid for work", body: "Create an x402 paid task and save the order proof.", points: 300, href: "/x402", icon: RadioTower },
-  { title: "Issue an agent card", body: "Create a SOMUSD budget card for a controlled agent spend flow.", points: 200, href: "/cards", icon: CreditCard },
-  { title: "Add private proof", body: "Create a privacy intent with encrypted memo details.", points: 200, href: "/privacy", icon: EyeOff },
-  { title: "Complete a trading proof", body: "Run a swap or yield proof and keep the tx evidence.", points: 250, href: "/swaps", icon: WalletCards },
+const QUESTS: Quest[] = [
+  { id: "wallet", title: "Enter Somnia beta", body: "Connect your wallet and create an ArcPay workspace.", points: 50, href: "/wallet", icon: Rocket, types: [] },
+  { id: "agent", title: "Launch your first agent", body: "Pick a template, add an endpoint, and publish your agent profile.", points: 250, href: "/launch-agent", icon: Bot, types: ["agent"] },
+  { id: "x402", title: "Get paid for work", body: "Create an x402 paid task and save the order proof.", points: 300, href: "/x402", icon: RadioTower, types: ["x402", "order"] },
+  { id: "card", title: "Issue an agent card", body: "Create a SOMUSD budget card for a controlled agent spend flow.", points: 200, href: "/cards", icon: CreditCard, types: ["card"] },
+  { id: "privacy", title: "Add private proof", body: "Create a privacy intent with encrypted memo details.", points: 200, href: "/privacy", icon: EyeOff, types: ["privacy", "viewing-key"] },
+  { id: "trading", title: "Complete a trading proof", body: "Run a swap or yield proof and keep the tx evidence.", points: 250, href: "/swaps", icon: WalletCards, types: ["swap", "yield"] },
 ];
 
 function QuestsRoute() {
+  const [records, setRecords] = useState<LocalRecord[]>([]);
+  const [wallet, setWallet] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  async function refresh() {
+    setLoading(true);
+    setWallet(window.localStorage.getItem("arcpay-somnia-wallet-session") ?? "");
+    setRecords(await fetchRecords());
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    void refresh();
+  }, []);
+
+  const questState = useMemo(() => {
+    const completed = new Set<string>();
+    if (wallet) completed.add("wallet");
+    for (const quest of QUESTS) {
+      if (quest.types.some((type) => records.some((record) => record.type.toLowerCase() === type))) completed.add(quest.id);
+    }
+    const points = QUESTS.reduce((sum, quest) => sum + (completed.has(quest.id) ? quest.points : 0), 0);
+    return { completed, points };
+  }, [records, wallet]);
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -23,11 +50,17 @@ function QuestsRoute() {
         eyebrow="Community beta"
         title="Quests"
         description="Complete useful Somnia Testnet actions, collect proof, and earn ArcPay beta points."
-        actions={<Link href="/leaderboard" className="rounded-full bg-foreground px-4 py-2.5 text-sm font-semibold text-background">View leaderboard</Link>}
+        actions={<div className="flex flex-wrap gap-2">
+          <button type="button" onClick={() => void refresh()} className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2.5 text-sm font-semibold">
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh proof
+          </button>
+          <Link href="/leaderboard" className="rounded-full bg-foreground px-4 py-2.5 text-sm font-semibold text-background">View leaderboard</Link>
+        </div>}
       />
 
       <section className="overflow-hidden rounded-[2rem] border border-border bg-[linear-gradient(135deg,#ffffff_0%,#f7fbff_55%,#edf7ff_100%)] p-6 shadow-sm md:p-8">
-        <div className="max-w-3xl">
+        <div className="grid gap-6 lg:grid-cols-[1fr_18rem] lg:items-end">
+          <div className="max-w-3xl">
           <div className="inline-flex rounded-full border border-border bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             Wave 1 missions
           </div>
@@ -37,22 +70,57 @@ function QuestsRoute() {
           <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
             Points are earned from actions that matter: launching agents, creating paid tasks, issuing cards, building private proof, and producing transaction evidence on Somnia Testnet.
           </p>
+          </div>
+          <div className="rounded-3xl border border-border bg-white p-5 shadow-sm">
+            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Your beta points</div>
+            <div className="mt-2 text-5xl font-semibold tracking-[-0.05em]">{questState.points}</div>
+            <div className="mt-2 text-sm text-muted-foreground">
+              {wallet ? `Wallet ${shortAddress(wallet)}` : "Connect a wallet to start."}
+            </div>
+          </div>
         </div>
       </section>
 
       <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {QUESTS.map((quest) => (
-          <Link key={quest.title} href={quest.href} className="group rounded-3xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-lg">
+        {QUESTS.map((quest) => {
+          const complete = questState.completed.has(quest.id);
+          const evidence = evidenceForQuest(quest, records, wallet);
+          return (
+          <Link key={quest.title} href={quest.href} className={`group rounded-3xl border p-5 transition hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-lg ${complete ? "border-primary/30 bg-primary/5" : "border-border bg-card"}`}>
             <div className="flex items-start justify-between gap-4">
               <span className="rounded-2xl bg-primary/10 p-3 text-primary"><quest.icon className="h-5 w-5" /></span>
-              <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold">{quest.points} pts</span>
+              <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${complete ? "bg-success/10 text-success" : "bg-muted"}`}>
+                {complete ? <CheckCircle2 className="h-3.5 w-3.5" /> : null}
+                {complete ? "Done" : `${quest.points} pts`}
+              </span>
             </div>
             <h3 className="mt-5 text-xl font-semibold tracking-tight">{quest.title}</h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">{quest.body}</p>
-            <div className="mt-5 text-sm font-semibold text-primary">Start quest</div>
+            <div className="mt-4 rounded-2xl bg-background px-3 py-2 text-xs text-muted-foreground">
+              {complete ? evidence : "Not complete yet. Start the quest and refresh proof after the transaction or record is saved."}
+            </div>
+            <div className="mt-5 text-sm font-semibold text-primary">{complete ? "Review proof" : "Start quest"}</div>
           </Link>
-        ))}
+          );
+        })}
       </section>
     </div>
   );
+}
+
+type Quest = {
+  id: string;
+  title: string;
+  body: string;
+  points: number;
+  href: string;
+  icon: typeof Rocket;
+  types: string[];
+};
+
+function evidenceForQuest(quest: Quest, records: LocalRecord[], wallet: string) {
+  if (quest.id === "wallet") return wallet ? `Connected wallet ${shortAddress(wallet)}.` : "Wallet not connected.";
+  const record = records.find((item) => quest.types.includes(item.type.toLowerCase()));
+  if (!record) return "Waiting for evidence.";
+  return `${record.title}${record.txHash ? ` - tx ${shortAddress(record.txHash)}` : ""}`;
 }

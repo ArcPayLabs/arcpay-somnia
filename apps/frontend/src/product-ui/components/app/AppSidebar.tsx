@@ -21,7 +21,9 @@ import {
   Activity,
   ShieldCheck,
   Rocket,
+  Wrench,
 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -62,13 +64,49 @@ const ITEMS = [
   { title: "Status", url: "/status", icon: Activity, networks: ["somnia"] },
 ] as const;
 
+const COMMUNITY_URLS = new Set([
+  "/dashboard",
+  "/launch-agent",
+  "/quests",
+  "/leaderboard",
+  "/wallet",
+  "/agents",
+  "/x402",
+  "/cards",
+  "/swaps",
+  "/yield",
+  "/privacy",
+]);
+
+const COMMUNITY_MODE_KEY = "arcpay-somnia-community-mode";
+export const COMMUNITY_MODE_EVENT = "arcpay-somnia-community-mode-change";
+
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const path = useRouterState({ select: (r) => r.location.pathname });
   const network = useNetwork((s) => s.mode);
+  const [communityMode, setCommunityMode] = useState(true);
   const isActive = (url: string) => path === url || path.startsWith(url + "/");
-  const visibleItems = ITEMS.filter((item) => isEnabledForNetwork(item.networks, network));
+  const visibleItems = useMemo(() => ITEMS.filter((item) => {
+    if (!isEnabledForNetwork(item.networks, network)) return false;
+    return !communityMode || COMMUNITY_URLS.has(item.url);
+  }), [communityMode, network]);
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem(COMMUNITY_MODE_KEY);
+    setCommunityMode(stored !== "off");
+    const sync = () => setCommunityMode(window.localStorage.getItem(COMMUNITY_MODE_KEY) !== "off");
+    window.addEventListener(COMMUNITY_MODE_EVENT, sync);
+    return () => window.removeEventListener(COMMUNITY_MODE_EVENT, sync);
+  }, []);
+
+  function toggleMode() {
+    const next = !communityMode;
+    setCommunityMode(next);
+    window.localStorage.setItem(COMMUNITY_MODE_KEY, next ? "on" : "off");
+    window.dispatchEvent(new Event(COMMUNITY_MODE_EVENT));
+  }
 
   return (
     <Sidebar collapsible="icon">
@@ -101,9 +139,15 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          {!collapsed && <SidebarGroupLabel>Workspace</SidebarGroupLabel>}
+          {!collapsed && <SidebarGroupLabel>{communityMode ? "Demo mode" : "Workspace"}</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton tooltip={communityMode ? "Show full console" : "Show community mode"} onClick={toggleMode}>
+                  <Wrench className="h-4 w-4 shrink-0" />
+                  {!collapsed && <span>{communityMode ? "Show full console" : "Community mode"}</span>}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={isActive("/settings")} tooltip="Settings">
                   <Link to="/settings" className="flex items-center gap-2">

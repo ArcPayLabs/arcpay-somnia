@@ -1,27 +1,45 @@
 "use client";
 
 import Link from "next/link";
-import { Bot, Crown, RadioTower, Rocket, Trophy, Users } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Bot, Crown, RadioTower, RefreshCw, Rocket, Trophy, Users } from "lucide-react";
 import { PageHeader } from "@/components/app/PageHeader";
+import { fetchRecords, shortAddress, type LocalRecord } from "@somnia/lib/somnia";
 
 export const Route = { options: { component: LeaderboardRoute } };
 
-const BOARDS = [
-  { title: "Top Operators", icon: Crown, rows: [["0xB883...f448", "1,850"], ["Research DAO", "1,250"], ["Strategy desk", "980"]] },
-  { title: "Top Agents", icon: Bot, rows: [["research-agent", "920"], ["market-scout", "760"], ["invoice-bot", "610"]] },
-  { title: "x402 Builders", icon: RadioTower, rows: [["paid-research", "14 calls"], ["data-checker", "9 calls"], ["risk-reader", "7 calls"]] },
-  { title: "Beta Teams", icon: Users, rows: [["Somnia traders", "5 proofs"], ["Agent studio", "3 agents"], ["Builder guild", "2 endpoints"]] },
-];
-
 function LeaderboardRoute() {
+  const [records, setRecords] = useState<LocalRecord[]>([]);
+  const [wallet, setWallet] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  async function refresh() {
+    setLoading(true);
+    setWallet(window.localStorage.getItem("arcpay-somnia-wallet-session") ?? "");
+    setRecords(await fetchRecords());
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    void refresh();
+  }, []);
+
+  const boards = useMemo(() => buildBoards(records, wallet), [records, wallet]);
+  const totalPoints = boards[0]?.rows[0]?.score ?? "0";
+
   return (
     <div className="space-y-6">
       <PageHeader
         icon={Trophy}
         eyebrow="Community beta"
         title="Leaderboard"
-        description="A preview of the ArcPay beta ranking system for operators, agents, builders, and teams."
-        actions={<Link href="/quests" className="rounded-full bg-foreground px-4 py-2.5 text-sm font-semibold text-background">Complete quests</Link>}
+        description="Live beta ranking for connected operators, agent launches, paid work, and proof records."
+        actions={<div className="flex flex-wrap gap-2">
+          <button type="button" onClick={() => void refresh()} className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2.5 text-sm font-semibold">
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh
+          </button>
+          <Link href="/quests" className="rounded-full bg-foreground px-4 py-2.5 text-sm font-semibold text-background">Complete quests</Link>
+        </div>}
       />
 
       <section className="rounded-[2rem] border border-border bg-[radial-gradient(circle_at_10%_10%,rgba(34,197,94,0.10),transparent_30%),linear-gradient(135deg,#ffffff_0%,#f8fafc_100%)] p-6 shadow-sm md:p-8">
@@ -34,29 +52,33 @@ function LeaderboardRoute() {
               Reward real Somnia activity, not empty clicks.
             </h2>
             <p className="mt-4 text-sm leading-6 text-muted-foreground md:text-base">
-              The production leaderboard will rank users by verified actions: agent launches, x402 orders, card events, privacy proofs, swap/yield evidence, and builder referrals.
+              This board reads the current workspace records and scores verified actions: connected wallet, agent launches, x402 orders, card events, privacy proofs, and trading evidence.
             </p>
           </div>
           <div className="rounded-3xl border border-border bg-white p-5 text-center shadow-sm">
-            <div className="text-4xl font-semibold tracking-tight">50</div>
-            <div className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Wave 1 seats</div>
+            <div className="text-4xl font-semibold tracking-tight">{totalPoints}</div>
+            <div className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">your points</div>
+            <div className="mt-2 text-xs text-muted-foreground">{wallet ? shortAddress(wallet) : "connect wallet"}</div>
           </div>
         </div>
       </section>
 
       <section className="grid gap-3 lg:grid-cols-2">
-        {BOARDS.map((board) => (
+        {boards.map((board) => (
           <div key={board.title} className="rounded-3xl border border-border bg-card p-5">
             <div className="flex items-center gap-3">
               <span className="rounded-2xl bg-primary/10 p-3 text-primary"><board.icon className="h-5 w-5" /></span>
               <h3 className="text-xl font-semibold tracking-tight">{board.title}</h3>
             </div>
             <div className="mt-5 space-y-2">
-              {board.rows.map(([name, score], index) => (
+              {board.rows.map(({ name, score, hint }, index) => (
                 <div key={name} className="flex items-center justify-between rounded-2xl bg-muted/45 px-4 py-3">
                   <div className="flex items-center gap-3">
                     <span className="flex h-8 w-8 items-center justify-center rounded-full bg-background text-sm font-bold">{index + 1}</span>
-                    <span className="font-medium">{name}</span>
+                    <span>
+                      <span className="block font-medium">{name}</span>
+                      {hint ? <span className="block text-xs text-muted-foreground">{hint}</span> : null}
+                    </span>
                   </div>
                   <span className="text-sm font-semibold text-primary">{score}</span>
                 </div>
@@ -67,4 +89,54 @@ function LeaderboardRoute() {
       </section>
     </div>
   );
+}
+
+type Board = {
+  title: string;
+  icon: typeof Crown;
+  rows: Array<{ name: string; score: string; hint?: string }>;
+};
+
+function buildBoards(records: LocalRecord[], wallet: string): Board[] {
+  const points = scoreRecords(records, wallet);
+  const agentRows = rowsForType(records, ["agent"], "No agents yet");
+  const x402Rows = rowsForType(records, ["x402", "order"], "No paid work yet");
+  const proofRows = rowsForType(records, ["privacy", "card", "swap", "yield", "oracle", "reputation"], "No proof records yet");
+
+  return [
+    {
+      title: "Top Operators",
+      icon: Crown,
+      rows: [{ name: wallet ? shortAddress(wallet) : "Connect wallet", score: String(points), hint: `${records.length} workspace records` }],
+    },
+    { title: "Top Agents", icon: Bot, rows: agentRows },
+    { title: "x402 Builders", icon: RadioTower, rows: x402Rows },
+    { title: "Proof Makers", icon: Users, rows: proofRows },
+  ];
+}
+
+function rowsForType(records: LocalRecord[], types: string[], empty: string) {
+  const rows = records
+    .filter((record) => types.includes(record.type.toLowerCase()))
+    .slice(0, 3)
+    .map((record) => ({
+      name: record.title.replace(/^Registered\s+/i, "").slice(0, 32),
+      score: record.txHash ? "verified" : record.status,
+      hint: record.txHash ? shortAddress(record.txHash) : record.type,
+    }));
+  return rows.length ? rows : [{ name: empty, score: "0", hint: "Complete quests to appear here" }];
+}
+
+function scoreRecords(records: LocalRecord[], wallet: string) {
+  let score = wallet ? 50 : 0;
+  for (const record of records) {
+    const type = record.type.toLowerCase();
+    if (type === "agent") score += 250;
+    else if (type === "x402" || type === "order") score += 300;
+    else if (type === "card") score += 200;
+    else if (type === "privacy" || type === "viewing-key") score += 200;
+    else if (type === "swap" || type === "yield") score += 250;
+    else score += 25;
+  }
+  return score;
 }

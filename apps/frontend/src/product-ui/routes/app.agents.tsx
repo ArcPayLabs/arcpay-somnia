@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bot, CheckCircle2, Copy, DatabaseZap, ExternalLink, PlugZap, Plus, ReceiptText, Sparkles, Workflow } from "lucide-react";
 import { ActionDrawer } from "@/components/primitives/ActionDrawer";
 import { AsyncButton } from "@/components/primitives/AsyncButton";
@@ -28,6 +28,15 @@ function AgentsRoute() {
 
   const agentId = agentIdFromSlug(form.slug);
   const protectedUrl = `https://x402.20.208.46.195.nip.io/agent/${encodeURIComponent(form.slug)}/work`;
+
+  useEffect(() => {
+    const slug = new URLSearchParams(window.location.search).get("template");
+    const selected = AGENT_TEMPLATES.find((item) => item.slug === slug);
+    if (selected) {
+      applyTemplate(selected);
+      setDrawerOpen(true);
+    }
+  }, []);
 
   async function registerAgent() {
     const validation = validateAgentForm(form);
@@ -324,6 +333,46 @@ const AGENT_TEMPLATES = [
     capabilities: "real-time-routing, policy-checks, x402-quotes",
     price: "0.005",
     description: "Somnia-speed payment coordinator for route intents, x402 quotes, and policy-safe execution plans.",
+  },
+  {
+    slug: "trading-agent",
+    name: "Trading Assistant",
+    endpoint: "https://example.com/somnia-agent/trading",
+    capabilities: "market-alerts, route-planning, risk-checks",
+    price: "0.006",
+    description: "Budget-controlled trading helper for swap, yield, and risk proof flows.",
+  },
+  {
+    slug: "market-data-agent",
+    name: "Market Data Agent",
+    endpoint: "https://example.com/somnia-agent/market-data",
+    capabilities: "price-data, alerts, json-api-receipts",
+    price: "0.004",
+    description: "Paid data endpoint for prices, alerts, API checks, and market summaries.",
+  },
+  {
+    slug: "invoice-agent",
+    name: "Invoice Agent",
+    endpoint: "https://example.com/somnia-agent/invoices",
+    capabilities: "client-billing, invoice-review, settlement-proof",
+    price: "0.005",
+    description: "Agent service for billing, payment requests, and settlement evidence.",
+  },
+  {
+    slug: "risk-agent",
+    name: "Risk Checker",
+    endpoint: "https://example.com/somnia-agent/risk",
+    capabilities: "wallet-risk, policy-checks, spend-review",
+    price: "0.005",
+    description: "Reviews wallets, routes, and agent actions before spend is approved.",
+  },
+  {
+    slug: "community-agent",
+    name: "Community Helper",
+    endpoint: "https://example.com/somnia-agent/community",
+    capabilities: "onboarding, faq, quest-guidance",
+    price: "0.003",
+    description: "Answers FAQs, routes tasks, and helps users onboard into Somnia.",
   },
   {
     slug: "privacy-agent",

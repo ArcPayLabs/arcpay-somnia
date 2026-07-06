@@ -15,6 +15,7 @@ import { getOptionalSupabaseClient } from "../../../app/supabase-client";
 import { useWalletConnectAction } from "@/hooks/use-wallet-connect-action";
 import { ensureCurrentUserAccount } from "@/lib/account";
 import { activateWorkspace, createWorkspace as createCloudWorkspace, loadCachedWorkspaces, loadWorkspaces, type WorkspaceRecord } from "@/lib/workspaces";
+import { COMMUNITY_MODE_EVENT } from "@/components/app/AppSidebar";
 
 const QUICK_NAV = [
   { label: "Overview", to: "/dashboard" },
@@ -38,6 +39,9 @@ const QUICK_NAV = [
   { label: "Settings", to: "/settings" },
 ];
 
+const COMMUNITY_NAV = new Set(["/dashboard", "/launch-agent", "/quests", "/leaderboard", "/wallet", "/agents", "/x402", "/cards", "/swaps", "/yield", "/privacy", "/settings"]);
+const COMMUNITY_MODE_KEY = "arcpay-somnia-community-mode";
+
 const NETWORK = "somnia" as const;
 
 export function AppTopBar() {
@@ -49,6 +53,7 @@ export function AppTopBar() {
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
   const [workspaceDraft, setWorkspaceDraft] = useState("Somnia agent treasury");
   const [workspaceMessage, setWorkspaceMessage] = useState("");
+  const [communityMode, setCommunityMode] = useState(true);
   const walletAction = useWalletConnectAction();
 
   useEffect(() => {
@@ -96,6 +101,15 @@ export function AppTopBar() {
       listener.subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    const sync = () => setCommunityMode(window.localStorage.getItem(COMMUNITY_MODE_KEY) !== "off");
+    sync();
+    window.addEventListener(COMMUNITY_MODE_EVENT, sync);
+    return () => window.removeEventListener(COMMUNITY_MODE_EVENT, sync);
+  }, []);
+
+  const quickNav = QUICK_NAV.filter((item) => !communityMode || COMMUNITY_NAV.has(item.to));
 
   async function signOut() {
     const supabase = getOptionalSupabaseClient();
@@ -219,7 +233,7 @@ export function AppTopBar() {
           <div className="absolute right-0 top-11 z-40 w-80 overflow-hidden rounded-2xl border border-border bg-popover p-2 shadow-xl">
             <div className="px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Navigation</div>
             <div className="grid max-h-[420px] gap-1 overflow-y-auto">
-              {QUICK_NAV.map((item) => (
+              {quickNav.map((item) => (
                 <Link key={item.to} to={item.to} className="rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-muted">
                   {item.label}
                 </Link>
