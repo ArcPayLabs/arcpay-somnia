@@ -4,18 +4,19 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Bot, CheckCircle2, CreditCard, EyeOff, RadioTower, RefreshCw, Rocket, Trophy, WalletCards } from "lucide-react";
 import { PageHeader } from "@/components/app/PageHeader";
+import { QUEST_RULES, questEvidence, questProgress, type QuestRule } from "@/lib/community-beta";
 import { fetchRecords, shortAddress, type LocalRecord } from "@somnia/lib/somnia";
 
 export const Route = { options: { component: QuestsRoute } };
 
-const QUESTS: Quest[] = [
-  { id: "wallet", title: "Enter Somnia beta", body: "Connect your wallet and create an ArcPay workspace.", points: 50, href: "/wallet", icon: Rocket, types: [] },
-  { id: "agent", title: "Launch your first agent", body: "Pick a template, add an endpoint, and publish your agent profile.", points: 250, href: "/launch-agent", icon: Bot, types: ["agent"] },
-  { id: "x402", title: "Get paid for work", body: "Create an x402 paid task and save the order proof.", points: 300, href: "/x402", icon: RadioTower, types: ["x402", "order"] },
-  { id: "card", title: "Issue an agent card", body: "Create a SOMUSD budget card for a controlled agent spend flow.", points: 200, href: "/cards", icon: CreditCard, types: ["card"] },
-  { id: "privacy", title: "Add private proof", body: "Create a privacy intent with encrypted memo details.", points: 200, href: "/privacy", icon: EyeOff, types: ["privacy", "viewing-key"] },
-  { id: "trading", title: "Complete a trading proof", body: "Run a swap or yield proof and keep the tx evidence.", points: 250, href: "/swaps", icon: WalletCards, types: ["swap", "yield"] },
-];
+const QUEST_ICONS: Record<QuestRule["id"], typeof Rocket> = {
+  wallet: Rocket,
+  agent: Bot,
+  x402: RadioTower,
+  card: CreditCard,
+  privacy: EyeOff,
+  trading: WalletCards,
+};
 
 function QuestsRoute() {
   const [records, setRecords] = useState<LocalRecord[]>([]);
@@ -33,15 +34,7 @@ function QuestsRoute() {
     void refresh();
   }, []);
 
-  const questState = useMemo(() => {
-    const completed = new Set<string>();
-    if (wallet) completed.add("wallet");
-    for (const quest of QUESTS) {
-      if (quest.types.some((type) => records.some((record) => record.type.toLowerCase() === type))) completed.add(quest.id);
-    }
-    const points = QUESTS.reduce((sum, quest) => sum + (completed.has(quest.id) ? quest.points : 0), 0);
-    return { completed, points };
-  }, [records, wallet]);
+  const questState = useMemo(() => questProgress(records, wallet), [records, wallet]);
 
   return (
     <div className="space-y-6">
@@ -82,13 +75,14 @@ function QuestsRoute() {
       </section>
 
       <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {QUESTS.map((quest) => {
+        {QUEST_RULES.map((quest) => {
           const complete = questState.completed.has(quest.id);
-          const evidence = evidenceForQuest(quest, records, wallet);
+          const evidence = questEvidence(quest, records, wallet);
+          const Icon = QUEST_ICONS[quest.id];
           return (
           <Link key={quest.title} href={quest.href} className={`group rounded-3xl border p-5 transition hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-lg ${complete ? "border-primary/30 bg-primary/5" : "border-border bg-card"}`}>
             <div className="flex items-start justify-between gap-4">
-              <span className="rounded-2xl bg-primary/10 p-3 text-primary"><quest.icon className="h-5 w-5" /></span>
+              <span className="rounded-2xl bg-primary/10 p-3 text-primary"><Icon className="h-5 w-5" /></span>
               <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${complete ? "bg-success/10 text-success" : "bg-muted"}`}>
                 {complete ? <CheckCircle2 className="h-3.5 w-3.5" /> : null}
                 {complete ? "Done" : `${quest.points} pts`}
@@ -106,21 +100,4 @@ function QuestsRoute() {
       </section>
     </div>
   );
-}
-
-type Quest = {
-  id: string;
-  title: string;
-  body: string;
-  points: number;
-  href: string;
-  icon: typeof Rocket;
-  types: string[];
-};
-
-function evidenceForQuest(quest: Quest, records: LocalRecord[], wallet: string) {
-  if (quest.id === "wallet") return wallet ? `Connected wallet ${shortAddress(wallet)}.` : "Wallet not connected.";
-  const record = records.find((item) => quest.types.includes(item.type.toLowerCase()));
-  if (!record) return "Waiting for evidence.";
-  return `${record.title}${record.txHash ? ` - tx ${shortAddress(record.txHash)}` : ""}`;
 }

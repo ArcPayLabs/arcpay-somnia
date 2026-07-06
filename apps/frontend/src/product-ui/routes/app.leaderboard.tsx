@@ -4,9 +4,17 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Bot, Crown, RadioTower, RefreshCw, Rocket, Trophy, Users } from "lucide-react";
 import { PageHeader } from "@/components/app/PageHeader";
+import { buildCommunityLeaderboard } from "@/lib/community-beta";
 import { fetchRecords, shortAddress, type LocalRecord } from "@somnia/lib/somnia";
 
 export const Route = { options: { component: LeaderboardRoute } };
+
+const BOARD_ICONS = {
+  "Top Operators": Crown,
+  "Top Agents": Bot,
+  "x402 Builders": RadioTower,
+  "Proof Makers": Users,
+};
 
 function LeaderboardRoute() {
   const [records, setRecords] = useState<LocalRecord[]>([]);
@@ -24,7 +32,7 @@ function LeaderboardRoute() {
     void refresh();
   }, []);
 
-  const boards = useMemo(() => buildBoards(records, wallet), [records, wallet]);
+  const boards = useMemo(() => buildCommunityLeaderboard(records, wallet), [records, wallet]);
   const totalPoints = boards[0]?.rows[0]?.score ?? "0";
 
   return (
@@ -64,10 +72,12 @@ function LeaderboardRoute() {
       </section>
 
       <section className="grid gap-3 lg:grid-cols-2">
-        {boards.map((board) => (
+        {boards.map((board) => {
+          const Icon = BOARD_ICONS[board.title as keyof typeof BOARD_ICONS] ?? Trophy;
+          return (
           <div key={board.title} className="rounded-3xl border border-border bg-card p-5">
             <div className="flex items-center gap-3">
-              <span className="rounded-2xl bg-primary/10 p-3 text-primary"><board.icon className="h-5 w-5" /></span>
+              <span className="rounded-2xl bg-primary/10 p-3 text-primary"><Icon className="h-5 w-5" /></span>
               <h3 className="text-xl font-semibold tracking-tight">{board.title}</h3>
             </div>
             <div className="mt-5 space-y-2">
@@ -85,58 +95,9 @@ function LeaderboardRoute() {
               ))}
             </div>
           </div>
-        ))}
+          );
+        })}
       </section>
     </div>
   );
-}
-
-type Board = {
-  title: string;
-  icon: typeof Crown;
-  rows: Array<{ name: string; score: string; hint?: string }>;
-};
-
-function buildBoards(records: LocalRecord[], wallet: string): Board[] {
-  const points = scoreRecords(records, wallet);
-  const agentRows = rowsForType(records, ["agent"], "No agents yet");
-  const x402Rows = rowsForType(records, ["x402", "order"], "No paid work yet");
-  const proofRows = rowsForType(records, ["privacy", "card", "swap", "yield", "oracle", "reputation"], "No proof records yet");
-
-  return [
-    {
-      title: "Top Operators",
-      icon: Crown,
-      rows: [{ name: wallet ? shortAddress(wallet) : "Connect wallet", score: String(points), hint: `${records.length} workspace records` }],
-    },
-    { title: "Top Agents", icon: Bot, rows: agentRows },
-    { title: "x402 Builders", icon: RadioTower, rows: x402Rows },
-    { title: "Proof Makers", icon: Users, rows: proofRows },
-  ];
-}
-
-function rowsForType(records: LocalRecord[], types: string[], empty: string) {
-  const rows = records
-    .filter((record) => types.includes(record.type.toLowerCase()))
-    .slice(0, 3)
-    .map((record) => ({
-      name: record.title.replace(/^Registered\s+/i, "").slice(0, 32),
-      score: record.txHash ? "verified" : record.status,
-      hint: record.txHash ? shortAddress(record.txHash) : record.type,
-    }));
-  return rows.length ? rows : [{ name: empty, score: "0", hint: "Complete quests to appear here" }];
-}
-
-function scoreRecords(records: LocalRecord[], wallet: string) {
-  let score = wallet ? 50 : 0;
-  for (const record of records) {
-    const type = record.type.toLowerCase();
-    if (type === "agent") score += 250;
-    else if (type === "x402" || type === "order") score += 300;
-    else if (type === "card") score += 200;
-    else if (type === "privacy" || type === "viewing-key") score += 200;
-    else if (type === "swap" || type === "yield") score += 250;
-    else score += 25;
-  }
-  return score;
 }
