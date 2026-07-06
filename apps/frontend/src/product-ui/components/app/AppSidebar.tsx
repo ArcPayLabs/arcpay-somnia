@@ -38,6 +38,8 @@ import {
 } from "@/components/ui/sidebar";
 import { LogoIcon } from "@/components/brand/LogoIcon";
 import { useNetwork, type NetworkMode } from "@/store/network";
+import { useAdminAccess } from "@/hooks/use-admin-access";
+import { COMMUNITY_ROUTES } from "@/lib/app-routes";
 
 const ITEMS = [
   { title: "Overview", url: "/dashboard", icon: LayoutDashboard, networks: ["somnia"] },
@@ -64,20 +66,6 @@ const ITEMS = [
   { title: "Status", url: "/status", icon: Activity, networks: ["somnia"] },
 ] as const;
 
-const COMMUNITY_URLS = new Set([
-  "/dashboard",
-  "/launch-agent",
-  "/quests",
-  "/leaderboard",
-  "/wallet",
-  "/agents",
-  "/x402",
-  "/cards",
-  "/swaps",
-  "/yield",
-  "/privacy",
-]);
-
 const COMMUNITY_MODE_KEY = "arcpay-somnia-community-mode";
 export const COMMUNITY_MODE_EVENT = "arcpay-somnia-community-mode-change";
 
@@ -86,22 +74,25 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const path = useRouterState({ select: (r) => r.location.pathname });
   const network = useNetwork((s) => s.mode);
+  const admin = useAdminAccess();
   const [communityMode, setCommunityMode] = useState(true);
   const isActive = (url: string) => path === url || path.startsWith(url + "/");
+  const effectiveCommunityMode = !admin.admin || communityMode;
   const visibleItems = useMemo(() => ITEMS.filter((item) => {
     if (!isEnabledForNetwork(item.networks, network)) return false;
-    return !communityMode || COMMUNITY_URLS.has(item.url);
-  }), [communityMode, network]);
+    return !effectiveCommunityMode || COMMUNITY_ROUTES.has(item.url);
+  }), [effectiveCommunityMode, network]);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(COMMUNITY_MODE_KEY);
-    setCommunityMode(stored !== "off");
-    const sync = () => setCommunityMode(window.localStorage.getItem(COMMUNITY_MODE_KEY) !== "off");
+    setCommunityMode(admin.admin ? stored !== "off" : true);
+    const sync = () => setCommunityMode(admin.admin ? window.localStorage.getItem(COMMUNITY_MODE_KEY) !== "off" : true);
     window.addEventListener(COMMUNITY_MODE_EVENT, sync);
     return () => window.removeEventListener(COMMUNITY_MODE_EVENT, sync);
-  }, []);
+  }, [admin.admin]);
 
   function toggleMode() {
+    if (!admin.admin) return;
     const next = !communityMode;
     setCommunityMode(next);
     window.localStorage.setItem(COMMUNITY_MODE_KEY, next ? "on" : "off");
@@ -139,15 +130,17 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          {!collapsed && <SidebarGroupLabel>{communityMode ? "Demo mode" : "Workspace"}</SidebarGroupLabel>}
+          {!collapsed && <SidebarGroupLabel>{effectiveCommunityMode ? "Community mode" : "Workspace"}</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton tooltip={communityMode ? "Show full console" : "Show community mode"} onClick={toggleMode}>
-                  <Wrench className="h-4 w-4 shrink-0" />
-                  {!collapsed && <span>{communityMode ? "Show full console" : "Community mode"}</span>}
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              {admin.admin ? (
+                <SidebarMenuItem>
+                  <SidebarMenuButton tooltip={communityMode ? "Show full console" : "Show community mode"} onClick={toggleMode}>
+                    <Wrench className="h-4 w-4 shrink-0" />
+                    {!collapsed && <span>{communityMode ? "Show full console" : "Community mode"}</span>}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ) : null}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={isActive("/settings")} tooltip="Settings">
                   <Link to="/settings" className="flex items-center gap-2">

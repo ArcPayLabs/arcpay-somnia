@@ -16,6 +16,8 @@ import { useWalletConnectAction } from "@/hooks/use-wallet-connect-action";
 import { ensureCurrentUserAccount } from "@/lib/account";
 import { activateWorkspace, createWorkspace as createCloudWorkspace, loadCachedWorkspaces, loadWorkspaces, type WorkspaceRecord } from "@/lib/workspaces";
 import { COMMUNITY_MODE_EVENT } from "@/components/app/AppSidebar";
+import { useAdminAccess } from "@/hooks/use-admin-access";
+import { COMMUNITY_ROUTES } from "@/lib/app-routes";
 
 const QUICK_NAV = [
   { label: "Overview", to: "/dashboard" },
@@ -39,7 +41,6 @@ const QUICK_NAV = [
   { label: "Settings", to: "/settings" },
 ];
 
-const COMMUNITY_NAV = new Set(["/dashboard", "/launch-agent", "/quests", "/leaderboard", "/wallet", "/agents", "/x402", "/cards", "/swaps", "/yield", "/privacy", "/settings"]);
 const COMMUNITY_MODE_KEY = "arcpay-somnia-community-mode";
 
 const NETWORK = "somnia" as const;
@@ -55,6 +56,7 @@ export function AppTopBar() {
   const [workspaceMessage, setWorkspaceMessage] = useState("");
   const [communityMode, setCommunityMode] = useState(true);
   const walletAction = useWalletConnectAction();
+  const admin = useAdminAccess();
 
   useEffect(() => {
     const supabase = getOptionalSupabaseClient();
@@ -103,13 +105,14 @@ export function AppTopBar() {
   }, []);
 
   useEffect(() => {
-    const sync = () => setCommunityMode(window.localStorage.getItem(COMMUNITY_MODE_KEY) !== "off");
+    const sync = () => setCommunityMode(admin.admin ? window.localStorage.getItem(COMMUNITY_MODE_KEY) !== "off" : true);
     sync();
     window.addEventListener(COMMUNITY_MODE_EVENT, sync);
     return () => window.removeEventListener(COMMUNITY_MODE_EVENT, sync);
-  }, []);
+  }, [admin.admin]);
 
-  const quickNav = QUICK_NAV.filter((item) => !communityMode || COMMUNITY_NAV.has(item.to));
+  const effectiveCommunityMode = !admin.admin || communityMode;
+  const quickNav = QUICK_NAV.filter((item) => !effectiveCommunityMode || COMMUNITY_ROUTES.has(item.to));
 
   async function signOut() {
     const supabase = getOptionalSupabaseClient();
